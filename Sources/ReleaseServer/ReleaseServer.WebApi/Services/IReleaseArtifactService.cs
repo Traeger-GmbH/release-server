@@ -1,10 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 
-[assembly: InternalsVisibleTo("release_server_web_api_test")]
 namespace release_server_web_api.Services
 {
     public class FsReleaseArtifactService : IReleaseArtifactService
