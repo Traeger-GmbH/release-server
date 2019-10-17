@@ -16,7 +16,7 @@ namespace release_server_web_api_test
         }
         
         [Fact]
-        public void TestUploadingArtifact()
+        public void TestStoringArtifact()
         {
             //Setup
             var testFileMock = new Mock<IFormFile>();
@@ -29,7 +29,7 @@ namespace release_server_web_api_test
             var testPath = Path.Combine("./", "1.0", "amd64", "ubuntu");
 
             //Act
-            FsReleaseArtifactService.UploadArtifact("1.0", "amd64", "ubuntu", testFile);
+            FsReleaseArtifactService.StoreArtifact("1.0", "amd64", "ubuntu", testFile);
             
             //Assert
             Assert.True(Directory.Exists(testPath));

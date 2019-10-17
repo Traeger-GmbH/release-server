@@ -14,7 +14,7 @@ namespace release_server_web_api.Services
             ArtifactRoot = artifactRoot;
         }
         
-        public async Task UploadArtifact(string version, string os, string architecture, IFormFile payload)
+        public async Task StoreArtifact(string version, string os, string architecture, IFormFile payload)
         {
             var path = Path.Combine(ArtifactRoot, version, os, architecture);
 
@@ -63,7 +63,7 @@ namespace release_server_web_api.Services
     
     public interface IReleaseArtifactService
     {
-        Task UploadArtifact(string version, string os, string architecture, IFormFile payload);
+        Task StoreArtifact(string version, string os, string architecture, IFormFile payload);
         Task<string> Get();
     }
 }

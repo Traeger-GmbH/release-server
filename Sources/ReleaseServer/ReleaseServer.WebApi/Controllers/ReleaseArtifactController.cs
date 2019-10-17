@@ -25,7 +25,7 @@ namespace release_server_web_api.Controllers
             if (file == null)
                 return BadRequest();
             
-            await FsReleaseArtifactService.UploadArtifact(version, os, architecture, file);
+            await FsReleaseArtifactService.StoreArtifact(version, os, architecture, file);
 
             return Ok("Upload of the artifact successful!");
         }
