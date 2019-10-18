@@ -26,10 +26,10 @@ namespace release_server_web_api_test
             testFileMock.Setup(_ => _.ContentDisposition).Returns("form-data;name=\"\", filename=\"test_artifact.zip\"\"");
 
             var testFile = testFileMock.Object;
-            var testPath = Path.Combine("./", "1.0", "amd64", "ubuntu");
+            var testPath = Path.Combine("./", "1.0", "ubuntu", "amd64");
 
             //Act
-            FsReleaseArtifactService.StoreArtifact("1.0", "amd64", "ubuntu", testFile);
+            FsReleaseArtifactService.StoreArtifact("1.0", "ubuntu", "amd64", testFile);
             
             //Assert
             Assert.True(Directory.Exists(testPath));
