@@ -17,15 +17,15 @@ namespace release_server_web_api.Controllers
             FsReleaseArtifactService = new FsReleaseArtifactService();
         }
 
-        [HttpPut("upload/{version}/{os}/{architecture}")]
-        public async Task<IActionResult> UploadArtifact(string version, string os, string architecture)
+        [HttpPut("upload/{product}/{version}/{os}/{architecture}")]
+        public async Task<IActionResult> UploadArtifact(string product, string version, string os, string architecture)
         {
             var file = Request.Form.Files.FirstOrDefault();
             
             if (file == null)
                 return BadRequest();
             
-            await FsReleaseArtifactService.StoreArtifact(version, os, architecture, file);
+            await FsReleaseArtifactService.StoreArtifact(product, version, os, architecture, file);
 
             return Ok("Upload of the artifact successful!");
         }

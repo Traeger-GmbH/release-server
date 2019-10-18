@@ -1,18 +1,20 @@
 using System.IO;
 using Moq;
 using release_server_web_api.Services;
-using Microsoft.AspNetCore.Http;    
+using Microsoft.AspNetCore.Http;
+using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Repositories;
 using Xunit;
 
 namespace release_server_web_api_test
 {
     public class ReleaseArtifactServiceTest
     {
-        private IReleaseArtifactService FsReleaseArtifactService;
+        private IReleaseArtifactRepository FsReleaseArtifactRepository;
 
         public ReleaseArtifactServiceTest()
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService();
+            FsReleaseArtifactRepository = new FsReleaseArtifactRepository();
         }
         
         [Fact]
@@ -26,17 +28,20 @@ namespace release_server_web_api_test
             testFileMock.Setup(_ => _.ContentDisposition).Returns("form-data;name=\"\", filename=\"test_artifact.zip\"\"");
 
             var testFile = testFileMock.Object;
-            var testPath = Path.Combine("./", "1.0", "ubuntu", "amd64");
+            var testPath = Path.Combine("./", "product" ,"1.1", "ubuntu", "amd64");
 
             //Act
-            FsReleaseArtifactService.StoreArtifact("1.0", "ubuntu", "amd64", testFile);
+            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "1.1", "ubuntu",
+                "amd64", testFile);
+            
+            FsReleaseArtifactRepository.StoreArtifact(testArtifact);
             
             //Assert
             Assert.True(Directory.Exists(testPath));
             Assert.True(File.Exists(Path.Combine(testPath, "test_artifact.zip")));
 
             //Cleanup
-            Directory.Delete("./1.0", true);
+            Directory.Delete("./product", true);
         }
     }
 }

@@ -1,22 +1,26 @@
 using System;
-using System.Threading.Tasks;
 using System.IO;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using ReleaseServer.WebApi.Models;
 
-namespace release_server_web_api.Services
+namespace ReleaseServer.WebApi.Repositories
 {
-    public class FsReleaseArtifactService : IReleaseArtifactService
+    public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
         private readonly string ArtifactRoot;
 
-        public FsReleaseArtifactService(string artifactRoot = "./")
+        public FsReleaseArtifactRepository(string artifactRoot = "./")
         {
             ArtifactRoot = artifactRoot;
         }
         
-        public async Task StoreArtifact(string version, string os, string architecture, IFormFile payload)
+        public async Task StoreArtifact(ReleaseArtifactModel artifact)
         {
-            var path = Path.Combine(ArtifactRoot, version, os, architecture);
+            var path = Path.Combine(ArtifactRoot,
+                artifact.ProductInformation.ProductIdentifier,
+                artifact.ProductInformation.Version,
+                artifact.ProductInformation.Os,
+                artifact.ProductInformation.HwArchitecture);
 
             try
             {
@@ -42,10 +46,10 @@ namespace release_server_web_api.Services
                 }
                 
                 //Create the file
-                using (var fs = File.Create(Path.Combine(path, payload.FileName)))
+                using (var fs = File.Create(Path.Combine(path, artifact.Payload.FileName)))
                 {
-                   await payload.CopyToAsync(fs);
-                   Console.WriteLine("The file {0} was successfully created", payload.FileName);
+                    await artifact.Payload.CopyToAsync(fs);
+                    Console.WriteLine("The file {0} was successfully created", artifact.Payload.FileName);
                 }
             }
             catch (Exception e)
@@ -54,16 +58,14 @@ namespace release_server_web_api.Services
                 throw;
             }
         }
-
-        public async Task<string> Get()
-        {
-            return "this is a test artifact";
-        }
     }
     
-    public interface IReleaseArtifactService
+    public interface IReleaseArtifactRepository
     {
-        Task StoreArtifact(string version, string os, string architecture, IFormFile payload);
-        Task<string> Get();
+        Task StoreArtifact(ReleaseArtifactModel artifact);
     }
 }
+
+
+
+
