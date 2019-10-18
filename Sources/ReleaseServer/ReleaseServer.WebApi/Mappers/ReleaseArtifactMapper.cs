@@ -8,17 +8,15 @@ namespace ReleaseServer.WebApi.Mappers
         public static ReleaseArtifactModel ConvertToReleaseArtifact(string product ,string version, string os, 
             string architecture, IFormFile payload)
         {
-            var productInformation = new ProductInformationModel
-            {
-                ProductIdentifier = product,
-                Version = version,
-                Os = os,
-                HwArchitecture = architecture
-            };
-
             return new ReleaseArtifactModel
             {
-                ProductInformation = productInformation,
+                ProductInformation = new ProductInformationModel
+                {
+                    ProductIdentifier = product,
+                    Version = version,
+                    Os = os,
+                    HwArchitecture = architecture
+                },
                 Payload = payload
             };
         }
