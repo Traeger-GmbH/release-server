@@ -16,9 +16,9 @@ namespace release_server_web_api.Services
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository();
         }
         
-        public async Task StoreArtifact(string version, string os, string architecture, IFormFile payload)
+        public async Task StoreArtifact(string product, string version, string os, string architecture, IFormFile payload)
         {
-            var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(version, os, architecture, payload);
+            var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, version, os, architecture, payload);
             await FsReleaseArtifactRepository.StoreArtifact(artifact);
         }
 
@@ -30,7 +30,7 @@ namespace release_server_web_api.Services
     
     public interface IReleaseArtifactService
     {
-        Task StoreArtifact(string version, string os, string architecture, IFormFile payload);
+        Task StoreArtifact(string product, string version, string os, string architecture, IFormFile payload);
         Task<string> Get();
     }
 }
