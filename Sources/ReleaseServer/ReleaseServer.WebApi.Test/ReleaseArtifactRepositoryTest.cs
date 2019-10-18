@@ -8,11 +8,11 @@ using Xunit;
 
 namespace release_server_web_api_test
 {
-    public class ReleaseArtifactServiceTest
+    public class ReleaseArtifactRepositoryTest
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
 
-        public ReleaseArtifactServiceTest()
+        public ReleaseArtifactRepositoryTest()
         {
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository();
         }
