@@ -17,6 +17,7 @@ namespace ReleaseServer.WebApi.Repositories
         public async Task StoreArtifact(ReleaseArtifactModel artifact)
         {
             var path = Path.Combine(ArtifactRoot,
+                artifact.ProductInformation.ProductIdentifier,
                 artifact.ProductInformation.Version,
                 artifact.ProductInformation.Os,
                 artifact.ProductInformation.HwArchitecture);
