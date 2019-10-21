@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="JsonConverters.Collections" Version="1.0.62" />
       <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.1.0-preview1.19506.1" />
     </ItemGroup>
 

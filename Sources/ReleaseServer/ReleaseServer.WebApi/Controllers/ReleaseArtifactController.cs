@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using release_server_web_api.Services;
 
 
@@ -28,6 +29,12 @@ namespace release_server_web_api.Controllers
             await FsReleaseArtifactService.StoreArtifact(product, version, os, architecture, file);
 
             return Ok("Upload of the artifact successful!");
+        }
+        
+        [HttpGet("versions/{product}")]
+        public string GetProductInfos(string product)
+        {
+            return JsonConvert.SerializeObject(FsReleaseArtifactService.GetProductInfos(product));
         }
         
         [HttpGet]

@@ -1,8 +1,8 @@
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.IO;
 using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 
 namespace release_server_web_api.Services
@@ -21,6 +21,10 @@ namespace release_server_web_api.Services
             var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, version, os, architecture, payload);
             await FsReleaseArtifactRepository.StoreArtifact(artifact);
         }
+        public List<ProductInformationModel> GetProductInfos(string productName)
+        {
+            return FsReleaseArtifactRepository.GetInfosByProductName(productName);
+        }
 
         public async Task<string> Get()
         {
@@ -31,6 +35,7 @@ namespace release_server_web_api.Services
     public interface IReleaseArtifactService
     {
         Task StoreArtifact(string product, string version, string os, string architecture, IFormFile payload);
+        List<ProductInformationModel> GetProductInfos(string productName);
         Task<string> Get();
     }
 }

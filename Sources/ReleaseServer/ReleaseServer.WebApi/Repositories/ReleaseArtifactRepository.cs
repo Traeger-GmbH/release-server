@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Repositories
@@ -58,11 +60,31 @@ namespace ReleaseServer.WebApi.Repositories
                 throw;
             }
         }
+
+        public List<ProductInformationModel> GetInfosByProductName(string productName)
+        {
+            //Get all directories / subdirectories
+            var directories = Directory.GetDirectories(Path.Combine(ArtifactRoot, productName), "*", SearchOption.AllDirectories);
+            var retVal = new List<ProductInformationModel>();
+            
+            foreach (var directory in directories)
+            {
+                var productInfo = ProductInformationMapper.PathToProductInfo(directory);
+                    
+                //Is null, if the directory hasn't a depth of 5
+                if (productInfo != null)
+                {
+                    retVal.Add(productInfo);
+                }
+            }
+            return retVal;
+        }
     }
     
-    public interface IReleaseArtifactRepository
+    public interface IReleaseArtifactRepository     
     {
         Task StoreArtifact(ReleaseArtifactModel artifact);
+        List<ProductInformationModel> GetInfosByProductName(string productName);
     }
 }
 
