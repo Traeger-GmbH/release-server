@@ -1,6 +1,8 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -37,6 +39,12 @@ namespace release_server_web_api.Controllers
         public string GetProductInfos([Required] string product)
         {
             return JsonConvert.SerializeObject(FsReleaseArtifactService.GetProductInfos(product));
+        }
+
+        [HttpGet("platforms/{product}/{version}")]
+        public string GetPlatforms([Required] string product, [Required]string version)
+        {
+            return JsonConvert.SerializeObject(FsReleaseArtifactService.GetPlatforms(product, version));
         }
         
         [HttpGet]

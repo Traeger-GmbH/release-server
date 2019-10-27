@@ -17,7 +17,7 @@ namespace ReleaseServer.WebApi.Mappers
                     ProductIdentifier = infos[1],
                     Os = infos[2],
                     HwArchitecture = infos[3],
-                    Version = infos[4],
+                    Version = infos[4]
                 };
             }
             return null;
