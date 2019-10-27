@@ -22,8 +22,4 @@
       <ProjectReference Include="..\ReleaseServer.WebApi\ReleaseServer.WebApi.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="TestData" />
-    </ItemGroup>
-
 </Project>
