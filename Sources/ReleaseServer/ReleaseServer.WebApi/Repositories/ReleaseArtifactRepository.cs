@@ -20,9 +20,9 @@ namespace ReleaseServer.WebApi.Repositories
         {
             var path = Path.Combine(ArtifactRoot,
                 artifact.ProductInformation.ProductIdentifier,
-                artifact.ProductInformation.Version,
                 artifact.ProductInformation.Os,
-                artifact.ProductInformation.HwArchitecture);
+                artifact.ProductInformation.HwArchitecture,
+                artifact.ProductInformation.Version);
 
             try
             {
@@ -64,6 +64,7 @@ namespace ReleaseServer.WebApi.Repositories
         public List<ProductInformationModel> GetInfosByProductName(string productName)
         {
             //Get all directories / subdirectories
+            //TODO: filtering with File operations
             var directories = Directory.GetDirectories(Path.Combine(ArtifactRoot, productName), "*", SearchOption.AllDirectories);
             var retVal = new List<ProductInformationModel>();
             

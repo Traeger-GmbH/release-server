@@ -9,15 +9,15 @@ namespace ReleaseServer.WebApi.Mappers
         {
             var infos = path.Split('/', '\\');
 
-            //If the directory has a depth of 4 (actual our standard artifact)
+            //If the directory has a depth of 5 (actual our standard artifact)
             if (infos.Length == 5)
             {
                 return new ProductInformationModel
                 {
                     ProductIdentifier = infos[1],
-                    Version = infos[2],
-                    Os = infos[3],
-                    HwArchitecture = infos[4]
+                    Os = infos[2],
+                    HwArchitecture = infos[3],
+                    Version = infos[4],
                 };
             }
             return null;

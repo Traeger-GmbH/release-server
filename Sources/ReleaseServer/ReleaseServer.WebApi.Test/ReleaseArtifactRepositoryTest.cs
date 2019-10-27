@@ -28,11 +28,11 @@ namespace release_server_web_api_test
             testFileMock.Setup(_ => _.ContentDisposition).Returns("form-data;name=\"\", filename=\"test_artifact.zip\"\"");
 
             var testFile = testFileMock.Object;
-            var testPath = Path.Combine("./", "product" ,"1.1", "ubuntu", "amd64");
+            var testPath = Path.Combine("./", "product", "ubuntu", "amd64", "1.1");
 
             //Act
-            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "1.1", "ubuntu",
-                "amd64", testFile);
+            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
+                "amd64", "1.1", testFile);
             
             FsReleaseArtifactRepository.StoreArtifact(testArtifact);
             

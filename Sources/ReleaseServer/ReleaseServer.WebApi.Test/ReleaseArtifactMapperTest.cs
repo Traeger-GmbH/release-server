@@ -39,8 +39,8 @@ namespace release_server_web_api_test
         [Fact]
         public void ConvertToReleaseArtifactTest()
         {
-            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "1.1", "ubuntu",
-                "amd64", testFile);
+            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product",  "ubuntu",
+                "amd64", "1.1", testFile);
             
             testArtifact.Should().BeEquivalentTo(expectedArtifact);
         }
