@@ -38,9 +38,19 @@ namespace release_server_web_api.Services
             return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Os + "-" + relevantProductInfo.HwArchitecture).ToList();
         }
 
-        public string GetReleaseInfo(string product, string os, string architecture, string version)
+        public string GetReleaseInfo(string productName, string os, string architecture, string version)
         {
-            return FsReleaseArtifactRepository.GetReleaseInfo(product, os, architecture, version);
+            return FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version);
+        }
+
+        public List<string> GetVersions(string productName, string os, string architecture)
+        {
+            var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);            
+            var relevantProductInfos = from productInfo in productInfos
+                where productInfo.Os == os && productInfo.HwArchitecture == architecture
+                select productInfo;
+
+            return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Version).ToList();
         }
 
         public async Task<string> Get()
@@ -54,7 +64,8 @@ namespace release_server_web_api.Services
         Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
         List<ProductInformationModel> GetProductInfos(string productName);
         List<string> GetPlatforms(string productName, string version);
-        string GetReleaseInfo(string product, string os, string architecture, string version);
+        string GetReleaseInfo(string productName, string os, string architecture, string version);
+        List<string> GetVersions(string productName, string os, string architecture);
         Task<string> Get();
     }
 }

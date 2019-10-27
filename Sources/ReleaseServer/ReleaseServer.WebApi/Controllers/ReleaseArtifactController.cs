@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -51,6 +52,12 @@ namespace release_server_web_api.Controllers
         public string GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             return FsReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+        }
+        
+        [HttpGet("versions/{product}/{os}/{architecture}")]
+        public List<string> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        {
+            return FsReleaseArtifactService.GetVersions(product, os, architecture);
         }
         
         [HttpGet]
