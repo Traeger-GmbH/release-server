@@ -47,6 +47,12 @@ namespace release_server_web_api.Controllers
             return JsonConvert.SerializeObject(FsReleaseArtifactService.GetPlatforms(product, version));
         }
         
+        [HttpGet("info/{product}/{os}/{architecture}/{version}")]
+        public string GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        {
+            return FsReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+        }
+        
         [HttpGet]
         public Task<string> GetArtifact()
         {

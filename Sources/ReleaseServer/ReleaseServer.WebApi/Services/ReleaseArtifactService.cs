@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,6 +38,11 @@ namespace release_server_web_api.Services
             return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Os + "-" + relevantProductInfo.HwArchitecture).ToList();
         }
 
+        public string GetReleaseInfo(string product, string os, string architecture, string version)
+        {
+            return FsReleaseArtifactRepository.GetReleaseInfo(product, os, architecture, version);
+        }
+
         public async Task<string> Get()
         {
             return "this is a test artifact";
@@ -48,6 +54,7 @@ namespace release_server_web_api.Services
         Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
         List<ProductInformationModel> GetProductInfos(string productName);
         List<string> GetPlatforms(string productName, string version);
+        string GetReleaseInfo(string product, string os, string architecture, string version);
         Task<string> Get();
     }
 }
