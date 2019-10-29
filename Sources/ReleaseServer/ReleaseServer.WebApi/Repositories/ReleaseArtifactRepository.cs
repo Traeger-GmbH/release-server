@@ -119,6 +119,35 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
+        public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)
+        {
+            try
+            {
+                var path = GeneratePath(productName, os, architecture, version);
+                
+                if (Directory.Exists(path))
+                {
+                    //Get the file information of the artifact (artifact must be a ZIP!)
+                    //TODO: Clarify, whether we have only a Zip or unzipped files.
+                    //TODO: Refactor -> it has to be smarter!
+                    var dir = new DirectoryInfo(path);
+                    var files = dir.GetFiles();
+                    
+                    byte[] artifact = File.ReadAllBytes(Path.Combine(path, files.First().FullName));
+                    
+                    return artifact;
+                }
+                Console.WriteLine("The directory {0} does not exist!", path);
+                throw new FileNotFoundException();
+            }
+            
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
         private string GeneratePath(string product, string os, string architecture, string version)
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
@@ -130,6 +159,7 @@ namespace ReleaseServer.WebApi.Repositories
         Task StoreArtifact(ReleaseArtifactModel artifact);
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
+        byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
     }
 }
 

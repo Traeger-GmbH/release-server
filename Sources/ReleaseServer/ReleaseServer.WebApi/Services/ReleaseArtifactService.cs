@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -53,9 +54,9 @@ namespace release_server_web_api.Services
             return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Version).ToList();
         }
 
-        public async Task<string> Get()
+        public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)
         {
-            return "this is a test artifact";
+           return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version);
         }
     }
     
@@ -66,6 +67,6 @@ namespace release_server_web_api.Services
         List<string> GetPlatforms(string productName, string version);
         string GetReleaseInfo(string productName, string os, string architecture, string version);
         List<string> GetVersions(string productName, string os, string architecture);
-        Task<string> Get();
+        byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
     }
 }
