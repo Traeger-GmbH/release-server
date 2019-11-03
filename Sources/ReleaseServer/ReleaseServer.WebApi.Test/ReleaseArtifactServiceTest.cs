@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Moq;
 using release_server_web_api.Services;
@@ -49,11 +48,28 @@ namespace release_server_web_api_test.TestData
         [Fact]
         public void TestGetPlatforms()
         {
-            var releaseArtifactService = new FsReleaseArtifactService();
-            var mockedRepository = new Mock<FsReleaseArtifactRepository>();
-            //mockedRepository.Setup(_ => _.GetInfosByProductName("product1")).Returns(testProductInfos);
+            //Setup
+            List<string> expectedPlatforms1 = new List<string>()
+                {"ubuntu-arm64", "ubuntu-amd64"};
+            
+            List<string> expectedPlatforms2 = new List<string>()
+                {"debian-amd64"};
 
-            //TODO: Finalize Unit test
+           var repositoryMock = new Mock<IReleaseArtifactRepository>();
+            repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
+            var mockedRepository = repositoryMock.Object;
+            
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            
+            
+            
+            //Act
+            var testPlatforms1 = releaseArtifactService.GetPlatforms("product1", "1.0");
+            var testPlatforms2 = releaseArtifactService.GetPlatforms("product1", "1.1");
+
+            //Assert
+            Assert.Equal(expectedPlatforms1, testPlatforms1);
+            Assert.Equal(expectedPlatforms2, testPlatforms2);
         }
     }
 }
