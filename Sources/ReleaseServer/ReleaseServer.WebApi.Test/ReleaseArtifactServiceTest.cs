@@ -15,7 +15,7 @@ namespace release_server_web_api_test.TestData
 
         public ReleaseArtifactServiceTest()
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService();
+            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository());
 
             testProductInfos = new List<ProductInformationModel>()
             {

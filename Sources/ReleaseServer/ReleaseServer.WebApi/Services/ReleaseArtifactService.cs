@@ -14,9 +14,9 @@ namespace release_server_web_api.Services
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
 
-        public FsReleaseArtifactService()
+        public FsReleaseArtifactService( IReleaseArtifactRepository fsReleaseArtifactRepository)
         {
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository();
+            FsReleaseArtifactRepository = fsReleaseArtifactRepository;
         }
         
         public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)

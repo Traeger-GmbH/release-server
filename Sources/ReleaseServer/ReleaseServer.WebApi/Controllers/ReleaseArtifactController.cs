@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
+using ReleaseServer.WebApi.Repositories;
 
 
 namespace release_server_web_api.Controllers
@@ -18,7 +19,7 @@ namespace release_server_web_api.Controllers
 
         public ReleaseArtifactController()
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService();
+            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository());
         }
 
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
