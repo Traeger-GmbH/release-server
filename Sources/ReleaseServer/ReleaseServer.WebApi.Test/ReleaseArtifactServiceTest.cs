@@ -60,9 +60,7 @@ namespace release_server_web_api_test.TestData
             var mockedRepository = repositoryMock.Object;
             
             var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
-            
-            
-            
+
             //Act
             var testPlatforms1 = releaseArtifactService.GetPlatforms("product1", "1.0");
             var testPlatforms2 = releaseArtifactService.GetPlatforms("product1", "1.1");

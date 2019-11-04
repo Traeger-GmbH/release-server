@@ -50,12 +50,8 @@ namespace ReleaseServer.WebApi.Repositories
                     Console.WriteLine("The directory {0} was successfully created", dirInfo.FullName);
                 }
                 
-                //Create the file
-                using (var fs = File.Create(Path.Combine(path, artifact.Payload.FileName)))
-                {
-                    await artifact.Payload.CopyToAsync(fs);
-                    Console.WriteLine("The file {0} was successfully created", artifact.Payload.FileName);
-                }
+                await Task.Run(() => artifact.Payload.ExtractToDirectory(path));
+                Console.WriteLine("The Artifact {0} was successfully unpacked & stored");
             }
             catch (Exception e)
             {

@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 
 namespace ReleaseServer.WebApi.Models
@@ -7,6 +8,6 @@ namespace ReleaseServer.WebApi.Models
         public ProductInformationModel ProductInformation { get; set; }
         
         //TODO: Find a better solution for IFormFile
-        public IFormFile Payload { get; set; }
+        public ZipArchive Payload { get; set; }
     }
 }

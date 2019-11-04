@@ -17,7 +17,7 @@ namespace ReleaseServer.WebApi.Mappers
                     HwArchitecture = architecture,
                     Version = version
                 },
-                Payload = payload
+                Payload = payload.ToZipArchive()
             };
         }
     }
