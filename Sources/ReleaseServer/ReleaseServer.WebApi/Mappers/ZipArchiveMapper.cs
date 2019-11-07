@@ -1,15 +1,23 @@
+using System;
+using System.IO;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 
 namespace ReleaseServer.WebApi.Mappers
 {
-    public static class ZipArchiveMapper
+    public  class ZipArchiveMapper : IDisposable
     {
-        public static ZipArchive ToZipArchive(this IFormFile formFile)
+        private Stream ZipStream;
+        
+        public ZipArchive FormFileToZipArchive(IFormFile formFile)
         {
-            //TODO: Clarify whether it's dangerous, that the stream didn't get disposed 
-            var stream = formFile.OpenReadStream();
-            return new ZipArchive(stream);
+            ZipStream = formFile.OpenReadStream();
+            return new ZipArchive(ZipStream);
+        }
+
+        public void Dispose()
+        {
+            ZipStream.Dispose();
         }
     }
 }

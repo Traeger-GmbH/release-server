@@ -1,8 +1,7 @@
+using System;
 using System.IO;
+using System.IO.Compression;
 using FluentAssertions;
-using Moq;
-using release_server_web_api.Services;
-using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -13,34 +12,36 @@ namespace release_server_web_api_test
     public class ReleaseArtifactRepositoryTest
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
+        private readonly string ProjectDirectory;
 
         public ReleaseArtifactRepositoryTest()
         {
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository("TestData");
+            //Could be done smarter
+            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+
         }
         
         [Fact]
-        public void TestStoringArtifact()
+        public async void TestStoringArtifact()
         {
-            //Setup
-            var testFileMock = new Mock<IFormFile>();
 
-            testFileMock.Setup(_ => _.FileName).Returns("test_artifact.zip");
-            testFileMock.Setup(_ => _.ContentType).Returns("application/zip");
-            testFileMock.Setup(_ => _.ContentDisposition).Returns("form-data;name=\"\", filename=\"test_artifact.zip\"\"");
+            var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
 
-            var testFile = testFileMock.Object;
+            using var stream = new MemoryStream(testFile);
+            var testZip = new ZipArchive(stream);
             var testPath = Path.Combine("TestData", "product", "ubuntu", "amd64", "1.1");
-
+                    
             //Act
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
-                "amd64", "1.1", testFile);
-            
-            FsReleaseArtifactRepository.StoreArtifact(testArtifact);
-            
-            //Assert
+                "amd64", "1.1", testZip);
+
+            await FsReleaseArtifactRepository.StoreArtifact(testArtifact);
+
+            //Assert whether the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "test_artifact.zip")));
+            Assert.True(File.Exists(Path.Combine(testPath, "changelog.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "testprogram.exe")));
 
             //Cleanup
             Directory.Delete("TestData", true);

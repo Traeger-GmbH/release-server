@@ -1,6 +1,7 @@
+using System;
+using System.IO;
+using System.IO.Compression;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Moq;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using Xunit;
@@ -9,21 +10,23 @@ namespace release_server_web_api_test
 {
     public class ReleaseArtifactMapperTest
     {
-        private readonly IFormFile testFile;
-        private readonly ReleaseArtifactModel expectedArtifact;
-        
+        private readonly byte[] testFile;
+
         public ReleaseArtifactMapperTest()
         {
+            var projectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            testFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
+        }
+        
+        [Fact]
+        //TODO: Fix unit test!!
+        public void ConvertToReleaseArtifactTest()
+        {
             //Setup
-            var testFileMock = new Mock<IFormFile>();
-
-            testFileMock.Setup(_ => _.FileName).Returns("test_artifact.zip");
-            testFileMock.Setup(_ => _.ContentType).Returns("application/zip");
-            testFileMock.Setup(_ => _.ContentDisposition).Returns("form-data;name=\"\", filename=\"test_artifact.zip\"\"");
-
-            testFile = testFileMock.Object;
+            using var stream = new MemoryStream(testFile);
+            var testZip = new ZipArchive(stream);
             
-            expectedArtifact = new ReleaseArtifactModel
+            var expectedArtifact = new ReleaseArtifactModel
             {
                 ProductInformation = new ProductInformationModel
                 {
@@ -32,17 +35,11 @@ namespace release_server_web_api_test
                     Os = "ubuntu",
                     HwArchitecture = "amd64"
                 },
-                //TODO: Fix unit test!!
-                //Payload = testFile
+                Payload = testZip
             };
-        }
-        
-        [Fact]
-        //TODO: Fix unit test!!
-        public void ConvertToReleaseArtifactTest()
-        {
+            
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product",  "ubuntu",
-                "amd64", "1.1", testFile);
+                "amd64", "1.1", testZip);
             
             testArtifact.Should().BeEquivalentTo(expectedArtifact);
         }

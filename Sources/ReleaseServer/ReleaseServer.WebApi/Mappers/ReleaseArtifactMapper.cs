@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Models;
 
@@ -6,7 +7,7 @@ namespace ReleaseServer.WebApi.Mappers
     public static class ReleaseArtifactMapper
     {
         public static ReleaseArtifactModel ConvertToReleaseArtifact(string product, string os, string architecture,
-            string version, IFormFile payload)
+            string version, ZipArchive payload)
         {
             return new ReleaseArtifactModel
             {
@@ -17,7 +18,7 @@ namespace ReleaseServer.WebApi.Mappers
                     HwArchitecture = architecture,
                     Version = version
                 },
-                Payload = payload.ToZipArchive()
+                Payload = payload
             };
         }
     }

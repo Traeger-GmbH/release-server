@@ -7,7 +7,6 @@ namespace ReleaseServer.WebApi.Models
     {
         public ProductInformationModel ProductInformation { get; set; }
         
-        //TODO: Find a better solution for IFormFile
         public ZipArchive Payload { get; set; }
     }
 }

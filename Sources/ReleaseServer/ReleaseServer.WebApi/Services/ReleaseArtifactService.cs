@@ -21,8 +21,14 @@ namespace release_server_web_api.Services
         
         public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
         {
-            var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, payload);
-            await FsReleaseArtifactRepository.StoreArtifact(artifact);
+
+            using (var zipMapper = new ZipArchiveMapper())
+            {
+                var zipPayload = zipMapper.FormFileToZipArchive(payload);
+                
+                var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
+                await FsReleaseArtifactRepository.StoreArtifact(artifact);
+            }
         }
         public List<ProductInformationModel> GetProductInfos(string productName)
         {
