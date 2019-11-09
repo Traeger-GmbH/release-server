@@ -9,13 +9,10 @@ namespace release_server_web_api_test.TestData
 {
     public class ReleaseArtifactServiceTest
     {
-        private IReleaseArtifactService FsReleaseArtifactService;
         private readonly List<ProductInformationModel> testProductInfos;
 
         public ReleaseArtifactServiceTest()
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository());
-
             testProductInfos = new List<ProductInformationModel>()
             {
 
@@ -33,6 +30,14 @@ namespace release_server_web_api_test.TestData
                     Os = "ubuntu",
                     HwArchitecture = "amd64",
                     Version = "1.0"
+                },
+                
+                new ProductInformationModel
+                {
+                    ProductIdentifier = "product1",
+                    Os = "debian",
+                    HwArchitecture = "amd64",
+                    Version = "1.2"
                 },
 
                 new ProductInformationModel
@@ -55,7 +60,7 @@ namespace release_server_web_api_test.TestData
             List<string> expectedPlatforms2 = new List<string>()
                 {"debian-amd64"};
 
-           var repositoryMock = new Mock<IReleaseArtifactRepository>();
+            var repositoryMock = new Mock<IReleaseArtifactRepository>();
             repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
             var mockedRepository = repositoryMock.Object;
             
@@ -68,6 +73,33 @@ namespace release_server_web_api_test.TestData
             //Assert
             Assert.Equal(expectedPlatforms1, testPlatforms1);
             Assert.Equal(expectedPlatforms2, testPlatforms2);
+        }
+
+        [Fact]
+        public void TestGetVersions()
+        {
+            //Setup 
+            List<string> expectedVersions1 = new List<string>()
+                {"1.2", "1.1"};
+
+            List<string> expectedVersions2 = new List<string>()
+            {
+                "1.0"
+            };
+            
+            var repositoryMock = new Mock<IReleaseArtifactRepository>();
+            repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
+            var mockedRepository = repositoryMock.Object;
+            
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            
+            //Act
+            var testVersions1 = releaseArtifactService.GetVersions("product1", "debian", "amd64");
+            var testVersions2 = releaseArtifactService.GetVersions("product1", "ubuntu", "amd64");
+
+            //Assert
+            Assert.Equal(expectedVersions1, testVersions1);
+            Assert.Equal(expectedVersions2, testVersions2);
         }
     }
 }
