@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 
@@ -90,12 +92,8 @@ namespace ReleaseServer.WebApi.Repositories
                 {
                     var dir = new DirectoryInfo(path);
                     var files = dir.GetFiles();
-                    var deploymentMetaName = files.FirstOrDefault(f => f.Name == "deployment.json");
                     
-                    if (deploymentMetaName == null)
-                        throw new Exception("meta information of the specified product does not exist!");
-                    
-                    var deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
+                    var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
                     var changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName));
                     return changelog;
@@ -119,13 +117,12 @@ namespace ReleaseServer.WebApi.Repositories
                 
                 if (Directory.Exists(path))
                 {
-                    //Get the file information of the artifact (artifact must be a ZIP!)
-                    //TODO: Clarify, whether we have only a Zip or unzipped files.
-                    //TODO: Refactor -> it has to be smarter!
                     var dir = new DirectoryInfo(path);
                     var files = dir.GetFiles();
                     
-                    byte[] artifact = File.ReadAllBytes(Path.Combine(path, files.First().FullName));
+                    var deploymentMetaInfo = GetDeploymentMetaInfo(files);
+                    
+                    byte[] artifact = File.ReadAllBytes(Path.Combine(path, deploymentMetaInfo.ArtifactFileName));
                     
                     return artifact;
                 }
@@ -133,10 +130,10 @@ namespace ReleaseServer.WebApi.Repositories
                 throw new FileNotFoundException();
             }
             
-            catch (Exception e)
+            catch (FileNotFoundException e)
             {
                 Console.WriteLine(e);
-                throw;
+                return Encoding.ASCII.GetBytes(e.Message);
             }
         }
 
@@ -144,6 +141,17 @@ namespace ReleaseServer.WebApi.Repositories
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
         }
+
+        private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
+        {
+            var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
+                    
+            if (deploymentMetaName == null)
+                throw new Exception("meta information of the specified product does not exist!");
+                    
+            return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
+        } 
+        
     }
     
     public interface IReleaseArtifactRepository     
