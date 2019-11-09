@@ -16,10 +16,10 @@ namespace release_server_web_api_test
 
         public ReleaseArtifactRepositoryTest()
         {
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository("TestData");
             //Could be done smarter
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-
+            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName; 
+            
+            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(Path.Combine(ProjectDirectory, "TestData"));
         }
         
         [Fact]
@@ -30,7 +30,7 @@ namespace release_server_web_api_test
 
             using var stream = new MemoryStream(testFile);
             var testZip = new ZipArchive(stream);
-            var testPath = Path.Combine("TestData", "product", "ubuntu", "amd64", "1.1");
+            var testPath = Path.Combine(ProjectDirectory, "TestData", "product", "ubuntu", "amd64", "1.1");
                     
             //Act
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
@@ -44,7 +44,7 @@ namespace release_server_web_api_test
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram.exe")));
 
             //Cleanup
-            Directory.Delete("TestData", true);
+            Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
         }
 
         [Fact]
@@ -52,9 +52,8 @@ namespace release_server_web_api_test
         {
             
             //Setup
-            Directory.CreateDirectory(Path.Combine("TestData", "testproduct", "debian", "amd64", "1.0"));
-            Directory.CreateDirectory(Path.Combine("TestData", "testproduct", "debian", "amd64"));
-            
+            Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
+
             var expectedProductInfo = new ProductInformationModel
             {
                 ProductIdentifier = "testproduct",
@@ -70,36 +69,21 @@ namespace release_server_web_api_test
             testProductInfo.Should().BeEquivalentTo(expectedProductInfo);
 
             //Cleanup
-            Directory.Delete("TestData", true);
+            Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "testproduct"), true);
         }
 
         [Fact]
         public async void TestGetReleaseInfo()
         {
-            //Setup (is duplicated from TestStoringArtifact() 
-            var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
-
-            using var stream = new MemoryStream(testFile);
-            var testZip = new ZipArchive(stream);
-            var testPath = Path.Combine("TestData", "product", "ubuntu", "amd64", "1.1");
-
+            //Setup 
             var expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
             
             //Act
-            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
-                "amd64", "1.1", testZip);
-
-            await FsReleaseArtifactRepository.StoreArtifact(testArtifact);
-            
-            //Act
-            var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("product", "ubuntu",
+            var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("productx", "ubuntu",
                 "amd64", "1.1");
             
             //Assert 
             testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo);
-            
-            //Cleanup
-            Directory.Delete("TestData", true);
         }
 
     }

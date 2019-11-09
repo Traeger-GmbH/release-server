@@ -71,7 +71,8 @@ namespace ReleaseServer.WebApi.Repositories
             
             foreach (var directory in directories)
             {
-                var productInfo = ProductInformationMapper.PathToProductInfo(directory);
+                var truncatedDir = directory.Replace(ArtifactRoot, ".");
+                var productInfo = ProductInformationMapper.PathToProductInfo(truncatedDir);
                     
                 //Is null, if the directory hasn't a depth of 5
                 if (productInfo != null)
