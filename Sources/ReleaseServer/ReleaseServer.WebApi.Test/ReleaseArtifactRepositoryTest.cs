@@ -72,5 +72,35 @@ namespace release_server_web_api_test
             //Cleanup
             Directory.Delete("TestData", true);
         }
+
+        [Fact]
+        public async void TestGetReleaseInfo()
+        {
+            //Setup (is duplicated from TestStoringArtifact() 
+            var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
+
+            using var stream = new MemoryStream(testFile);
+            var testZip = new ZipArchive(stream);
+            var testPath = Path.Combine("TestData", "product", "ubuntu", "amd64", "1.1");
+
+            var expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
+            
+            //Act
+            var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
+                "amd64", "1.1", testZip);
+
+            await FsReleaseArtifactRepository.StoreArtifact(testArtifact);
+            
+            //Act
+            var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("product", "ubuntu",
+                "amd64", "1.1");
+            
+            //Assert 
+            testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo);
+            
+            //Cleanup
+            Directory.Delete("TestData", true);
+        }
+
     }
 }

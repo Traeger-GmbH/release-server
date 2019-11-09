@@ -88,23 +88,19 @@ namespace ReleaseServer.WebApi.Repositories
 
                 if (Directory.Exists(path))
                 {
-                    //Get the file information of the artifact (artifact must be a ZIP!)
-                    //TODO: Clarify, whether we have only a Zip or unzipped files.
                     var dir = new DirectoryInfo(path);
                     var files = dir.GetFiles();
+                    var deploymentMetaName = files.FirstOrDefault(f => f.Name == "deployment.json");
                     
-                    //Assumption: only one Zip-File is stored as artifact
-                    using (ZipArchive archive = ZipFile.OpenRead(files.First().FullName))
-                    {
-                        var changelogEntry = archive.GetEntry("changelog.txt");
+                    if (deploymentMetaName == null)
+                        throw new Exception("meta information of the specified product does not exist!");
+                    
+                    var deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
 
-                        var changelog = changelogEntry.Open();
-                        var reader = new StreamReader(changelog);
-
-                        var payload = reader.ReadToEnd();
-                        return payload;
-                    }
+                    var changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName));
+                    return changelog;
                 }
+                
                 Console.WriteLine("The directory {0} does not exist!", path);
                 return (new string("Error: Release notes for this artifact not found!"));
             }

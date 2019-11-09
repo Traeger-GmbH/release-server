@@ -19,7 +19,6 @@ namespace release_server_web_api_test
         }
         
         [Fact]
-        //TODO: Fix unit test!!
         public void ConvertToReleaseArtifactTest()
         {
             //Setup
