@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using FluentAssertions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -73,7 +74,7 @@ namespace release_server_web_api_test
         }
 
         [Fact]
-        public async void TestGetReleaseInfo()
+        public void TestGetReleaseInfo()
         {
             //Setup 
             var expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
@@ -84,6 +85,21 @@ namespace release_server_web_api_test
             
             //Assert 
             testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo);
+        }
+
+        [Fact]
+        public void TestGetSpecificArtifact()
+        {
+            //Setup
+            var expectedArtifact = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "productx",
+                "ubuntu", "amd64", "1.1", "artifact.zip"));
+            
+            //Act
+            var testArtifact = FsReleaseArtifactRepository.GetSpecificArtifact("productx",
+                "ubuntu", "amd64", "1.1");
+            
+            //Assert
+            Assert.True(expectedArtifact.SequenceEqual(testArtifact));
         }
 
     }
