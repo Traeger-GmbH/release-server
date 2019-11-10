@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +38,7 @@ namespace release_server_web_api.Services
         {
             var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);            
             var relevantProductInfos = from productInfo in productInfos
-                where productInfo.Version == version
+                where productInfo.Version == new Version(version)
                 select productInfo;
 
             return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Os + "-" + relevantProductInfo.HwArchitecture).ToList();
@@ -57,7 +56,17 @@ namespace release_server_web_api.Services
                 where productInfo.Os == os && productInfo.HwArchitecture == architecture
                 select productInfo;
 
-            return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Version).ToList();
+            return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Version.ToString()).ToList();
+        }
+
+        public string GetLatestVersion(string productName, string os, string architecture)
+        {
+            var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);
+            
+            
+
+
+            return "";
         }
 
         public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)
@@ -73,6 +82,7 @@ namespace release_server_web_api.Services
         List<string> GetPlatforms(string productName, string version);
         string GetReleaseInfo(string productName, string os, string architecture, string version);
         List<string> GetVersions(string productName, string os, string architecture);
+        string GetLatestVersion(string productName, string os, string architecture);
         byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
     }
 }

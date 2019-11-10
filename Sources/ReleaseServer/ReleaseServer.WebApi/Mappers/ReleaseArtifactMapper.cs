@@ -1,3 +1,4 @@
+using System;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Models;
@@ -16,7 +17,7 @@ namespace ReleaseServer.WebApi.Mappers
                     ProductIdentifier = product,
                     Os = os,
                     HwArchitecture = architecture,
-                    Version = version
+                    Version = new Version(version)
                 },
                 Payload = payload
             };

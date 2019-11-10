@@ -60,7 +60,7 @@ namespace release_server_web_api_test
                 ProductIdentifier = "testproduct",
                 Os = "debian",
                 HwArchitecture = "amd64",
-                Version = "1.0",
+                Version = new Version("1.0"),
             };
 
             //Act

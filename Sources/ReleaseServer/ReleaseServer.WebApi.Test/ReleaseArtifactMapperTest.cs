@@ -30,7 +30,7 @@ namespace release_server_web_api_test
                 ProductInformation = new ProductInformationModel
                 {
                     ProductIdentifier = "product",
-                    Version = "1.1",
+                    Version = new Version("1.1"),
                     Os = "ubuntu",
                     HwArchitecture = "amd64"
                 },

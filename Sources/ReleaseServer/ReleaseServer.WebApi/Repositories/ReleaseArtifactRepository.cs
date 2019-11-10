@@ -15,7 +15,7 @@ namespace ReleaseServer.WebApi.Repositories
     {
         private readonly string ArtifactRoot;
 
-        public FsReleaseArtifactRepository(string artifactRoot = "./")
+        public FsReleaseArtifactRepository(string artifactRoot = ".")
         {
             ArtifactRoot = artifactRoot;
         }
@@ -27,7 +27,7 @@ namespace ReleaseServer.WebApi.Repositories
                 artifact.ProductInformation.ProductIdentifier,
                 artifact.ProductInformation.Os,
                 artifact.ProductInformation.HwArchitecture,
-                artifact.ProductInformation.Version);
+                artifact.ProductInformation.Version.ToString());
 
             try
             {
@@ -71,8 +71,7 @@ namespace ReleaseServer.WebApi.Repositories
             
             foreach (var directory in directories)
             {
-                var truncatedDir = directory.Replace(ArtifactRoot, ".");
-                var productInfo = ProductInformationMapper.PathToProductInfo(truncatedDir);
+                var productInfo = ProductInformationMapper.PathToProductInfo(ArtifactRoot, directory);
                     
                 //Is null, if the directory hasn't a depth of 5
                 if (productInfo != null)

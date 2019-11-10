@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Moq;
 using release_server_web_api.Services;
@@ -21,7 +22,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "ubuntu",
                     HwArchitecture = "arm64",
-                    Version = "1.0"
+                    Version = new Version("1.0")
                 },
 
                 new ProductInformationModel
@@ -29,7 +30,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "ubuntu",
                     HwArchitecture = "amd64",
-                    Version = "1.0"
+                    Version = new Version("1.0")
                 },
                 
                 new ProductInformationModel
@@ -37,7 +38,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "debian",
                     HwArchitecture = "amd64",
-                    Version = "1.2"
+                    Version = new Version("1.2")
                 },
 
                 new ProductInformationModel
@@ -45,7 +46,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "debian",
                     HwArchitecture = "amd64",
-                    Version = "1.1"
+                    Version = new Version("1.1")
                 }
             };
         }

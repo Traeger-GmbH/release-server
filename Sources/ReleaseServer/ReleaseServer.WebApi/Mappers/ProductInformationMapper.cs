@@ -5,19 +5,24 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public class ProductInformationMapper
     {
-        public static ProductInformationModel PathToProductInfo(string path)
+        public static ProductInformationModel PathToProductInfo(string rootPath, string path)
         {
-            var infos = path.Split('/', '\\');
+         
+            //Remove the rootPath
+            var truncatedDir = path.Remove(0, rootPath.Length);
+            truncatedDir = truncatedDir.TrimStart('/', '\\');
+            
+            var infos = truncatedDir.Split('/', '\\');
 
-            //If the directory has a depth of 5 (actual our standard artifact)
-            if (infos.Length == 5)
+            //If the directory has a depth of 4 (actual our standard artifact)
+            if (infos.Length == 4)
             {
                 return new ProductInformationModel
                 {
-                    ProductIdentifier = infos[1],
-                    Os = infos[2],
-                    HwArchitecture = infos[3],
-                    Version = infos[4]
+                    ProductIdentifier = infos[0],
+                    Os = infos[1],
+                    HwArchitecture = infos[2],
+                    Version = new Version(infos[3])
                 };
             }
             return null;
