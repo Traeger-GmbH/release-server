@@ -62,11 +62,13 @@ namespace release_server_web_api.Services
         public string GetLatestVersion(string productName, string os, string architecture)
         {
             var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);
-            
-            
+            var relevantProductVersions = from productInfo in productInfos
+                where productInfo.Os == os && productInfo.HwArchitecture == architecture
+                select productInfo.Version;
 
+            var orderedVersions= relevantProductVersions.OrderByDescending(v => v);
 
-            return "";
+            return orderedVersions.First().ToString();
         }
 
         public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)

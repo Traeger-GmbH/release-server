@@ -64,5 +64,11 @@ namespace release_server_web_api.Controllers
             var result = new FileContentResult(FsReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version),"application/octet-stream");
             return result;
         }
+        
+        [HttpGet("latest/{product}/{os}/{architecture}")]
+        public string GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
+        {
+            return FsReleaseArtifactService.GetLatestVersion(product, os, architecture);
+        }
     }
 }

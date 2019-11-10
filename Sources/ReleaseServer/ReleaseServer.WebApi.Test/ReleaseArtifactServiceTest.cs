@@ -102,5 +102,24 @@ namespace release_server_web_api_test.TestData
             Assert.Equal(expectedVersions1, testVersions1);
             Assert.Equal(expectedVersions2, testVersions2);
         }
+
+        [Fact]
+        public void TestGetLatestVersion()
+        {
+            //Setup 
+            var repositoryMock = new Mock<IReleaseArtifactRepository>();
+            repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
+            var mockedRepository = repositoryMock.Object;
+            
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            
+            //Act
+            var testVersions1 = releaseArtifactService.GetLatestVersion("product1", "debian", "amd64");
+            var testVersions2 = releaseArtifactService.GetLatestVersion("product1", "ubuntu", "amd64");
+
+            //Assert
+            Assert.Equal("1.2", testVersions1);
+            Assert.Equal("1.0", testVersions2);
+        }
     }
 }
