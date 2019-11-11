@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
@@ -78,5 +79,22 @@ namespace release_server_web_api.Controllers
         {
             return FsReleaseArtifactService.GetLatestVersion(product, os, architecture);
         }
+        
+        [HttpDelete("{product}/{os}/{architecture}/{version}")]
+        public IActionResult DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        {
+            FsReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+
+            return Ok("artifact successfully deleted");
+        }
+        
+        [HttpDelete("{product}")]
+        public IActionResult DeleteProduct ([Required] string product)
+        {
+            FsReleaseArtifactService.DeleteProduct(product);
+
+            return Ok("product successfully deleted");
+        }
+
     }
 }

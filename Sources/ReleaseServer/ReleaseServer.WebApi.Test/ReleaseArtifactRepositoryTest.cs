@@ -102,5 +102,49 @@ namespace release_server_web_api_test
             Assert.True(expectedArtifact.SequenceEqual(testArtifact));
         }
 
+        [Fact]
+        public void TestDeleteSpecificArtifact()
+        {
+            //Setup
+            SetupTestDirectory();
+            
+            //Act 
+            FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
+            
+            //Assert
+            Assert.False(Directory.Exists(Path.Combine(ProjectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1")));
+            
+            //Cleanup
+            Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "producty"), true);
+        }
+        
+        [Fact]
+        public void TestDeleteProduct()
+        {
+            //Setup
+            SetupTestDirectory();
+            
+            //Act 
+            FsReleaseArtifactRepository.DeleteProduct("producty");
+            
+            //Assert
+            Assert.False(Directory.Exists(Path.Combine(ProjectDirectory, "TestData", "producty")));
+        }
+
+        private void SetupTestDirectory()
+        {
+            //Setup
+            var sourcePath = Path.Combine(ProjectDirectory, "TestData", "productx", "ubuntu", "amd64", "1.1");
+            Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1"));
+
+            var files = Directory.GetFiles(sourcePath);
+
+            foreach (var file in files)
+            {
+                var destFile = file.Replace("productx", "producty");
+                File.Copy(file, destFile);
+            }
+        }
+        
     }
 }

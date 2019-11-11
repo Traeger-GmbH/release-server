@@ -137,6 +137,20 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
+        public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        {
+            var path = GeneratePath(productName, os, architecture, version);
+            
+            Directory.Delete(path, true);
+        }
+
+        public void DeleteProduct(string productName)
+        {
+            var path = Path.Combine(ArtifactRoot, productName);
+            
+            Directory.Delete(path, true);
+        }
+
         private string GeneratePath(string product, string os, string architecture, string version)
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
@@ -160,6 +174,8 @@ namespace ReleaseServer.WebApi.Repositories
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
         byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
+        void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
+        void DeleteProduct(string productName);
     }
 }
 

@@ -82,6 +82,16 @@ namespace release_server_web_api.Services
 
             return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion);
         }
+
+        public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        {
+            FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version);
+        }
+
+        public void DeleteProduct(string productName)
+        {
+            FsReleaseArtifactRepository.DeleteProduct(productName);
+        }
     }
     
     public interface IReleaseArtifactService
@@ -94,5 +104,7 @@ namespace release_server_web_api.Services
         string GetLatestVersion(string productName, string os, string architecture);
         byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
         byte[] GetLatestArtifact(string productName, string os, string architecture);
+        void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
+        void DeleteProduct(string productName);
     }
 }
