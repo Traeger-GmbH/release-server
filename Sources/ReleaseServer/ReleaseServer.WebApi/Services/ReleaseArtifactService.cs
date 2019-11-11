@@ -75,6 +75,13 @@ namespace release_server_web_api.Services
         {
            return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version);
         }
+
+        public byte[] GetLatestArtifact(string productName, string os, string architecture)
+        {
+            var latestVersion = GetLatestVersion(productName, os, architecture);
+
+            return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion);
+        }
     }
     
     public interface IReleaseArtifactService
@@ -86,5 +93,6 @@ namespace release_server_web_api.Services
         List<string> GetVersions(string productName, string os, string architecture);
         string GetLatestVersion(string productName, string os, string architecture);
         byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
+        byte[] GetLatestArtifact(string productName, string os, string architecture);
     }
 }

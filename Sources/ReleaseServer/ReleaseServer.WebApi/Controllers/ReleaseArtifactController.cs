@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -59,12 +60,19 @@ namespace release_server_web_api.Controllers
         }
         
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
-        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var result = new FileContentResult(FsReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version),"application/octet-stream");
             return result;
         }
         
+        [HttpGet("download/{product}/{os}/{architecture}/latest")]
+        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture)
+        {
+            var result = new FileContentResult(FsReleaseArtifactService.GetLatestArtifact(product, os, architecture),"application/octet-stream");
+            return result;
+        }
+
         [HttpGet("latest/{product}/{os}/{architecture}")]
         public string GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
