@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Moq;
+using NSubstitute;
 using release_server_web_api.Services;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -65,7 +67,7 @@ namespace release_server_web_api_test.TestData
             repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
             var mockedRepository = repositoryMock.Object;
             
-            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository, Substitute.For<ILogger<FsReleaseArtifactService>>());
 
             //Act
             var testPlatforms1 = releaseArtifactService.GetPlatforms("product1", "1.0");
@@ -92,7 +94,7 @@ namespace release_server_web_api_test.TestData
             repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
             var mockedRepository = repositoryMock.Object;
             
-            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository, Substitute.For<ILogger<FsReleaseArtifactService>>());
             
             //Act
             var testVersions1 = releaseArtifactService.GetVersions("product1", "debian", "amd64");
@@ -111,7 +113,7 @@ namespace release_server_web_api_test.TestData
             repositoryMock.Setup(r => r.GetInfosByProductName("product1")).Returns(new List<ProductInformationModel>(testProductInfos));
             var mockedRepository = repositoryMock.Object;
             
-            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository);
+            var releaseArtifactService = new FsReleaseArtifactService(mockedRepository, Substitute.For<ILogger<FsReleaseArtifactService>>());
             
             //Act
             var testVersions1 = releaseArtifactService.GetLatestVersion("product1", "debian", "amd64");

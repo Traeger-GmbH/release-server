@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -12,10 +13,12 @@ namespace release_server_web_api.Services
     public class FsReleaseArtifactService : IReleaseArtifactService
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
+        private ILogger Logger;
 
-        public FsReleaseArtifactService( IReleaseArtifactRepository fsReleaseArtifactRepository)
+        public FsReleaseArtifactService( IReleaseArtifactRepository fsReleaseArtifactRepository, ILogger<FsReleaseArtifactService> logger)
         {
             FsReleaseArtifactRepository = fsReleaseArtifactRepository;
+            Logger = logger;
         }
         
         public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
@@ -23,6 +26,7 @@ namespace release_server_web_api.Services
 
             using (var zipMapper = new ZipArchiveMapper())
             {
+                Logger.LogDebug("convert the uploaded payload to a ZIP archive");
                 var zipPayload = zipMapper.FormFileToZipArchive(payload);
                 
                 var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);

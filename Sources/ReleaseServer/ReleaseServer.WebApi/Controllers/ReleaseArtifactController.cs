@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -5,8 +6,10 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
+using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Repositories;
 
 
@@ -16,15 +19,23 @@ namespace release_server_web_api.Controllers
     [Route("[controller]")]
     public class ReleaseArtifactController : ControllerBase
     {
-        private IReleaseArtifactService FsReleaseArtifactService { get; }
+        private IReleaseArtifactService FsReleaseArtifactService;
+        private ILogger Logger;
 
-        public ReleaseArtifactController()
+        //TODO: Refactor this kind of logging! 
+        public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
+            ILogger<FsReleaseArtifactRepository> repositoryLogger,
+            ILogger<FsReleaseArtifactService> serviceLogger
+            )
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository());
+            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository(repositoryLogger), serviceLogger);
+            Logger = logger;
         }
 
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
-        public async Task<IActionResult> UploadArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        //Max. 500 MB
+        [RequestSizeLimit(524288000)]
+        public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var file = Request.Form.Files.FirstOrDefault();
             

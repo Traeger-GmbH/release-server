@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -14,10 +14,12 @@ namespace ReleaseServer.WebApi.Repositories
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
         private readonly string ArtifactRoot;
+        private ILogger Logger;
 
-        public FsReleaseArtifactRepository(string artifactRoot = ".")
+        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, string artifactRoot = ".")
         {
             ArtifactRoot = artifactRoot;
+            Logger = logger;
         }
         
         public async Task StoreArtifact(ReleaseArtifactModel artifact)
@@ -34,7 +36,7 @@ namespace ReleaseServer.WebApi.Repositories
                 //If the directory already exists, delete the old content in there
                 if (Directory.Exists(path))
                 {
-                    Console.WriteLine("This path already exits! Old content will be deleted!");
+                    Logger.LogInformation("This path already exits! Old content will be deleted!");
                     
                     var dirInfo = new DirectoryInfo(path);
                         
@@ -43,21 +45,21 @@ namespace ReleaseServer.WebApi.Repositories
                         file.Delete();
                     }
                     
-                    Console.Write("Old path successfully deleted!");
+                    Logger.LogInformation("Old path successfully deleted!");
                 }
                 else
                 {
                     //Create the directory
                     var dirInfo = Directory.CreateDirectory(path);
-                    Console.WriteLine("The directory {0} was successfully created", dirInfo.FullName);
+                    Logger.LogInformation("The directory {0} was successfully created", dirInfo.FullName);
                 }
                 
                 await Task.Run(() => artifact.Payload.ExtractToDirectory(path));
-                Console.WriteLine("The Artifact {0} was successfully unpacked & stored");
+                Logger.LogInformation("The Artifact was successfully unpacked & stored");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogInformation(e.Message);
                 throw;
             }
         }
@@ -99,12 +101,12 @@ namespace ReleaseServer.WebApi.Repositories
                     return changelog;
                 }
                 
-                Console.WriteLine("The directory {0} does not exist!", path);
+                Logger.LogInformation("The directory {0} does not exist!", path);
                 return (new string("Error: Release notes for this artifact not found!"));
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogInformation(e.Message);
                 throw;
             }
         }
@@ -126,14 +128,14 @@ namespace ReleaseServer.WebApi.Repositories
                     
                     return artifact;
                 }
-                Console.WriteLine("The directory {0} does not exist!", path);
+                Logger.LogInformation("The directory {0} does not exist!", path);
                 throw new FileNotFoundException();
             }
             
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
-                Console.WriteLine(e);
-                return Encoding.ASCII.GetBytes(e.Message);
+                Logger.LogInformation(e.Message);
+                throw;
             }
         }
 

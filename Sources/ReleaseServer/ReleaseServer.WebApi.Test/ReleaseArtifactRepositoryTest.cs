@@ -3,6 +3,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -20,7 +22,7 @@ namespace release_server_web_api_test
             //Could be done smarter
             ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName; 
             
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(Path.Combine(ProjectDirectory, "TestData"));
+            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(Substitute.For<ILogger<FsReleaseArtifactRepository>>(),Path.Combine(ProjectDirectory, "TestData"));
         }
         
         [Fact]
