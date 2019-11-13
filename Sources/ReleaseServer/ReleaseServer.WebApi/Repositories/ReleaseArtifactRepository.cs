@@ -59,7 +59,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogInformation(e.Message);
+                Logger.LogCritical(e.Message);
                 throw;
             }
         }
@@ -101,12 +101,12 @@ namespace ReleaseServer.WebApi.Repositories
                     return changelog;
                 }
                 
-                Logger.LogInformation("The directory {0} does not exist!", path);
-                return (new string("Error: Release notes for this artifact not found!"));
+                throw new FileNotFoundException("Error: Release notes for this artifact not found!");
+                
             }
             catch (Exception e)
             {
-                Logger.LogInformation(e.Message);
+                Logger.LogCritical(e.Message);
                 throw;
             }
         }
@@ -134,7 +134,7 @@ namespace ReleaseServer.WebApi.Repositories
             
             catch (Exception e)
             {
-                Logger.LogInformation(e.Message);
+                Logger.LogCritical(e.Message);
                 throw;
             }
         }
