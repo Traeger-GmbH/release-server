@@ -1,8 +1,8 @@
-# Dokumentation der REST-API (Stand 13.11.2019)
+# Documentation of the REST API
 
-## 1. Upload eines Release-Artifacts (Story 2)
+## 1. Upload a release artifact
 
-Ermöglicht den Upload eines eindeutigen Release-Artefakts.
+Upload of a specific release artifact.
 
 - **URL** : `/releaseartifact/upload/:product/:os/:hwArch/:version`
 
@@ -12,13 +12,13 @@ Ermöglicht den Upload eines eindeutigen Release-Artefakts.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
-    `version=[string]`: Die Versionsnummer (z.B. 1.0)
+    `version=[string]`: The version (e.g. 1.0)
 
 - **Auth required** : NO
 
@@ -26,7 +26,7 @@ Ermöglicht den Upload eines eindeutigen Release-Artefakts.
 
 - **Success Response**
 
-    **Condition** : Sobald das Paket erfolgreich entpackt und gespeichert wurde.
+    **Condition** : If the uploaded package is unpacked & stored successfully.
 
     **Code** : `200 OK`
 
@@ -34,7 +34,7 @@ Ermöglicht den Upload eines eindeutigen Release-Artefakts.
 
 - **Error Response 1**
 
-    **Condition** : Wenn ein falscher Body übergeben wird (kein `'content-type: multipart/form-data;`)
+    **Condition** : If you provide the wrong body (not `'content-type: multipart/form-data;`)
 
     **Code** : `400 BAD REQUEST`
 
@@ -51,7 +51,7 @@ Ermöglicht den Upload eines eindeutigen Release-Artefakts.
 
 - **Error Response 2**
 
-    **Condition** : Wenn der Body >500 MB ist.
+    **Condition** : If the provided body size > 500 MB.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -69,9 +69,9 @@ Ermöglicht den Upload eines eindeutigen Release-Artefakts.
 <div style="page-break-after: always;">
 
 
-## 2. Liste alle verfügbaren Produkte (Story 3)
+## 2. List all available products
 
-Ermöglicht eine Auflistung aller verfügbaren Produkte.
+Retrieves all available products.
 
 - **URL** : `/releaseartifact/versions/:product`
 
@@ -81,7 +81,7 @@ Ermöglicht eine Auflistung aller verfügbaren Produkte.
 
     **Required:**
 
-    `product=[string]`: der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
 
 - **Auth required** : NO
@@ -90,7 +90,7 @@ Ermöglicht eine Auflistung aller verfügbaren Produkte.
 
 - **Success Response**
 
-    **Condition** : Wenn Produkte mit dem spezifizierten Namen existieren.
+    **Condition** : If there exists a product with the specified product name.
 
     **Code** : `200 OK`
 
@@ -113,7 +113,7 @@ Ermöglicht eine Auflistung aller verfügbaren Produkte.
 
 - **Error Response**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -131,9 +131,9 @@ Ermöglicht eine Auflistung aller verfügbaren Produkte.
 <div style="page-break-after: always;">
 
 
-## 3. Liefere Changelog für ein Produkt (Story 4)
+## 3. Get the changelog of a specific product
 
-Liefert den Changelog für ein spezifisches Produkt. 
+Retrieves the changelog of a specific product.
 
 - **URL** : `/releaseartifact/info/:product/:os/:hwArch/:version`
 
@@ -143,13 +143,13 @@ Liefert den Changelog für ein spezifisches Produkt.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
-    `version=[string]`: Die Versionsnummer (z.B. 1.0)
+    `version=[string]`: The version (e.g. 1.0)
 
 
 - **Auth required** : NO
@@ -158,7 +158,7 @@ Liefert den Changelog für ein spezifisches Produkt.
 
 - **Success Response**
 
-    **Condition** : Wenn das spezifische Produkt existiert.
+    **Condition** : If the specific product exists.
 
     **Code** : `200 OK`
 
@@ -172,7 +172,7 @@ Liefert den Changelog für ein spezifisches Produkt.
 
 - **Error Response**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert bzw. keine Release-Notes vorhanden sind.
+    **Condition** : If the product with the specified product name does not exist or if there is no changelog available.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -190,9 +190,9 @@ Liefert den Changelog für ein spezifisches Produkt.
 <div style="page-break-after: always;">
 
 
-## 4. Liste alle verfügbaren Plattformen eines Produktes (Story 5)
+## 4. List all available platforms for a specific product
 
-Listet alle verfügbaren Plattformen für ein spezifisches Product
+Retrieves all available platforms for a specific product.
 
 - **URL** : `/releaseartifact/platforms/:product/:version`
 
@@ -202,9 +202,9 @@ Listet alle verfügbaren Plattformen für ein spezifisches Product
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `version=[string]`: Die Versionsnummer (z.B. 1.0)
+    `version=[string]`: The version (e.g. 1.0)
 
 
 - **Auth required** : NO
@@ -213,7 +213,7 @@ Listet alle verfügbaren Plattformen für ein spezifisches Product
 
 - **Success Response 1**
 
-    **Condition** : Wenn Plattformen für das spezifische Produkt existieren.
+    **Condition** : If there are existing platforms for the specified product.
 
     **Code** : `200 OK`
 
@@ -225,7 +225,7 @@ Listet alle verfügbaren Plattformen für ein spezifisches Product
 
 - **Success Response 2**
 
-    **Condition** : Wenn keine Plattformen für das spezifische Produkt existieren.
+    **Condition** : If there exists no platform for the specified product.
 
     **Code** : `200 OK`
 
@@ -237,7 +237,7 @@ Listet alle verfügbaren Plattformen für ein spezifisches Product
 
 - **Error Response**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -255,9 +255,9 @@ Listet alle verfügbaren Plattformen für ein spezifisches Product
 <div style="page-break-after: always;">
 
 
-## 5. Liste alle verfügbaren Versionen zu einer Plattform sowie eines Produktes (Story 6)
+## 5. List all available versions for a specific platform & product
 
-Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifischen Plattform
+Retrieves all available versions that are fitting to a specific product & platform (HW architecture + OS).
 
 - **URL** : `/releaseartifact/versions/:product/:os/:hwArch`
 
@@ -267,11 +267,11 @@ Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifi
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
 - **Auth required** : NO
 
@@ -279,7 +279,7 @@ Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifi
 
 - **Success Response 1**
 
-    **Condition** : Wenn Versionen für das spezifische Produkt & Plattform existieren.
+    **Condition** : If there are existing versions for the specified platform & product.
 
     **Code** : `200 OK`
 
@@ -291,7 +291,7 @@ Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifi
 
 - **Success Response 2**
 
-    **Condition** : Wenn keine Versionen für das spezifische Produkt & Plattform existieren.
+    **Condition** : If there are no versions for the specified product & platform.
 
     **Code** : `200 OK`
 
@@ -303,7 +303,7 @@ Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifi
 
 - **Error Response**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -321,9 +321,9 @@ Listet alle verfügbaren Versionen für ein spezifisches Product & einer spezifi
 <div style="page-break-after: always;">
 
 
-## 6. Download eines spezifischen Produktes / Artefaktes (Story 7)
+## 6. Download of a specific product / artifact
 
-Liefert das Artefakt des spezifischen Produktes.
+Retrieves the artifact of the specified product.
 
 - **URL** : `/releaseartifact/download/:product/:os/:hwArch/:version`
 
@@ -333,13 +333,13 @@ Liefert das Artefakt des spezifischen Produktes.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
-    `version=[string]`: Die Versionsnummer (z.B. 1.0)
+    `version=[string]`: The version (e.g. 1.0)
 
 - **Auth required** : NO
 
@@ -347,16 +347,16 @@ Liefert das Artefakt des spezifischen Produktes.
 
 - **Success Response**
 
-    **Condition** : Wenn das spezifizierte Produkt existiert.
+    **Condition** : If there exists a product with the specified product name.
 
     **Code** : `200 OK`
 
-    **Content example** : ZIP-Datei mit dem Artefakt / Produkt.
+    **Content example** : ZIP file with the artifact.
 
 
 - **Error Response**
 
-    **Condition** :  Wenn das spezifizierte Produkt nicht existiert.
+    **Condition** :  If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -374,9 +374,9 @@ Liefert das Artefakt des spezifischen Produktes.
 <div style="page-break-after: always;">
 
 
-## 7. Download der neuesten Version eines spezifischen Produktes / Artefaktes (Story 8)
+## 7. Download of latest version of a specific artifact / product 
 
-Liefert das neueste Artefakt des spezifischen Produktes.
+Retrieves the latest artifact of a specific product.
 
 - **URL** : `/releaseartifact/download/:product/:os/:hwArch/latest`
 
@@ -386,11 +386,11 @@ Liefert das neueste Artefakt des spezifischen Produktes.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
 - **Auth required** : NO
 
@@ -398,16 +398,16 @@ Liefert das neueste Artefakt des spezifischen Produktes.
 
 - **Success Response**
 
-    **Condition** : Wenn das spezifizierte Produkt existiert.
+    **Condition** : If the specific product exists.
 
     **Code** : `200 OK`
 
-    **Content example** : ZIP-Datei mit dem Artefakt / Produkt.
+    **Content example** : ZIP file with the artifact.
 
 
 - **Error Response 1**
 
-    **Condition** :  Wenn das Produkt die spezifizierte Plattform (OS + HW-Architektur) nicht unterstützt.
+    **Condition** :  If the product is not available for the specified platform (OS + HW architecture).
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -420,7 +420,7 @@ Liefert das neueste Artefakt des spezifischen Produktes.
     ```
 - **Error Response2**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -438,9 +438,9 @@ Liefert das neueste Artefakt des spezifischen Produktes.
 <div style="page-break-after: always;">
 
 
-## 8. Liste die neueste Version eines spezifischen Produktes / Artefaktes (Story 9)
+## 8. Retrieve the newest version of a specific product
 
-Liefert die neueste Versionsnummer des spezifischen Produktes.
+Retrieves the newest version of a specific product.
 
 - **URL** : `/releaseartifact/latest/:product/:os/:hwArch`
 
@@ -450,11 +450,11 @@ Liefert die neueste Versionsnummer des spezifischen Produktes.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
 - **Auth required** : NO
 
@@ -462,7 +462,7 @@ Liefert die neueste Versionsnummer des spezifischen Produktes.
 
 - **Success Response**
 
-    **Condition** : Wenn das spezifizierte Produkt existiert.
+    **Condition** : If the specified product exists.
 
     **Code** : `200 OK`
 
@@ -474,7 +474,7 @@ Liefert die neueste Versionsnummer des spezifischen Produktes.
 
 - **Error Response 1**
 
-    **Condition** :  Wenn das Produkt die spezifizierte Plattform (OS + HW-Architektur) nicht unterstützt.
+    **Condition** :  If the product is not available for the specified platform (OS + HW architecture).
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -487,7 +487,7 @@ Liefert die neueste Versionsnummer des spezifischen Produktes.
     ```
 - **Error Response2**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If the product with the specified product name does not exist.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -505,9 +505,9 @@ Liefert die neueste Versionsnummer des spezifischen Produktes.
 <div style="page-break-after: always;">
 
 
-## 9. Lösche ein spezifisches Produkt / Artefakt (Story 10)
+## 9. Delete a specific artififact / product 
 
-Löscht das spezifizierte Produkt.
+Deletes the specified product.
 
 - **URL** : `/releaseartifact/:product/:os/:hwArch/:version`
 
@@ -517,13 +517,13 @@ Löscht das spezifizierte Produkt.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
-    `os=[string]`: Das Betriebssystem (z.B. ubuntu)
+    `os=[string]`: The operating system (e.g. ubuntu)
 
-    `hwArch=[string]`: Die Hardware-Architektur (z.B. amd64)
+    `hwArch=[string]`: The hardware architecture (e.g. amd64)
 
-    `version=[string]`: Die Versionsnummer (z.B. 1.0)
+    `version=[string]`: The version (e.g. 1.0)
 
 - **Auth required** : NO
 
@@ -531,7 +531,7 @@ Löscht das spezifizierte Produkt.
 
 - **Success Response**
 
-    **Condition** : Wenn das spezifizierte Produkt erfolgreich gelöscht wurde.
+    **Condition** : If the specified product got deleted successfully.
 
     **Code** : `200 OK`
 
@@ -542,7 +542,7 @@ Löscht das spezifizierte Produkt.
 
 - **Error Response**
 
-    **Condition** : Wenn das Produkt mit dem spezifizierten Namen nicht existiert.
+    **Condition** : If there exists no product with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -561,9 +561,9 @@ Löscht das spezifizierte Produkt.
 <div style="page-break-after: always;">
 
 
-## 10. Lösche eine gesamte Produktreihe (Story 10)
+## 10. Delete the whole product line
 
-Löscht alle Produkte eines spezifischen Produktnamens.
+Deletes all products of a specific product name.
 
 - **URL** : `/releaseartifact/:product`
 
@@ -573,7 +573,7 @@ Löscht alle Produkte eines spezifischen Produktnamens.
 
     **Required:**
 
-    `product=[string]`: Der eindeutige Produktname (z.B. softwareX)
+    `product=[string]`: The unique product name (e.g. softwareX)
 
 - **Auth required** : NO
 
@@ -581,7 +581,7 @@ Löscht alle Produkte eines spezifischen Produktnamens.
 
 - **Success Response**
 
-    **Condition** : Wenn alle Produkte des spezifizierten Produktnamens erfolgreich gelöscht wurden.
+    **Condition** : If all products of the specified product name got deleted successfully.
 
     **Code** : `200 OK`
 
@@ -592,7 +592,7 @@ Löscht alle Produkte eines spezifischen Produktnamens.
 
 - **Error Response**
 
-    **Condition** : Wenn die Produktreihe mit dem spezifizierten Produktnamen nicht existiert.
+    **Condition** : If there exists no product line with the specified product name.
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
