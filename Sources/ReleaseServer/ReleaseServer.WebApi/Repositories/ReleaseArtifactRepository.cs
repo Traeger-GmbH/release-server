@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
@@ -111,7 +112,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)
+        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version)
         {
             try
             {
@@ -124,9 +125,13 @@ namespace ReleaseServer.WebApi.Repositories
                     
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
                     
-                    byte[] artifact = File.ReadAllBytes(Path.Combine(path, deploymentMetaInfo.ArtifactFileName));
                     
-                    return artifact;
+                    return new ArtifactDownloadModel
+                    {
+                        Payload = File.ReadAllBytes(Path.Combine(path, deploymentMetaInfo.ArtifactFileName)),
+                        FileName = deploymentMetaInfo.ArtifactFileName,
+                    };
+                    
                 }
                 Logger.LogInformation("The directory {0} does not exist!", path);
                 throw new FileNotFoundException();
@@ -175,7 +180,7 @@ namespace ReleaseServer.WebApi.Repositories
         Task StoreArtifact(ReleaseArtifactModel artifact);
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
-        byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
+        ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
     }

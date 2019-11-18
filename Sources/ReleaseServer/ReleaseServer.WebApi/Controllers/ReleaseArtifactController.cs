@@ -1,15 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Repositories;
 
 
@@ -74,15 +71,49 @@ namespace release_server_web_api.Controllers
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
         public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
-            var result = new FileContentResult(FsReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version),"application/octet-stream");
-            return result;
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+
+            var response = FsReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
+
+            //Determine the content type
+            if (!provider.TryGetContentType(response.FileName, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            
+            //Set the filename of the response
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = response.FileName
+            };
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            
+            return new FileContentResult(response.Payload, contentType);
         }
         
         [HttpGet("download/{product}/{os}/{architecture}/latest")]
-        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture)
+        public IActionResult  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
-            var result = new FileContentResult(FsReleaseArtifactService.GetLatestArtifact(product, os, architecture),"application/octet-stream");
-            return result;
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+
+            var response = FsReleaseArtifactService.GetLatestArtifact(product, os, architecture);
+
+            //Determine the content type
+            if (!provider.TryGetContentType(response.FileName, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            
+            //Set the filename of the response
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = response.FileName
+            };
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            
+            return new FileContentResult(response.Payload, contentType);
         }
 
         [HttpGet("latest/{product}/{os}/{architecture}")]

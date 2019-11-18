@@ -75,12 +75,12 @@ namespace release_server_web_api.Services
             return orderedVersions.First().ToString();
         }
 
-        public byte[] GetSpecificArtifact(string productName, string os, string architecture, string version)
+        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version)
         {
            return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version);
         }
 
-        public byte[] GetLatestArtifact(string productName, string os, string architecture)
+        public ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture)
         {
             var latestVersion = GetLatestVersion(productName, os, architecture);
 
@@ -106,8 +106,8 @@ namespace release_server_web_api.Services
         string GetReleaseInfo(string productName, string os, string architecture, string version);
         List<string> GetVersions(string productName, string os, string architecture);
         string GetLatestVersion(string productName, string os, string architecture);
-        byte[] GetSpecificArtifact(string productName, string os, string architecture, string version);
-        byte[] GetLatestArtifact(string productName, string os, string architecture);
+        ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
+        ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture);
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
     }

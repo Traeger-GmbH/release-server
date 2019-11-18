@@ -93,15 +93,21 @@ namespace release_server_web_api_test
         public void TestGetSpecificArtifact()
         {
             //Setup
-            var expectedArtifact = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "productx",
-                "ubuntu", "amd64", "1.1", "artifact.zip"));
-            
+            var expectedArtifact = new ArtifactDownloadModel
+            {
+                FileName = Path.GetFileName(Path.Combine(ProjectDirectory, "TestData", "productx",
+                    "ubuntu", "amd64", "1.1", "artifact.zip")),
+
+                Payload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "productx",
+                    "ubuntu", "amd64", "1.1", "artifact.zip"))
+            };
+
             //Act
             var testArtifact = FsReleaseArtifactRepository.GetSpecificArtifact("productx",
                 "ubuntu", "amd64", "1.1");
             
             //Assert
-            Assert.True(expectedArtifact.SequenceEqual(testArtifact));
+            testArtifact.Should().BeEquivalentTo(expectedArtifact);
         }
 
         [Fact]
