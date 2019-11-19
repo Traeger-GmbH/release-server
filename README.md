@@ -4,4 +4,4 @@ An application for managing your own release artifacts. The release server provi
 
 - Upload the release artifacts
 - Download the release artifacts
-- Get informations about the release artifacts (e.g. which version is the latest etc.)
+- Get information about the release artifacts (e.g. which version is the latest etc.)
