@@ -11,9 +11,14 @@ namespace ReleaseServer.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            var conf = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json")
+                .Build();
+            
+            Configuration = conf;
         }
 
         public IConfiguration Configuration { get; }
@@ -38,7 +43,6 @@ namespace ReleaseServer.WebApi
 
             app.UseAuthorization();
             
-            //See: https://stackoverflow.com/questions/38630076/asp-net-core-web-api-exception-handling
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();

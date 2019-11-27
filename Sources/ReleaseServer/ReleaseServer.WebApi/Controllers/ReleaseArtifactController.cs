@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
@@ -22,10 +23,11 @@ namespace release_server_web_api.Controllers
         //TODO: Refactor this kind of logging! 
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
             ILogger<FsReleaseArtifactRepository> repositoryLogger,
-            ILogger<FsReleaseArtifactService> serviceLogger
-            )
+            ILogger<FsReleaseArtifactService> serviceLogger,
+            IConfiguration configuration
+        )
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository(repositoryLogger), serviceLogger);
+            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository(repositoryLogger, configuration["ArtifactRootDirectory"]), serviceLogger);
             Logger = logger;
         }
 

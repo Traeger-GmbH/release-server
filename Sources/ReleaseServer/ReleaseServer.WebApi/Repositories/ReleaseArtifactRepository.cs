@@ -17,7 +17,7 @@ namespace ReleaseServer.WebApi.Repositories
         private readonly string ArtifactRoot;
         private ILogger Logger;
 
-        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, string artifactRoot = ".")
+        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, string artifactRoot)
         {
             ArtifactRoot = artifactRoot;
             Logger = logger;
