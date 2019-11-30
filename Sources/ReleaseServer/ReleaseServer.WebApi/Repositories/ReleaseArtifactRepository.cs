@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -26,37 +27,48 @@ namespace ReleaseServer.WebApi.Repositories
         public async Task StoreArtifact(ReleaseArtifactModel artifact)
         {
             
-           var path = GeneratePath(
+           var path = GenerateArtifactPath(
                 artifact.ProductInformation.ProductIdentifier,
                 artifact.ProductInformation.Os,
                 artifact.ProductInformation.HwArchitecture,
                 artifact.ProductInformation.Version.ToString());
 
+           var tmpPath = GenerateTemporaryPath();
+
             try
             {
+                //Create the temporary directory
+                if (!Directory.Exists(tmpPath))
+                    Directory.CreateDirectory(tmpPath);
+                
+                //Extract the payload to the temporary directory
+                await Task.Run(() => artifact.Payload.ExtractToDirectory(tmpPath));
+                Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
+                
                 //If the directory already exists, delete the old content in there
                 if (Directory.Exists(path))
                 {
                     Logger.LogInformation("This path already exits! Old content will be deleted!");
                     
                     var dirInfo = new DirectoryInfo(path);
-                        
-                    foreach (var file in dirInfo.GetFiles())
-                    {
-                        file.Delete();
-                    }
+                    dirInfo.Delete(true);
                     
                     Logger.LogInformation("Old path successfully deleted!");
                 }
                 else
                 {
-                    //Create the directory
+                    //Create the directory & delete the last directory hierarchy of the path
+                    //(this is necessary, so that Directory.Move() below does not fail with "Directory already exists" 
                     var dirInfo = Directory.CreateDirectory(path);
-                    Logger.LogInformation("The directory {0} was successfully created", dirInfo.FullName);
+                    dirInfo.Delete();
+                    Logger.LogInformation("The directory {0} was successfully created", dirInfo.Parent.FullName);
                 }
                 
-                await Task.Run(() => artifact.Payload.ExtractToDirectory(path));
-                Logger.LogInformation("The Artifact was successfully unpacked & stored");
+                Directory.CreateDirectory(Path.Combine(ArtifactRoot, artifact.ProductInformation.ProductIdentifier));
+                
+                //Move the extracted payload to the right directory
+                Directory.Move(tmpPath, path);
+                Logger.LogInformation("The Artifact was successfully stored");
             }
             catch (Exception e)
             {
@@ -89,7 +101,7 @@ namespace ReleaseServer.WebApi.Repositories
         {
             try
             {
-                var path = GeneratePath(product, os, architecture, version);
+                var path = GenerateArtifactPath(product, os, architecture, version);
 
                 if (Directory.Exists(path))
                 {
@@ -116,7 +128,7 @@ namespace ReleaseServer.WebApi.Repositories
         {
             try
             {
-                var path = GeneratePath(productName, os, architecture, version);
+                var path = GenerateArtifactPath(productName, os, architecture, version);
                 
                 if (Directory.Exists(path))
                 {
@@ -146,7 +158,7 @@ namespace ReleaseServer.WebApi.Repositories
 
         public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
         {
-            var path = GeneratePath(productName, os, architecture, version);
+            var path = GenerateArtifactPath(productName, os, architecture, version);
             
             Directory.Delete(path, true);
         }
@@ -158,9 +170,14 @@ namespace ReleaseServer.WebApi.Repositories
             Directory.Delete(path, true);
         }
 
-        private string GeneratePath(string product, string os, string architecture, string version)
+        private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
+        }
+        
+        private string GenerateTemporaryPath()
+        {
+            return Path.Combine(ArtifactRoot, "temp", Guid.NewGuid().ToString());
         }
 
         private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
