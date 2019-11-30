@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NSubstitute;
 using release_server_web_api.Services;
+using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
@@ -24,7 +25,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "ubuntu",
                     HwArchitecture = "arm64",
-                    Version = new Version("1.0")
+                    Version = "1.0".ToProductVersion()
                 },
 
                 new ProductInformationModel
@@ -32,7 +33,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "ubuntu",
                     HwArchitecture = "amd64",
-                    Version = new Version("1.0")
+                    Version = "1.0".ToProductVersion()
                 },
                 
                 new ProductInformationModel
@@ -40,7 +41,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "debian",
                     HwArchitecture = "amd64",
-                    Version = new Version("1.2")
+                    Version = "1.2".ToProductVersion()
                 },
 
                 new ProductInformationModel
@@ -48,7 +49,7 @@ namespace release_server_web_api_test.TestData
                     ProductIdentifier = "product1",
                     Os = "debian",
                     HwArchitecture = "amd64",
-                    Version = new Version("1.1")
+                    Version = "1.1".ToProductVersion()
                 }
             };
         }

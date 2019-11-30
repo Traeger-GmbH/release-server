@@ -42,7 +42,7 @@ namespace release_server_web_api.Services
         {
             var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);            
             var relevantProductInfos = from productInfo in productInfos
-                where productInfo.Version == new Version(version)
+                where productInfo.Version == version.ToProductVersion()
                 select productInfo;
 
             return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Os + "-" + relevantProductInfo.HwArchitecture).ToList();

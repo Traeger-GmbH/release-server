@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Models
     {
         public string ProductIdentifier { get; set; }
         
-        public Version Version { get; set; }
+        public ProductVersion Version { get; set; }
         
         public string Os { get; set; }
         

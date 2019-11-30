@@ -17,7 +17,7 @@ namespace ReleaseServer.WebApi.Mappers
                     ProductIdentifier = product,
                     Os = os,
                     HwArchitecture = architecture,
-                    Version = new Version(version)
+                    Version = version.ToProductVersion()
                 },
                 Payload = payload
             };

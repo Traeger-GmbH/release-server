@@ -1,4 +1,3 @@
-using System;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Mappers
@@ -22,9 +21,10 @@ namespace ReleaseServer.WebApi.Mappers
                     ProductIdentifier = infos[0],
                     Os = infos[1],
                     HwArchitecture = infos[2],
-                    Version = new Version(infos[3])
+                    Version = infos[3].ToProductVersion()
                 };
             }
+
             return null;
         }
     }
