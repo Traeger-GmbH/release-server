@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using ReleaseServer.WebApi.Auth;
 
 namespace ReleaseServer.WebApi
 {
@@ -27,6 +29,9 @@ namespace ReleaseServer.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +46,7 @@ namespace ReleaseServer.WebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
             
             app.UseExceptionHandler(a => a.Run(async context =>
