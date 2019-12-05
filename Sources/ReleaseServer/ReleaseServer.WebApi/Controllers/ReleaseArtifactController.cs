@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using release_server_web_api.Services;
 using ReleaseServer.WebApi.Repositories;
@@ -92,9 +93,9 @@ namespace release_server_web_api.Controllers
             }
             
             //Set the filename of the response
-            var cd = new System.Net.Mime.ContentDisposition
+            var cd = new ContentDispositionHeaderValue("attachment")
             {
-                FileName = response.FileName
+                FileNameStar = response.FileName
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
             
