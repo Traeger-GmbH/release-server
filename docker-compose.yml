@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  release-server:
+    build: .
+    working_dir: /app
+    ports: 
+      - "5001:5001"
+    environment: 
+      - SERVER_AUTH_PATH=/auth/credentials.json
+    volumes: 
+      - ./Sources/ReleaseServer/ReleaseServer.WebApi/appsettings.json:/app/appsettings.json
+      - ./artifacts:/app/artifacts
+      - ./credentials.json:/auth/credentials.json
