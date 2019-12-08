@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -79,7 +80,16 @@ namespace release_server_web_api_test
         public void TestGetReleaseInfo()
         {
             //Setup 
-            var expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
+            string expectedReleaseInfo;
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
+            }
+            else
+            {
+                expectedReleaseInfo = "Release 1.0.0\n- This is an example\n- This is another example";
+            }
             
             //Act
             var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("productx", "ubuntu",
