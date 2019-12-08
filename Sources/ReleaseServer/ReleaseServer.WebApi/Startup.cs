@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -18,6 +19,7 @@ namespace ReleaseServer.WebApi
             var conf = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile(Environment.GetEnvironmentVariable("SERVER_AUTH_PATH"))
                 .Build();
             
             Configuration = conf;

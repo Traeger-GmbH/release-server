@@ -24,7 +24,7 @@ namespace ReleaseServer.WebApi.Auth
             UrlEncoder encoder, 
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            AuthPath = configuration["AuthDirectory"];
+            AuthPath = Environment.GetEnvironmentVariable("SERVER_AUTH_PATH");
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
