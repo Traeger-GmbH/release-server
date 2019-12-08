@@ -3,5 +3,5 @@ mono: none
 dotnet: 3.0
 solution: ReleaseServer.sln
 script:
-  - dotnet restore
-  - dotnet test
+  - dotnet restore ./Sources/ReleaseServer/
+  - dotnet test ./Sources/ReleaseServer/
