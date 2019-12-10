@@ -40,12 +40,7 @@ namespace release_server_web_api.Services
 
         public List<string> GetPlatforms(string productName, string version)
         {
-            var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);            
-            var relevantProductInfos = from productInfo in productInfos
-                where productInfo.Version == version.ToProductVersion()
-                select productInfo;
-
-            return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Os + "-" + relevantProductInfo.HwArchitecture).ToList();
+            return FsReleaseArtifactRepository.GetPlatforms(productName, version);
         }
 
         public string GetReleaseInfo(string productName, string os, string architecture, string version)
@@ -55,24 +50,14 @@ namespace release_server_web_api.Services
 
         public List<string> GetVersions(string productName, string os, string architecture)
         {
-            var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);            
-            var relevantProductInfos = from productInfo in productInfos
-                where productInfo.Os == os && productInfo.HwArchitecture == architecture
-                select productInfo;
-
-            return relevantProductInfos.Select(relevantProductInfo => relevantProductInfo.Version.ToString()).ToList();
+            return FsReleaseArtifactRepository.GetVersions(productName, os, architecture);
         }
 
         public string GetLatestVersion(string productName, string os, string architecture)
         {
-            var productInfos = FsReleaseArtifactRepository.GetInfosByProductName(productName);
-            var relevantProductVersions = from productInfo in productInfos
-                where productInfo.Os == os && productInfo.HwArchitecture == architecture
-                select productInfo.Version;
-
-            var orderedVersions= relevantProductVersions.OrderByDescending(v => v);
-
-            return orderedVersions.First().ToString();
+            var versions = FsReleaseArtifactRepository.GetVersions(productName, os, architecture);
+            
+            return versions.First();
         }
 
         public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version)

@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -17,13 +17,12 @@ namespace release_server_web_api_test
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
         private readonly string ProjectDirectory;
-
         public ReleaseArtifactRepositoryTest()
         {
             //Could be done smarter
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName; 
-            
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(Substitute.For<ILogger<FsReleaseArtifactRepository>>(),Path.Combine(ProjectDirectory, "TestData"));
+            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
+                Substitute.For<ILogger<FsReleaseArtifactRepository>>(), Path.Combine(ProjectDirectory, "TestData"));
         }
         
         [Fact]
@@ -74,6 +73,59 @@ namespace release_server_web_api_test
 
             //Cleanup
             Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "testproduct"), true);
+        }
+        
+        [Fact]
+        public void TestGetPlatforms()
+        {
+            //Setup
+            List<string> expectedPlatforms1 = new List<string>()
+                {"ubuntu-amd64", "ubuntu-arm64"};
+            
+            List<string> expectedPlatforms2 = new List<string>()
+                {"debian-amd64", "ubuntu-amd64"};
+            
+            List<string> expectedPlatforms3 = new List<string>()
+                {"debian-amd64"};
+
+            //Act
+            var testPlatforms1 = FsReleaseArtifactRepository.GetPlatforms("productx", "1.0");
+            var testPlatforms2 = FsReleaseArtifactRepository.GetPlatforms("productx", "1.1");
+            var testPlatforms3 = FsReleaseArtifactRepository.GetPlatforms("productx", "1.2-beta");
+
+            //Assert
+            Assert.Equal(expectedPlatforms1, testPlatforms1);
+            Assert.Equal(expectedPlatforms2, testPlatforms2);
+            Assert.Equal(expectedPlatforms3, testPlatforms3);
+        }
+        
+        
+        [Fact]
+        public void TestGetVersions()
+        {
+            //Setup 
+            List<string> expectedVersions1 = new List<string>()
+                {"1.2-beta", "1.1"};
+
+            List<string> expectedVersions2 = new List<string>()
+            {
+                "1.1", "1.0"
+            };
+            
+            List<string> expectedVersions3 = new List<string>()
+            {
+                "1.0"
+            };
+            
+            //Act
+            var testVersions1 = FsReleaseArtifactRepository.GetVersions("productx", "debian", "amd64");
+            var testVersions2 = FsReleaseArtifactRepository.GetVersions("productx", "ubuntu", "amd64");
+            var testVersions3 = FsReleaseArtifactRepository.GetVersions("productx", "ubuntu", "arm64");
+
+            //Assert
+            Assert.Equal(expectedVersions1, testVersions1);
+            Assert.Equal(expectedVersions2, testVersions2);
+            Assert.Equal(expectedVersions3, testVersions3);
         }
 
         [Fact]
@@ -163,6 +215,5 @@ namespace release_server_web_api_test
                 File.Copy(file, destFile);
             }
         }
-        
     }
 }

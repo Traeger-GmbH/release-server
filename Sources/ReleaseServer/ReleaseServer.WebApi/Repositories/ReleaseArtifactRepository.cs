@@ -16,11 +16,13 @@ namespace ReleaseServer.WebApi.Repositories
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
         private readonly string ArtifactRoot;
+        private readonly DirectoryInfo ArtifactRootDir;
         private ILogger Logger;
 
         public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, string artifactRoot)
         {
             ArtifactRoot = artifactRoot;
+            ArtifactRootDir = new DirectoryInfo(artifactRoot);
             Logger = logger;
         }
         
@@ -79,22 +81,21 @@ namespace ReleaseServer.WebApi.Repositories
 
         public List<ProductInformationModel> GetInfosByProductName(string productName)
         {
-            //Get all directories / subdirectories
-            //TODO: filtering with File operations
-            var directories = Directory.GetDirectories(Path.Combine(ArtifactRoot, productName), "*", SearchOption.AllDirectories);
-            var retVal = new List<ProductInformationModel>();
-            
-            foreach (var directory in directories)
-            {
-                var productInfo = ProductInformationMapper.PathToProductInfo(ArtifactRoot, directory);
-                    
-                //Is null, if the directory hasn't a depth of 5
-                if (productInfo != null)
+            var productInformations =
+                from productDir in ArtifactRootDir.EnumerateDirectories()
+                where productDir.Name == productName
+                from osDir in productDir.EnumerateDirectories()
+                from hwArchDir in osDir.EnumerateDirectories()
+                from versionDir in hwArchDir.EnumerateDirectories()
+                select new ProductInformationModel()
                 {
-                    retVal.Add(productInfo);
-                }
-            }
-            return retVal;
+                    ProductIdentifier = productDir.Name,
+                    Os = osDir.Name,
+                    HwArchitecture = hwArchDir.Name,
+                    Version = versionDir.Name.ToProductVersion()
+                };
+
+            return productInformations.ToList();
         }
 
         public string GetReleaseInfo(string product, string os, string architecture, string version)
@@ -170,6 +171,35 @@ namespace ReleaseServer.WebApi.Repositories
             Directory.Delete(path, true);
         }
 
+        public List<string> GetVersions(string productName, string os, string architecture)
+        {
+            var versions =
+                from productDir in ArtifactRootDir.EnumerateDirectories()
+                where productDir.Name == productName
+                from osDir in productDir.EnumerateDirectories()
+                where osDir.Name == os
+                from hwArchDir in osDir.EnumerateDirectories()
+                where hwArchDir.Name == architecture
+                from versionDir in hwArchDir.EnumerateDirectories()
+                select versionDir.Name;
+        
+            return versions.OrderByDescending(v => v).ToList();
+        }
+
+        public List<string> GetPlatforms(string productName, string version)
+        {
+            var platforms =
+                from productDir in ArtifactRootDir.EnumerateDirectories()
+                where productDir.Name == productName
+                from osDir in productDir.EnumerateDirectories()
+                from hwArchDir in osDir.EnumerateDirectories()
+                from versionDir in hwArchDir.EnumerateDirectories()
+                where versionDir.Name == version
+                select osDir.Name + "-" + hwArchDir.Name;
+
+            return platforms.ToList();
+        }
+
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
@@ -200,6 +230,8 @@ namespace ReleaseServer.WebApi.Repositories
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
+        List<string> GetVersions(string productName, string os, string architecture);
+        List<string> GetPlatforms(string productName, string version);
     }
 }
 
