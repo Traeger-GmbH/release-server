@@ -197,7 +197,7 @@ namespace ReleaseServer.WebApi.Repositories
                 where versionDir.Name == version
                 select osDir.Name + "-" + hwArchDir.Name;
 
-            return platforms.OrderByDescending(p => p).ToList();
+            return platforms.OrderBy(p => p).ToList();
         }
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
