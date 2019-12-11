@@ -20,9 +20,11 @@ Upload of a specific release artifact.
 
     `version=[string]`: The version (e.g. 1.0)
 
-- **Auth required** : NO
+- **Auth required** : YES
 
-- **Data**: ZIP-File mit `'content-type: multipart/form-data;`
+- **Authorization type** : Basic Auth
+
+- **Data**: ZIP-File with `'content-type: multipart/form-data;`
 
 - **Success Response**
 
@@ -63,7 +65,13 @@ Upload of a specific release artifact.
         }
     ```
 
-- **Sample Call**: PUT https://localhost:5001/releaseartifact/upload/softwareX/ubuntu/arm64/1.0
+- **Error Response 3**
+
+    **Condition** : If the user is not authorized (wrong credentials or missing / invalid authorization header)
+
+    **Code** : `401 UNAUTHORIZED`
+
+- **Sample Call**: PUT https://localhost:5001/releaseartifact/upload/softwareX/ubuntu/arm64/1.0 + authorization header
 
 
 <div style="page-break-after: always;">
@@ -525,7 +533,9 @@ Deletes the specified product.
 
     `version=[string]`: The version (e.g. 1.0)
 
-- **Auth required** : NO
+- **Auth required** : YES
+
+- **Authorization type** : Basic Auth
 
 - **Data**: {}
 
@@ -540,7 +550,7 @@ Deletes the specified product.
         artifact successfully deleted
         ```
 
-- **Error Response**
+- **Error Response 1**
 
     **Condition** : If there exists no product with the specified product name.
 
@@ -554,7 +564,13 @@ Deletes the specified product.
         }
     ```
 
-- **Sample Call**: DELETE https://localhost:5001/releaseartifact/softwareX/debian/amd64/1.0
+- **Error Response 2**
+
+    **Condition** : If the user is not authorized (wrong credentials or missing/invalid authorization header)
+
+    **Code** : `401 UNAUTHORIZED`
+
+- **Sample Call**: DELETE https://localhost:5001/releaseartifact/softwareX/debian/amd64/1.0 + authorization header
 
 
 
@@ -575,7 +591,9 @@ Deletes all products of a specific product name.
 
     `product=[string]`: The unique product name (e.g. softwareX)
 
-- **Auth required** : NO
+- **Auth required** : YES
+
+- **Authorization type** : Basic Auth
 
 - **Data**: {}
 
@@ -590,7 +608,7 @@ Deletes all products of a specific product name.
         product successfully deleted
         ```
 
-- **Error Response**
+- **Error Response 1**
 
     **Condition** : If there exists no product line with the specified product name.
 
@@ -604,4 +622,10 @@ Deletes all products of a specific product name.
         }
     ```
 
-- **Sample Call**: https://localhost:5001/releaseartifact/codabdix
+- **Error Response 2**
+
+    **Condition** : If the user is not authorized (wrong credentials or missing/invalid authorization header)
+
+    **Code** : `401 UNAUTHORIZED`
+
+- **Sample Call**: https://localhost:5001/releaseartifact/codabdix + authorization header
