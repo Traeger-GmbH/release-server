@@ -107,13 +107,19 @@ Retrieves all available products.
     ```json
         {
             "ProductIdentifier": "softwareX",
-            "Version": "1.0",
+            "Version": {
+                "VersionNumber": "1.0",
+                "VersionSuffix": ""
+            },
             "Os": "debian",
             "HwArchitecture": "amd64"
         },
         {
             "ProductIdentifier": "softwareX",
-            "Version": "1.1",
+            "Version": {
+                "VersionNumber": "1.1",
+                "VersionSuffix": ""
+            },
             "Os": "debian",
             "HwArchitecture": "amd64"
         }
