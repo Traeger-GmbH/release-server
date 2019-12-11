@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS builder
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS builder
 LABEL maintainer=info@traeger.de
 
 WORKDIR /app
