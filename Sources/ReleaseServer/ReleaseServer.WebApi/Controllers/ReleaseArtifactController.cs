@@ -9,11 +9,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using release_server_web_api.Services;
 using ReleaseServer.WebApi.Repositories;
+using ReleaseServer.WebApi.Services;
 
 
-namespace release_server_web_api.Controllers
+namespace ReleaseServer.WebApi.Controllers
 {
     [Authorize]
     [ApiController]

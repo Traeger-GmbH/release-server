@@ -8,7 +8,7 @@ using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 
-namespace release_server_web_api.Services
+namespace ReleaseServer.WebApi.Services
 {
     public class FsReleaseArtifactService : IReleaseArtifactService
     {

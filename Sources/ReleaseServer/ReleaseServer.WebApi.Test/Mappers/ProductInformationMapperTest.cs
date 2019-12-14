@@ -7,7 +7,7 @@ using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using Xunit;
 
-namespace release_server_web_api_test
+namespace ReleaseServer.WebApi.Test
 {
     public class ProductInformationMapperTest
     {

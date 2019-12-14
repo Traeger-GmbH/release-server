@@ -2,11 +2,11 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using release_server_web_api.Services;
+using ReleaseServer.WebApi.Services;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
 
-namespace release_server_web_api_test.TestData
+namespace ReleaseServer.WebApi.Test.TestData
 {
     public class ReleaseArtifactServiceTest
     {

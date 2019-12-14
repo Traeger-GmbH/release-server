@@ -11,7 +11,7 @@ using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
 
-namespace release_server_web_api_test
+namespace ReleaseServer.WebApi.Test
 {
     public class ReleaseArtifactRepositoryTest
     {
