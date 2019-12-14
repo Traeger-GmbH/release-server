@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
@@ -22,6 +22,8 @@ namespace ReleaseServer.WebApi.Controllers
     {
         private IReleaseArtifactService FsReleaseArtifactService;
         private ILogger Logger;
+        private JsonSerializerOptions JsonSerializerOptions;
+
 
         //TODO: Refactor this kind of logging! 
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
@@ -32,6 +34,7 @@ namespace ReleaseServer.WebApi.Controllers
         {
             FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository(repositoryLogger, configuration["ArtifactRootDirectory"]), serviceLogger);
             Logger = logger;
+            JsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
         }
         
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
@@ -53,14 +56,14 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("versions/{product}")]
         public string GetProductInfos([Required] string product)
         {
-            return JsonConvert.SerializeObject(FsReleaseArtifactService.GetProductInfos(product));
+            return JsonSerializer.Serialize(FsReleaseArtifactService.GetProductInfos(product),JsonSerializerOptions);
         }
 
         [AllowAnonymous]
         [HttpGet("platforms/{product}/{version}")]
         public string GetPlatforms([Required] string product, [Required]string version)
         {
-            return JsonConvert.SerializeObject(FsReleaseArtifactService.GetPlatforms(product, version));
+            return JsonSerializer.Serialize(FsReleaseArtifactService.GetPlatforms(product, version), JsonSerializerOptions);
         }
         
         [AllowAnonymous]
