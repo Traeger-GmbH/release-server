@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -82,9 +83,11 @@ namespace ReleaseServer.WebApi.Auth
             //Get the credentials from the auth path and base64 decode the password
             var validCredentials = await Task.Run(() =>
                 JsonConvert.DeserializeObject<CredentialsModel>(File.ReadAllText(AuthPath)));
-            validCredentials.Password = Encoding.Default.GetString(Convert.FromBase64String(validCredentials.Password));
-
-            if (credentials.Username == validCredentials.Username && credentials.Password == validCredentials.Password)
+            
+            var validPwBase64 = Convert.FromBase64String(validCredentials.Password);
+            
+            if (CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username)) && 
+                CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), validPwBase64))
                 return validCredentials.Username;
             
             return null;
