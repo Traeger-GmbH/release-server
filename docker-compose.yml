@@ -2,7 +2,7 @@ version: '3'
 
 services:
   release-server:
-    image: traeger/release-server:latest
+    image: traeger/release-server:0.1
     working_dir: /app
     ports: 
       - "5001:5001"
