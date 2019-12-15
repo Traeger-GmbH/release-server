@@ -9,6 +9,6 @@ services:
     environment: 
       - SERVER_AUTH_PATH=/auth/credentials.json
     volumes: 
-      - ./Sources/ReleaseServer/ReleaseServer.WebApi/appsettings.json:/app/appsettings.json
+      - ./appsettings.json:/app/appsettings.json
       - ./artifacts:/app/artifacts
       - ./credentials.json:/auth/credentials.json

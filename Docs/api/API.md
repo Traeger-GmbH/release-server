@@ -6,6 +6,7 @@ Upload of a specific release artifact.
 
 - **URL** : `/releaseartifact/upload/:product/:os/:hwArch/:version`
 
+
 - **Method** : `PUT`
 
 - **URL Parameters** :
@@ -106,22 +107,16 @@ Retrieves all available products.
 
     ```json
         {
-            "ProductIdentifier": "softwareX",
-            "Version": {
-                "VersionNumber": "1.0",
-                "VersionSuffix": ""
-            },
-            "Os": "debian",
-            "HwArchitecture": "amd64"
+            "identifier": "softwareX",
+            "version": "1.0",
+            "os": "debian",
+            "architecture": "amd64"
         },
         {
-            "ProductIdentifier": "softwareX",
-            "Version": {
-                "VersionNumber": "1.1",
-                "VersionSuffix": ""
-            },
-            "Os": "debian",
-            "HwArchitecture": "amd64"
+            "identifier": "softwareX",
+            "version": "1.1-beta",
+            "os": "debian",
+            "architecture": "amd64"
         }
     ```
 
