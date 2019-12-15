@@ -44,9 +44,7 @@ The first two REST endpoint examples are documented above.
 
 For more information about the other endpoints and their usage, read the [API documentation](https://github.com/Traeger-GmbH/release-server/blob/master/Docs/api/API.md).
 
-### Example REST calls
-
-#### Upload an Artifact
+### Upload an Artifact
 
 __Structure of the artifact payload:__ The payload has to be a zip file and has to contain the following elements:
 
@@ -67,7 +65,7 @@ __Response example:__
 Status: 200 OK
 Message: Upload of the artifact successful!
 
-#### List all available products
+### List all available products
 
 __GET request to list the products__:
 
