@@ -153,5 +153,11 @@ namespace ReleaseServer.WebApi.Controllers
             return Ok("product successfully deleted");
         }
 
+        [AllowAnonymous]
+        [Route("{*url}", Order = 999)]
+        public IActionResult CatchAll()
+        {
+            return NotFound("");
+        }
     }
 }
