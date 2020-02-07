@@ -5,6 +5,8 @@ using NSubstitute;
 using ReleaseServer.WebApi.Services;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace ReleaseServer.WebApi.Test.TestData
 {
@@ -18,9 +20,21 @@ namespace ReleaseServer.WebApi.Test.TestData
         {
             //Setup
             //Could be done smarter!
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName; 
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(Substitute.For<ILogger<FsReleaseArtifactRepository>>(),Path.Combine(ProjectDirectory, "TestData"));
-            FsReleaseArtifactService = new FsReleaseArtifactService(FsReleaseArtifactRepository, Substitute.For<ILogger<FsReleaseArtifactService>>());
+            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+
+            var configuration = new Mock<IConfiguration>();
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
+                .Returns(Path.Combine(ProjectDirectory, "TestData"));
+
+            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
+                    Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
+                    configuration.Object
+                );
+            FsReleaseArtifactService = new FsReleaseArtifactService(
+                    FsReleaseArtifactRepository,
+                    Substitute.For<ILogger<FsReleaseArtifactService>>()
+                );
         }
 
         [Fact]

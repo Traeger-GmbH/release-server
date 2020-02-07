@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NSubstitute;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -21,8 +24,16 @@ namespace ReleaseServer.WebApi.Test
         {
             //Could be done smarter
             ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+
+            var configuration = new Mock<IConfiguration>();
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
+                .Returns(Path.Combine(ProjectDirectory, "TestData"));
+
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
-                Substitute.For<ILogger<FsReleaseArtifactRepository>>(), Path.Combine(ProjectDirectory, "TestData"));
+                    Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
+                    configuration.Object
+                );
         }
         
         [Fact]
