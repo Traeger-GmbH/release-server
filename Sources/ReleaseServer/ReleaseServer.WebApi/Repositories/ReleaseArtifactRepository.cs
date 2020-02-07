@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Mappers;
@@ -19,10 +20,10 @@ namespace ReleaseServer.WebApi.Repositories
         private readonly DirectoryInfo ArtifactRootDir;
         private ILogger Logger;
 
-        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, string artifactRoot)
+        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, IConfiguration configuration)
         {
-            ArtifactRoot = artifactRoot;
-            ArtifactRootDir = new DirectoryInfo(artifactRoot);
+            ArtifactRoot = configuration["ArtifactRootDirectory"];
+            ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
             Logger = logger;
         }
         

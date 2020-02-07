@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using ReleaseServer.WebApi.Auth;
+using ReleaseServer.WebApi.Repositories;
+using ReleaseServer.WebApi.Services;
 
 namespace ReleaseServer.WebApi
 {
@@ -34,6 +36,9 @@ namespace ReleaseServer.WebApi
 
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
+
+            services.AddSingleton<IReleaseArtifactRepository, FsReleaseArtifactRepository>();
+            services.AddSingleton<IReleaseArtifactService, FsReleaseArtifactService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -20,20 +20,17 @@ namespace ReleaseServer.WebApi.Controllers
     [Route("[controller]")]
     public class ReleaseArtifactController : ControllerBase
     {
-        private IReleaseArtifactService FsReleaseArtifactService;
+        private IReleaseArtifactService ReleaseArtifactService;
         private ILogger Logger;
         private JsonSerializerOptions JsonSerializerOptions;
 
 
         //TODO: Refactor this kind of logging! 
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
-            ILogger<FsReleaseArtifactRepository> repositoryLogger,
-            ILogger<FsReleaseArtifactService> serviceLogger,
-            IConfiguration configuration
-        )
+            IReleaseArtifactService releaseArtifactService)
         {
-            FsReleaseArtifactService = new FsReleaseArtifactService(new FsReleaseArtifactRepository(repositoryLogger, configuration["ArtifactRootDirectory"]), serviceLogger);
             Logger = logger;
+            ReleaseArtifactService = releaseArtifactService;
             JsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
         }
         
@@ -47,7 +44,7 @@ namespace ReleaseServer.WebApi.Controllers
             if (file == null)
                 return BadRequest();
             
-            await FsReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
+            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
 
             return Ok("Upload of the artifact successful!");
         }
@@ -56,28 +53,28 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("versions/{product}")]
         public string GetProductInfos([Required] string product)
         {
-            return JsonSerializer.Serialize(FsReleaseArtifactService.GetProductInfos(product),JsonSerializerOptions);
+            return JsonSerializer.Serialize(ReleaseArtifactService.GetProductInfos(product),JsonSerializerOptions);
         }
 
         [AllowAnonymous]
         [HttpGet("platforms/{product}/{version}")]
         public string GetPlatforms([Required] string product, [Required]string version)
         {
-            return JsonSerializer.Serialize(FsReleaseArtifactService.GetPlatforms(product, version), JsonSerializerOptions);
+            return JsonSerializer.Serialize(ReleaseArtifactService.GetPlatforms(product, version), JsonSerializerOptions);
         }
         
         [AllowAnonymous]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
         public string GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            return FsReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+            return ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
         }
         
         [AllowAnonymous]
         [HttpGet("versions/{product}/{os}/{architecture}")]
         public List<string> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return FsReleaseArtifactService.GetVersions(product, os, architecture);
+            return ReleaseArtifactService.GetVersions(product, os, architecture);
         }
         
         [AllowAnonymous]
@@ -87,7 +84,7 @@ namespace ReleaseServer.WebApi.Controllers
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = FsReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
+            var response = ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -112,7 +109,7 @@ namespace ReleaseServer.WebApi.Controllers
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = FsReleaseArtifactService.GetLatestArtifact(product, os, architecture);
+            var response = ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -134,13 +131,13 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("latest/{product}/{os}/{architecture}")]
         public string GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return FsReleaseArtifactService.GetLatestVersion(product, os, architecture);
+            return ReleaseArtifactService.GetLatestVersion(product, os, architecture);
         }
         
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
         public IActionResult DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            FsReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+            ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
 
             return Ok("artifact successfully deleted");
         }
@@ -148,7 +145,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}")]
         public IActionResult DeleteProduct ([Required] string product)
         {
-            FsReleaseArtifactService.DeleteProduct(product);
+            ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
         }
