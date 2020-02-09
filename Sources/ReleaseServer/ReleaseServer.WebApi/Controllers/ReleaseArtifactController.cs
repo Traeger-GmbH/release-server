@@ -1,17 +1,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
 
@@ -49,9 +46,9 @@ namespace ReleaseServer.WebApi.Controllers
         
         [AllowAnonymous]
         [HttpGet("versions/{product}")]
-        public List<ProductInformationResponseModel> GetProductInfos([Required] string product)
+        public ProductInformationListResponseModel GetProductInfos([Required] string product)
         {
-            return ReleaseArtifactService.GetProductInfos(product);
+            return ReleaseArtifactService.GetProductInfos(product).ToProductInfoListResponse();
         }
 
         [AllowAnonymous]

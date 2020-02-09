@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using NLog.Targets;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -35,11 +32,9 @@ namespace ReleaseServer.WebApi.Services
                 await FsReleaseArtifactRepository.StoreArtifact(artifact);
             }
         }
-        public List<ProductInformationResponseModel> GetProductInfos(string productName)
+        public List<ProductInformationModel> GetProductInfos(string productName)
         {
-            var productInfoList = FsReleaseArtifactRepository.GetInfosByProductName(productName);
-
-            return productInfoList.ConvertAll(pI => pI.ToProductInfoResponse());
+            return FsReleaseArtifactRepository.GetInfosByProductName(productName);
         }
 
         public List<string> GetPlatforms(string productName, string version)
@@ -90,7 +85,7 @@ namespace ReleaseServer.WebApi.Services
     public interface IReleaseArtifactService
     {
         Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
-        List<ProductInformationResponseModel> GetProductInfos(string productName);
+        List<ProductInformationModel> GetProductInfos(string productName);
         List<string> GetPlatforms(string productName, string version);
         string GetReleaseInfo(string productName, string os, string architecture, string version);
         List<string> GetVersions(string productName, string os, string architecture);

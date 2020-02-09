@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -55,6 +56,46 @@ namespace ReleaseServer.WebApi.Test
             //Assert
             testProductResult1.Should().BeEquivalentTo(expectedProductResult1);
             testProductResult2.Should().BeEquivalentTo(expectedProductResult2);
+        }
+        
+        [Fact]
+        public void TestProductInformationListResponseMapping()
+        {
+            //Setup
+            var testProductInfoList = new List<ProductInformationModel>
+            {
+                testProductInfo1,
+                testProductInfo2
+            };
+
+
+            var expectedProductInforListRepsonse = new ProductInformationListResponseModel
+            {
+                ProductInformations = new List<ProductInformationResponseModel>
+                {
+                    new ProductInformationResponseModel
+                    {
+                        Identifier = "product1",
+                        Os = "ubuntu",
+                        Architecture = "arm64",
+                        Version = "1.0"
+                    },
+
+                    new ProductInformationResponseModel
+                    {
+                        Identifier = "product1",
+                        Os = "ubuntu",
+                        Architecture = "amd64",
+                        Version = "1.1-beta"
+                    }
+                }
+            };
+
+            //Act
+            var testResponse = testProductInfoList.ToProductInfoListResponse();
+            
+            //Assert
+            testResponse.Should().BeEquivalentTo(expectedProductInforListRepsonse);
         }
     }
 }

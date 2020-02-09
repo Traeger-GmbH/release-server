@@ -1,7 +1,12 @@
-using NSubstitute.Core;
+using System.Collections.Generic;
 
 namespace ReleaseServer.WebApi.Models
 {
+    public class ProductInformationListResponseModel
+    {
+        public List<ProductInformationResponseModel> ProductInformations { get; set; }
+    }
+    
     public class ProductInformationResponseModel
     {
         public string Identifier { get; set; }
