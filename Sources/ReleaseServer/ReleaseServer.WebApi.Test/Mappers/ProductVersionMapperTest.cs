@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using FluentAssertions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using Xunit;
@@ -44,8 +46,35 @@ namespace ReleaseServer.WebApi.Test
             
             Assert.Throws<ArgumentException>(() => invalidVersion.ToProductVersion());
         }
+
+        [Fact]
+        public void ConvertVersionStringToProductVersionResponse()
+        {
+            var testVersionString = "1.0";
+
+            var expectedProductVersionResponse = new ProductVersionResponseModel
+            {
+                Version = "1.0"
+            };
+
+            var testResponse = testVersionString.ToProductVersionResponse();
+            
+            testResponse.Should().BeEquivalentTo(expectedProductVersionResponse);
+        }
         
-        
-        
+        [Fact]
+        public void ConvertVersionStringListToProductVersionListResponse()
+        {
+            var testVersionStringList = new List<string> {"1.1", "1.0"};
+
+            var expectedProductVersionResponse = new ProductVersionListResponseModel
+            {
+                Versions =  new List<string> {"1.1", "1.0"}
+            };
+
+            var testResponse = testVersionStringList.ToProductVersionListResponse();
+            
+            testResponse.Should().BeEquivalentTo(expectedProductVersionResponse);
+        }
     }
 }

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
@@ -22,16 +24,12 @@ namespace ReleaseServer.WebApi.Controllers
     {
         private IReleaseArtifactService ReleaseArtifactService;
         private ILogger Logger;
-        private JsonSerializerOptions JsonSerializerOptions;
 
-
-        //TODO: Refactor this kind of logging! 
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
             IReleaseArtifactService releaseArtifactService)
         {
             Logger = logger;
             ReleaseArtifactService = releaseArtifactService;
-            JsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
         }
         
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
@@ -51,30 +49,32 @@ namespace ReleaseServer.WebApi.Controllers
         
         [AllowAnonymous]
         [HttpGet("versions/{product}")]
-        public string GetProductInfos([Required] string product)
+        public List<ProductInformationResponseModel> GetProductInfos([Required] string product)
         {
-            return JsonSerializer.Serialize(ReleaseArtifactService.GetProductInfos(product),JsonSerializerOptions);
+            return ReleaseArtifactService.GetProductInfos(product);
         }
 
         [AllowAnonymous]
         [HttpGet("platforms/{product}/{version}")]
-        public string GetPlatforms([Required] string product, [Required]string version)
+        public PlatformsResponseModel GetPlatforms([Required] string product, [Required]string version)
         {
-            return JsonSerializer.Serialize(ReleaseArtifactService.GetPlatforms(product, version), JsonSerializerOptions);
+            var platformsList = ReleaseArtifactService.GetPlatforms(product, version);
+
+            return platformsList.ToPlatformsResponse();
         }
         
         [AllowAnonymous]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public string GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public ChangelogResponseModel GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            return ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+            return ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version).toChangelogResponse();
         }
         
         [AllowAnonymous]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public List<string> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public ProductVersionListResponseModel GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetVersions(product, os, architecture);
+            return ReleaseArtifactService.GetVersions(product, os, architecture).ToProductVersionListResponse();
         }
         
         [AllowAnonymous]
@@ -129,9 +129,9 @@ namespace ReleaseServer.WebApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
-        public string GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
+        public ProductVersionResponseModel GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetLatestVersion(product, os, architecture);
+            return ReleaseArtifactService.GetLatestVersion(product, os, architecture).ToProductVersionResponse();
         }
         
         [HttpDelete("{product}/{os}/{architecture}/{version}")]

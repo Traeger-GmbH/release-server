@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Mappers
@@ -22,6 +23,22 @@ namespace ReleaseServer.WebApi.Mappers
             {
                 VersionNumber = new Version(versionElements[0]),
                 VersionSuffix = versionElements[1]
+            };
+        }
+
+        public static ProductVersionResponseModel ToProductVersionResponse(this string version)
+        {
+            return new ProductVersionResponseModel
+            {
+                Version = version
+            };
+        }
+        
+        public static ProductVersionListResponseModel ToProductVersionListResponse(this List<string> versionList)
+        {
+            return new ProductVersionListResponseModel
+            {
+                Versions = versionList
             };
         }
     }
