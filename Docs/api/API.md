@@ -97,7 +97,7 @@ Retrieves all available products.
 
 - **Data**: {}
 
-- **Success Response**
+- **Success Response 1**
 
     **Condition** : If there exists a product with the specified product name.
 
@@ -120,18 +120,16 @@ Retrieves all available products.
         }
     ```
 
-- **Error Response**
+- **Success Response 2**
 
     **Condition** : If there exists no product with the specified product name.
 
-    **Code** : `500 INTERNAL SERVER ERROR`
+    **Code** : `200 OK`
 
     **Content example**
 
     ```json
-        {
-            "error": "Could not find a part of the path 'C:\\Path\\softwareX'."
-        }
+        "productInformations": []
     ```
 
 - **Sample Call**: GET https://localhost:5001/releaseartifact/versions/softwareX
@@ -173,10 +171,10 @@ Retrieves the changelog of a specific product.
 
     **Content example** :
 
-    ```text
-        Release 1.0.0
-        - This is an example
-        - This is another example
+    ```json
+        {
+            "changelog": "Release 1.0.0\r\n- This is an example\r\n- This is another example"
+        }
     ```
 
 - **Error Response**
@@ -228,33 +226,27 @@ Retrieves all available platforms for a specific product.
 
     **Content example** :
 
-    ```text
-        ["debian-amd64","debian-arm64","ubuntu-arm64"]
+    ```json
+        {
+            "platforms": [
+                "debian-amd64",
+                "debian-arm64"
+            ]
+        }
     ```
 
 - **Success Response 2**
 
-    **Condition** : If there exists no platform for the specified product.
+    **Condition** : If there exists no platform for the specified product and also if there exists no product with the specified product name.
+
 
     **Code** : `200 OK`
 
     **Content example** :
 
-    ```text
-        []
-    ```
-
-- **Error Response**
-
-    **Condition** : If there exists no product with the specified product name.
-
-    **Code** : `500 INTERNAL SERVER ERROR`
-
-    **Content example**
-
     ```json
         {
-            "error": "Could not find a part of the path 'C:\\Path\\softwareX'."
+            "platforms": []
         }
     ```
 
@@ -294,20 +286,27 @@ Retrieves all available versions that are fitting to a specific product & platfo
 
     **Content example** :
 
-    ```text
-        ["1.0","1.1"]
+    ```json
+        {
+            "versions": [
+                "1.1",
+                "1.0"
+            ]
+        }
     ```
 
 - **Success Response 2**
 
-    **Condition** : If there are no versions for the specified product & platform.
+    **Condition** : If there are no versions for the specified product / platform and also if there exists no product with the specified product name.
 
     **Code** : `200 OK`
 
     **Content example** :
 
-    ```text
-        []
+    ```json
+        {
+        "versions": []
+        }
     ```
 
 - **Error Response**
@@ -383,7 +382,7 @@ Retrieves the artifact of the specified product.
 <div style="page-break-after: always;">
 
 
-## 7. Download of latest version of a specific artifact / product 
+## 7. Download the latest version of a specific artifact / product 
 
 Retrieves the latest artifact of a specific product.
 
@@ -476,14 +475,17 @@ Retrieves the newest version of a specific product.
     **Code** : `200 OK`
 
     **Content example** :
-        ```text
-        1.1
-        ```
+    ```json
+        {
+            "version": "1.0"
+        }
+    ```
 
 
-- **Error Response 1**
+- **Error Response**
 
-    **Condition** :  If the product is not available for the specified platform (OS + HW architecture).
+    **Condition** :  If the product is not available for the specified platform (OS + HW architecture) and if the product with the specified product name does not exist.
+
 
     **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -492,19 +494,6 @@ Retrieves the newest version of a specific product.
     ```json
         {
             "error": "Sequence contains no elements"
-        }
-    ```
-- **Error Response2**
-
-    **Condition** : If the product with the specified product name does not exist.
-
-    **Code** : `500 INTERNAL SERVER ERROR`
-
-    **Content example**
-
-    ```json
-        {
-            "error": "Could not find a part of the path 'C:\\Path\\softwareX'."
         }
     ```
 
