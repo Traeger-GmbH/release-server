@@ -11,7 +11,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o output/ReleaseServer
 
 # TODO .../core/runtime does not work (framework not found) -> investigate the issue and fix it
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
 COPY --from=builder /app/output ./
 
