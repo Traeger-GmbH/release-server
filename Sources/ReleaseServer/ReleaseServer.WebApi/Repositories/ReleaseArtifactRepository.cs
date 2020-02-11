@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,13 +14,14 @@ namespace ReleaseServer.WebApi.Repositories
 {
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
-        private readonly string ArtifactRoot;
+        private readonly string ArtifactRoot, BackupRoot;
         private readonly DirectoryInfo ArtifactRootDir;
         private ILogger Logger;
 
         public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, IConfiguration configuration)
         {
             ArtifactRoot = configuration["ArtifactRootDirectory"];
+            BackupRoot = configuration["BackupRootDirectory"];
             ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
             Logger = logger;
         }
@@ -200,6 +199,36 @@ namespace ReleaseServer.WebApi.Repositories
 
             return platforms.OrderBy(p => p).ToList();
         }
+        
+        public BackupInformationModel RunBackup()
+        {
+            var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
+            
+            string backupFileName = "backup_" + timeStamp + ".zip";
+            string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName); 
+            
+            //Clear the backup folder first
+            DeleteSubDirs(BackupRoot);
+            
+            //Create the backup -> zip the whole ArtifactRoot folder
+            ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
+
+            return new BackupInformationModel
+            {
+                FullPath = backupArchiveFileName,
+                FileName = backupFileName
+            };
+        }
+
+        private void DeleteSubDirs(string path)
+        {
+            var directoryInfo = new DirectoryInfo(path);
+
+            foreach (var file in directoryInfo.GetFiles())
+            {
+                file.Delete();
+            }
+        }
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
@@ -219,8 +248,7 @@ namespace ReleaseServer.WebApi.Repositories
                 throw new Exception("meta information of the specified product does not exist!");
                     
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
-        } 
-        
+        }
     }
     
     public interface IReleaseArtifactRepository     
@@ -233,6 +261,7 @@ namespace ReleaseServer.WebApi.Repositories
         void DeleteProduct(string productName);
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
+        BackupInformationModel RunBackup();
     }
 }
 

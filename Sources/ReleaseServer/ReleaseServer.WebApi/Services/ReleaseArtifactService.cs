@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -13,6 +15,8 @@ namespace ReleaseServer.WebApi.Services
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
         private ILogger Logger;
+        private static Mutex DirectoryLock = new Mutex(); 
+        //private object directoryLock;
 
         public FsReleaseArtifactService( IReleaseArtifactRepository fsReleaseArtifactRepository, ILogger<FsReleaseArtifactService> logger)
         {
@@ -22,7 +26,6 @@ namespace ReleaseServer.WebApi.Services
         
         public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
         {
-
             using (var zipMapper = new ZipArchiveMapper())
             {
                 Logger.LogDebug("convert the uploaded payload to a ZIP archive");
@@ -80,6 +83,14 @@ namespace ReleaseServer.WebApi.Services
         {
             FsReleaseArtifactRepository.DeleteProduct(productName);
         }
+
+        public BackupInformationModel RunBackup()
+        {
+          
+            //TODO: Insert Lock logic in there.
+
+            return FsReleaseArtifactRepository.RunBackup();
+        }
     }
     
     public interface IReleaseArtifactService
@@ -94,5 +105,6 @@ namespace ReleaseServer.WebApi.Services
         ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture);
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
+        BackupInformationModel RunBackup();
     }
 }

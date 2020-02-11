@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -145,6 +146,28 @@ namespace ReleaseServer.WebApi.Controllers
             ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
+        }
+        
+        [HttpGet("backup")]
+        public FileStreamResult Backup()
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+
+            var backupInfo = ReleaseArtifactService.RunBackup();
+            
+            var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
+
+            //Determine the content type
+            if (!provider.TryGetContentType(backupInfo.FileName, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            
+            return new FileStreamResult(stream, contentType)
+            {
+                FileDownloadName = backupInfo.FileName
+            };
         }
 
         [AllowAnonymous]
