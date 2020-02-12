@@ -17,15 +17,15 @@ namespace ReleaseServer.WebApi.Auth
 {
     public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        private readonly string AuthPath;
-        
-        public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, 
-            ILoggerFactory logger, 
+        private readonly IConfiguration Configuration;
+
+        public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+            ILoggerFactory logger,
             IConfiguration configuration,
-            UrlEncoder encoder, 
+            UrlEncoder encoder,
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            AuthPath = Environment.GetEnvironmentVariable("SERVER_AUTH_PATH");
+            Configuration = configuration;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -80,9 +80,11 @@ namespace ReleaseServer.WebApi.Auth
 
         private async Task<string> CheckCredentials(CredentialsModel credentials)
         {
-            //Get the credentials from the auth path and base64 decode the password
+            //Didn't have to be async, but later if there are DB operations needed.
             var validCredentials = await Task.Run(() =>
-                JsonConvert.DeserializeObject<CredentialsModel>(File.ReadAllText(AuthPath)));
+                new CredentialsModel{
+                    Username = Configuration["Credentials:Username"],
+                    Password = Configuration["Credentials:Password"]});
             
             var validPwBase64 = Convert.FromBase64String(validCredentials.Password);
             

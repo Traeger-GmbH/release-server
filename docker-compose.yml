@@ -2,13 +2,10 @@ version: '3'
 
 services:
   release-server:
-    image: traeger/release-server:0.1
+    image: traeger/release-server:latest
     working_dir: /app
     ports: 
       - "5001:5001"
-    environment: 
-      - SERVER_AUTH_PATH=/auth/credentials.json
     volumes: 
       - ./appsettings.json:/app/appsettings.json
       - ./artifacts:/app/artifacts
-      - ./credentials.json:/auth/credentials.json
