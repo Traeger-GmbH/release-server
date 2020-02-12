@@ -28,7 +28,7 @@ Now, the release server is reachable at https://localhost:5001.
 
 1. Pull the Docker image: `docker pull traeger/release-server:latest`
 
-2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it in the same directory of 1.
+2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it into a directory of your choice.
 
 3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and __base64 encoded__ password.
 
