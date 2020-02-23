@@ -50,7 +50,7 @@ namespace ReleaseServer.WebApi.Test
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
                 "amd64", "1.1", testZip);
 
-            await FsReleaseArtifactRepository.StoreArtifact(testArtifact);
+            FsReleaseArtifactRepository.StoreArtifact(testArtifact);
 
             //Assert whether the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));

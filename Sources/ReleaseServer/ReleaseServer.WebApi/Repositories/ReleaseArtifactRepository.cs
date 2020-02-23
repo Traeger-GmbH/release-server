@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
@@ -26,7 +26,7 @@ namespace ReleaseServer.WebApi.Repositories
             Logger = logger;
         }
         
-        public async Task StoreArtifact(ReleaseArtifactModel artifact)
+        public void StoreArtifact(ReleaseArtifactModel artifact)
         {
             
            var path = GenerateArtifactPath(
@@ -44,7 +44,7 @@ namespace ReleaseServer.WebApi.Repositories
                     Directory.CreateDirectory(tmpPath);
                 
                 //Extract the payload to the temporary directory
-                await Task.Run(() => artifact.Payload.ExtractToDirectory(tmpPath));
+                artifact.Payload.ExtractToDirectory(tmpPath);
                 Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
                 
                 //If the directory already exists, delete the old content in there
@@ -202,6 +202,9 @@ namespace ReleaseServer.WebApi.Repositories
         
         public BackupInformationModel RunBackup()
         {
+            Thread.Sleep(10000);
+            
+            
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
             
             string backupFileName = "backup_" + timeStamp + ".zip";
@@ -253,7 +256,7 @@ namespace ReleaseServer.WebApi.Repositories
     
     public interface IReleaseArtifactRepository     
     {
-        Task StoreArtifact(ReleaseArtifactModel artifact);
+        void StoreArtifact(ReleaseArtifactModel artifact);
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);

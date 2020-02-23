@@ -33,14 +33,14 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
-        public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var file = Request.Form.Files.FirstOrDefault();
             
             if (file == null)
                 return BadRequest();
             
-            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
+            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
 
             return Ok("Upload of the artifact successful!");
         }
@@ -148,6 +148,7 @@ namespace ReleaseServer.WebApi.Controllers
             return Ok("product successfully deleted");
         }
         
+        [AllowAnonymous]
         [HttpGet("backup")]
         public FileStreamResult Backup()
         {
