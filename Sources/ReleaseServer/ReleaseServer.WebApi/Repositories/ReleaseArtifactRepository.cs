@@ -202,16 +202,13 @@ namespace ReleaseServer.WebApi.Repositories
         
         public BackupInformationModel RunBackup()
         {
-            Thread.Sleep(10000);
-            
-            
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
             
             string backupFileName = "backup_" + timeStamp + ".zip";
             string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName); 
             
             //Clear the backup folder first
-            DeleteSubDirs(BackupRoot);
+            DeleteFilesInPath(BackupRoot);
             
             //Create the backup -> zip the whole ArtifactRoot folder
             ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
@@ -223,7 +220,24 @@ namespace ReleaseServer.WebApi.Repositories
             };
         }
 
-        private void DeleteSubDirs(string path)
+        public void RestoreBackup(ZipArchive backupPayload)
+        {
+            try
+            {
+                //Clear the whole artifact root directory
+                Directory.Delete(ArtifactRoot, true);
+                Directory.CreateDirectory(ArtifactRoot);
+                
+                backupPayload.ExtractToDirectory(ArtifactRoot);
+            }
+            catch (Exception e)
+            {
+                Logger.LogCritical("unexpected error during restoring the backup");
+                throw;
+            }
+        }
+
+        private void DeleteFilesInPath(string path)
         {
             var directoryInfo = new DirectoryInfo(path);
 
@@ -265,6 +279,7 @@ namespace ReleaseServer.WebApi.Repositories
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
         BackupInformationModel RunBackup();
+        void RestoreBackup(ZipArchive backupPayload);
     }
 }
 

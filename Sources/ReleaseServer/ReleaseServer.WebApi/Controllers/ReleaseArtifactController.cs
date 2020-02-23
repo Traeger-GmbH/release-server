@@ -172,6 +172,20 @@ namespace ReleaseServer.WebApi.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPut("restore")]
+        public IActionResult Restore()
+        {
+            var payload = Request.Form.Files.FirstOrDefault();
+            
+            if (payload == null)
+                return BadRequest();
+            
+            ReleaseArtifactService.RestoreBackup(payload);
+
+            return Ok("backup successfully restored");
+        }
+
+        [AllowAnonymous]
         [Route("{*url}", Order = 999)]
         public IActionResult CatchAll()
         {

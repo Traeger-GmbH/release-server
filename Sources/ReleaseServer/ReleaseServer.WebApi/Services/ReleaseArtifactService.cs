@@ -91,6 +91,18 @@ namespace ReleaseServer.WebApi.Services
             lock (DirectoryLock)
                 return  FsReleaseArtifactRepository.RunBackup();
         }
+
+        public void RestoreBackup(IFormFile payload)
+        {
+            using (var zipMapper = new ZipArchiveMapper())
+            {
+                Logger.LogDebug("convert the uploaded backup payload to a ZIP archive");
+                var zipPayload = zipMapper.FormFileToZipArchive(payload);
+                
+                lock (DirectoryLock)
+                    FsReleaseArtifactRepository.RestoreBackup(zipPayload);
+            }
+        }
     }
     
     public interface IReleaseArtifactService
@@ -106,5 +118,6 @@ namespace ReleaseServer.WebApi.Services
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
         BackupInformationModel RunBackup();
+        void RestoreBackup(IFormFile payload);
     }
 }
