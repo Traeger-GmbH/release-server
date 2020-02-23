@@ -4,7 +4,7 @@ namespace ReleaseServer.WebApi.Models
 {
     public class ProductInformationListResponseModel
     {
-        public List<ProductInformationResponseModel> ProductInformations { get; set; }
+        public List<ProductInformationResponseModel> ProductInformation { get; set; }
     }
     
     public class ProductInformationResponseModel

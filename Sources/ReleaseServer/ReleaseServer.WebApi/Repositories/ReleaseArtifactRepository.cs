@@ -81,7 +81,7 @@ namespace ReleaseServer.WebApi.Repositories
 
         public List<ProductInformationModel> GetInfosByProductName(string productName)
         {
-            var productInformations =
+            var productInformation =
                 from productDir in ArtifactRootDir.EnumerateDirectories()
                 where productDir.Name == productName
                 from osDir in productDir.EnumerateDirectories()
@@ -95,7 +95,7 @@ namespace ReleaseServer.WebApi.Repositories
                     Version = versionDir.Name.ToProductVersion()
                 };
 
-            return productInformations.ToList();
+            return productInformation.ToList();
         }
 
         public string GetReleaseInfo(string product, string os, string architecture, string version)

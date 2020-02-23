@@ -129,7 +129,7 @@ Retrieves all available products.
     **Content example**
 
     ```json
-        "productInformations": []
+        "productInformation": []
     ```
 
 - **Sample Call**: GET https://localhost:5001/releaseartifact/versions/softwareX

@@ -16,9 +16,9 @@ You have two options to setup the release server.
 
 1. Download the [docker-compose.yml](https://github.com/Traeger-GmbH/release-server/blob/master/docker-compose.yml) and put it in a directory of your choice.
 
-2. Download the appsettings.json and credentials.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put them the same directory of 1.
+2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it in the same directory of 1.
 
-3. Replace the placeholder in the credentials.json with your own username and __base64 encoded__ password.
+3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and __base64 encoded__ password.
 
 4. Run the application with docker-compose: `docker-compose -f "docker-compose.yml" up -d --build`
 
@@ -26,13 +26,13 @@ Now, the release server is reachable at https://localhost:5001.
 
 ### Run with Docker
 
-1. Pull the Docker image: `docker pull traeger/release-server:0.1`
+1. Pull the Docker image: `docker pull traeger/release-server:latest`
 
-2. Download the appsettings.json and credentials.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put them into a directory of your choice.
+2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it into a directory of your choice.
 
-3. Replace the placeholder in the credentials.json with your own username and __base64 encoded__ password.
+3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and __base64 encoded__ password.
 
-4. Run the application with docker run: `docker run -d --env SERVER_AUTH_PATH=/auth/credentials.json -v <path_to_your_directory>/appsettings.json:/app/appsettings.json -v <path_to_your_directory>/artifacts:/app/artifacts -v <path_to_your_directory>/credentials.json:/auth/credentials.json -p 5001:5001  traeger/release-server:0.1`
+4. Run the application with docker run: `docker run -d -v <path_to_your_directory>/appsettings.json:/app/appsettings.json -v <path_to_your_directory>/artifacts:/app/artifacts -p 5001:5001  traeger/release-server:latest`
  
     __Note:__ You have to replace the placeholder of the docker run command!  
 
@@ -72,16 +72,20 @@ __GET request to list the products__:
  `curl -k -X GET https://localhost:5001/releaseartifact/versions/<your_product_name>`
 
  __Response example:__
- 
-        {
-            "identifier": "softwareX",
-            "version": "1.0",
-            "os": "debian",
-            "architecture": "amd64"
-        },
-        {
-            "identifier": "softwareX",
-            "version": "1.1-beta",
-            "os": "debian",
-            "architecture": "amd64"
-        }
+
+    {
+        "productInformation": [
+            {
+                "identifier": "softwareX",
+                "version": "1.0",
+                "os": "debian",
+                "architecture": "amd64"
+            },
+            {
+                "identifier": "softwareX",
+                "version": "1.1-beta",
+                "os": "debian",
+                "architecture": "amd64"
+            }
+        ]
+    }

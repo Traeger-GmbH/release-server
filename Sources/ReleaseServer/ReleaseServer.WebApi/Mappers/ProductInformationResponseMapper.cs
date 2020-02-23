@@ -27,7 +27,7 @@ namespace ReleaseServer.WebApi.Mappers
             
             return new ProductInformationListResponseModel
             {
-                ProductInformations = retVal
+                ProductInformation = retVal
             };
         }
     }

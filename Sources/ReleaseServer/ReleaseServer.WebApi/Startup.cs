@@ -8,7 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using NSubstitute.Extensions;
 using ReleaseServer.WebApi.Auth;
+using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
@@ -21,7 +23,6 @@ namespace ReleaseServer.WebApi
             var conf = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile(Environment.GetEnvironmentVariable("SERVER_AUTH_PATH"))
                 .Build();
             
             Configuration = conf;

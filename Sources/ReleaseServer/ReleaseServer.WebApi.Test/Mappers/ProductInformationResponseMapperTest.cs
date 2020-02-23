@@ -71,7 +71,7 @@ namespace ReleaseServer.WebApi.Test
 
             var expectedProductInforListRepsonse = new ProductInformationListResponseModel
             {
-                ProductInformations = new List<ProductInformationResponseModel>
+                ProductInformation = new List<ProductInformationResponseModel>
                 {
                     new ProductInformationResponseModel
                     {
