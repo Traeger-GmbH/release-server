@@ -37,7 +37,7 @@ namespace ReleaseServer.WebApi.Test
         }
         
         [Fact]
-        public async void TestStoringArtifact()
+        public void TestStoringArtifact()
         {
             //Cleanup test dir from old tests (if they failed before)
             CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
