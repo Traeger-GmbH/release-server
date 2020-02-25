@@ -148,7 +148,6 @@ namespace ReleaseServer.WebApi.Controllers
             return Ok("product successfully deleted");
         }
         
-        [AllowAnonymous]
         [HttpGet("backup")]
         public FileStreamResult Backup()
         {
@@ -171,7 +170,6 @@ namespace ReleaseServer.WebApi.Controllers
             };
         }
 
-        [AllowAnonymous]
         [HttpPut("restore")]
         public IActionResult Restore()
         {
