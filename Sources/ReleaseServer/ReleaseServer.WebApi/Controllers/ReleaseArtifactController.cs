@@ -147,11 +147,12 @@ namespace ReleaseServer.WebApi.Controllers
             return Ok("product successfully deleted");
         }
 
-        [AllowAnonymous]
+        //Commented out, because swagger runs into a fetch error
+/*        [AllowAnonymous]
         [Route("{*url}", Order = 999)]
         public IActionResult CatchAll()
         {
             return NotFound("");
-        }
+        }*/
     }
 }
