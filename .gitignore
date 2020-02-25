@@ -37,3 +37,7 @@ bin/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Directories of the Release Server
+TestBackup
+TestArtifactRoot
