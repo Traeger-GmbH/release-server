@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading;
+using ReleaseServer.WebApi.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
@@ -35,16 +35,16 @@ namespace ReleaseServer.WebApi.Repositories
                 artifact.ProductInformation.HwArchitecture,
                 artifact.ProductInformation.Version.ToString());
 
-           var tmpPath = GenerateTemporaryPath();
+           var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
 
             try
             {
                 //Create the temporary directory
-                if (!Directory.Exists(tmpPath))
-                    Directory.CreateDirectory(tmpPath);
+                if (!tmpDir.Exists)
+                    tmpDir.Create();
                 
                 //Extract the payload to the temporary directory
-                artifact.Payload.ExtractToDirectory(tmpPath);
+                artifact.Payload.ExtractToDirectory(tmpDir.ToString());
                 Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
                 
                 //If the directory already exists, delete the old content in there
@@ -69,8 +69,13 @@ namespace ReleaseServer.WebApi.Repositories
                 Directory.CreateDirectory(Path.Combine(ArtifactRoot, artifact.ProductInformation.ProductIdentifier));
                 
                 //Move the extracted payload to the right directory
-                Directory.Move(tmpPath, path);
+                Directory.Move(tmpDir.ToString(), path);
                 Logger.LogInformation("The Artifact was successfully stored");
+                
+                //Cleanup the tmp directory 
+                Directory.Delete(tmpDir.Parent.ToString());
+                
+                
             }
             catch (Exception e)
             {
@@ -202,13 +207,22 @@ namespace ReleaseServer.WebApi.Repositories
         
         public BackupInformationModel RunBackup()
         {
-            var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
+            var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
             
             string backupFileName = "backup_" + timeStamp + ".zip";
             string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName); 
             
             //Clear the backup folder first
-            DeleteFilesInPath(BackupRoot);
+            var backupDirectoryInfo = new DirectoryInfo(BackupRoot);
+
+            if (backupDirectoryInfo.Exists)
+            {
+                backupDirectoryInfo.DeleteContent();
+            }
+            else
+            {
+                backupDirectoryInfo.Create();
+            }
             
             //Create the backup -> zip the whole ArtifactRoot folder
             ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
@@ -224,9 +238,14 @@ namespace ReleaseServer.WebApi.Repositories
         {
             try
             {
-                //Clear the whole artifact root directory
-                Directory.Delete(ArtifactRoot, true);
-                Directory.CreateDirectory(ArtifactRoot);
+                //Clear the whole artifact root directory or create it, if it's not existing
+                if (ArtifactRootDir.Exists) 
+                {
+                    ArtifactRootDir.DeleteContent();  
+                }
+                else {
+                    ArtifactRootDir.Create();
+                }
                 
                 backupPayload.ExtractToDirectory(ArtifactRoot);
             }
@@ -234,16 +253,6 @@ namespace ReleaseServer.WebApi.Repositories
             {
                 Logger.LogCritical("unexpected error during restoring the backup");
                 throw;
-            }
-        }
-
-        private void DeleteFilesInPath(string path)
-        {
-            var directoryInfo = new DirectoryInfo(path);
-
-            foreach (var file in directoryInfo.GetFiles())
-            {
-                file.Delete();
             }
         }
 
@@ -282,7 +291,3 @@ namespace ReleaseServer.WebApi.Repositories
         void RestoreBackup(ZipArchive backupPayload);
     }
 }
-
-
-
-
