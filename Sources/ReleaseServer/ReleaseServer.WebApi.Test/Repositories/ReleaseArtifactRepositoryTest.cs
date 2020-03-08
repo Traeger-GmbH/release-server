@@ -11,6 +11,7 @@ using Moq;
 using NSubstitute;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
+using ReleaseServer.WebApi.Test.Utils;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
 
@@ -40,7 +41,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestStoringArtifact()
         {
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
 
             var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
 
@@ -69,7 +70,7 @@ namespace ReleaseServer.WebApi.Test
             //Setup
             
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
             
             Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
 
@@ -193,9 +194,9 @@ namespace ReleaseServer.WebApi.Test
             //Setup
             
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
             
-            SetupTestDirectory();
+            TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
             FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
@@ -213,9 +214,9 @@ namespace ReleaseServer.WebApi.Test
             //Setup
             
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
             
-            SetupTestDirectory();
+            TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
             FsReleaseArtifactRepository.DeleteProduct("producty");
@@ -232,8 +233,8 @@ namespace ReleaseServer.WebApi.Test
             var testBackupDir = Path.Combine(ProjectDirectory, "TestBackup");
             
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(testArtifactRoot);
-            CleanupDirIfExists(testBackupDir);
+            TestUtils.CleanupDirIfExists(testArtifactRoot);
+            TestUtils.CleanupDirIfExists(testBackupDir);
 
             //Mock a separate Repository with different directories as the global one
             var configuration = new Mock<IConfiguration>();
@@ -289,7 +290,7 @@ namespace ReleaseServer.WebApi.Test
             var testArtifactRoot = Path.Combine(ProjectDirectory, "TestArtifactRoot");
 
             //Cleanup test dir from old tests (if they failed before)
-            CleanupDirIfExists(testArtifactRoot);
+            TestUtils.CleanupDirIfExists(testArtifactRoot);
             
             //Mock a separate Repository with different directories as the global one
             var configuration = new Mock<IConfiguration>();
@@ -319,27 +320,6 @@ namespace ReleaseServer.WebApi.Test
             
             //Cleanup
             Directory.Delete(testArtifactRoot, true);
-        }
-        
-        private void SetupTestDirectory()
-        {
-            //Setup
-            var sourcePath = Path.Combine(ProjectDirectory, "TestData", "productx", "ubuntu", "amd64", "1.1");
-            Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1"));
-
-            var files = Directory.GetFiles(sourcePath);
-
-            foreach (var file in files)
-            {
-                var destFile = file.Replace("productx", "producty");
-                File.Copy(file, destFile);
-            }
-        }
-
-        private void CleanupDirIfExists(string path)
-        {
-            if (Directory.Exists(path))
-                Directory.Delete(path, true);
         }
     }
 }
