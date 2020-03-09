@@ -72,10 +72,9 @@ namespace ReleaseServer.WebApi.Repositories
                 Directory.Move(tmpDir.ToString(), path);
                 Logger.LogInformation("The Artifact was successfully stored");
                 
-                //Cleanup the tmp directory 
-                Directory.Delete(tmpDir.Parent.ToString());
-                
-                
+                //Cleanup the tmp directory
+                tmpDir.Parent.Delete(true);
+
             }
             catch (Exception e)
             {
@@ -251,7 +250,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogCritical("unexpected error during restoring the backup");
+                Logger.LogCritical("unexpected error during restoring the backup: {message}", e.Message);
                 throw;
             }
         }
