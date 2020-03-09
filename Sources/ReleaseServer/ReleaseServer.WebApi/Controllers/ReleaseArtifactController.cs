@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using NSwag.Annotations;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Services;
@@ -148,11 +148,12 @@ namespace ReleaseServer.WebApi.Controllers
         }
 
         //Commented out, because swagger runs into a fetch error
-/*        [AllowAnonymous]
+       [AllowAnonymous]
+       [OpenApiIgnore]
         [Route("{*url}", Order = 999)]
         public IActionResult CatchAll()
         {
             return NotFound("");
-        }*/
+        }
     }
 }

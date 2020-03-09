@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using NSubstitute.Extensions;
+using NSwag;
 using ReleaseServer.WebApi.Auth;
-using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
@@ -36,9 +34,27 @@ namespace ReleaseServer.WebApi
         {
             services.AddControllers();
             
-            services.AddSwaggerGen(c => 
+            //Register OpenAPI services
+            services.AddOpenApiDocument(config =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Release Server API", Version = "v1" });
+                config.AddSecurity("basic", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.Basic,
+                });
+                
+                config.PostProcess = document =>
+                {
+                    document.Info.Description = "An application for managing your own release artifacts. " +
+                                                "The release server provides several REST endpoints for the following operations";
+                    document.Info.Version = "v1";
+                    document.Info.Title = "Release Server API";
+                    document.Info.Contact = new NSwag.OpenApiContact
+                    {
+                        Name = "Traeger Industry Components GmbH",
+                        Email = "info@traeger.de",
+                        Url = "https://www.traeger.de"
+                    };
+                };
             });
 
             services.AddAuthentication("BasicAuthentication")
@@ -75,12 +91,9 @@ namespace ReleaseServer.WebApi
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            //Register Swagger UI middleware & generator
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
         }
     }
 }
