@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -32,14 +33,14 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
-        public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var file = Request.Form.Files.FirstOrDefault();
             
             if (file == null)
                 return BadRequest();
             
-            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
+            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
 
             return Ok("Upload of the artifact successful!");
         }
@@ -145,6 +146,41 @@ namespace ReleaseServer.WebApi.Controllers
             ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
+        }
+        
+        [HttpGet("backup")]
+        public FileStreamResult Backup()
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+
+            var backupInfo = ReleaseArtifactService.RunBackup();
+            
+            var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
+
+            //Determine the content type
+            if (!provider.TryGetContentType(backupInfo.FileName, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            
+            return new FileStreamResult(stream, contentType)
+            {
+                FileDownloadName = backupInfo.FileName
+            };
+        }
+
+        [HttpPut("restore")]
+        public IActionResult Restore()
+        {
+            var payload = Request.Form.Files.FirstOrDefault();
+            
+            if (payload == null)
+                return BadRequest();
+            
+            ReleaseArtifactService.RestoreBackup(payload);
+
+            return Ok("backup successfully restored");
         }
 
         [AllowAnonymous]

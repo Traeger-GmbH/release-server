@@ -72,7 +72,7 @@ Upload of a specific release artifact.
 
     **Code** : `401 UNAUTHORIZED`
 
-- **Sample Call**: PUT https://localhost:5001/releaseartifact/upload/softwareX/ubuntu/arm64/1.0 + authorization header
+- **Sample Call**: PUT https://localhost:5001/releaseartifact/upload/softwareX/ubuntu/arm64/1.0 + authorization header + 'multipart/form-data' payload
 
 
 <div style="page-break-after: always;">
@@ -536,9 +536,9 @@ Deletes the specified product.
     **Code** : `200 OK`
 
     **Content example** :
-        ```text
+    ```text
         artifact successfully deleted
-        ```
+    ```
 
 - **Error Response 1**
 
@@ -594,9 +594,9 @@ Deletes all products of a specific product name.
     **Code** : `200 OK`
 
     **Content example** :
-        ```text
+    ```text
         product successfully deleted
-        ```
+    ```
 
 - **Error Response 1**
 
@@ -618,4 +618,79 @@ Deletes all products of a specific product name.
 
     **Code** : `401 UNAUTHORIZED`
 
-- **Sample Call**: https://localhost:5001/releaseartifact/codabdix + authorization header
+- **Sample Call**: https://localhost:5001/releaseartifact/productx + authorization header
+
+
+<div style="page-break-after: always;">
+
+
+## 11. Backup all Artifacts
+
+Backups the whole artifact directory and retrieves it as a ZIP file.
+
+- **URL** : `/releaseartifact/backup`
+
+- **Method** : `GET`
+
+- **URL Parameters** : not necessary
+
+- **Auth required** : YES
+
+- **Authorization type** : Basic Auth
+
+- **Data**: {}
+
+- **Success Response**
+
+    **Condition** : If the artifact directory backup was successful.
+
+    **Code** : `200 OK`
+
+    **Content example** : ZIP file with the backup.
+
+- **Error Response**
+
+    **Condition** : If the user is not authorized (wrong credentials or missing/invalid authorization header)
+
+    **Code** : `401 UNAUTHORIZED`
+
+- **Sample Call**: https://localhost:5001/releaseartifact/backup + authorization header
+
+
+<div style="page-break-after: always;">
+
+
+## 12. Restore a Backup
+
+Backups the whole artifact directory and retrieves a ZIP file of it.
+
+- **URL** : `/releaseartifact/restore`
+
+- **Method** : `PUT`
+
+- **URL Parameters** : not necessary
+
+- **Auth required** : YES
+
+- **Authorization type** : Basic Auth
+
+- **Data**: Backup ZIP-File with 'content-type: multipart/form-data;
+
+- **Success Response**
+
+    **Condition** : If the restore process was successful.
+
+    **Code** : `200 OK`
+
+    **Content example** : 
+    ```text
+        backup successfully restored
+    ```
+
+- **Error Response**
+
+    **Condition** : If the user is not authorized (wrong credentials or missing/invalid authorization header)
+
+    **Code** : `401 UNAUTHORIZED`
+
+- **Sample Call**: https://localhost:5001/releaseartifact/restore + authorization header + 'multipart/form-data' payload
