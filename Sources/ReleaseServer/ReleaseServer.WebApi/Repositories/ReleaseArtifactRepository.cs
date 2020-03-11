@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+using ReleaseServer.WebApi.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
@@ -16,18 +14,19 @@ namespace ReleaseServer.WebApi.Repositories
 {
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
-        private readonly string ArtifactRoot;
+        private readonly string ArtifactRoot, BackupRoot;
         private readonly DirectoryInfo ArtifactRootDir;
         private ILogger Logger;
 
         public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, IConfiguration configuration)
         {
             ArtifactRoot = configuration["ArtifactRootDirectory"];
+            BackupRoot = configuration["BackupRootDirectory"];
             ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
             Logger = logger;
         }
         
-        public async Task StoreArtifact(ReleaseArtifactModel artifact)
+        public void StoreArtifact(ReleaseArtifactModel artifact)
         {
             
            var path = GenerateArtifactPath(
@@ -36,16 +35,16 @@ namespace ReleaseServer.WebApi.Repositories
                 artifact.ProductInformation.HwArchitecture,
                 artifact.ProductInformation.Version.ToString());
 
-           var tmpPath = GenerateTemporaryPath();
+           var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
 
             try
             {
                 //Create the temporary directory
-                if (!Directory.Exists(tmpPath))
-                    Directory.CreateDirectory(tmpPath);
+                if (!tmpDir.Exists)
+                    tmpDir.Create();
                 
                 //Extract the payload to the temporary directory
-                await Task.Run(() => artifact.Payload.ExtractToDirectory(tmpPath));
+                artifact.Payload.ExtractToDirectory(tmpDir.ToString());
                 Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
                 
                 //If the directory already exists, delete the old content in there
@@ -70,8 +69,12 @@ namespace ReleaseServer.WebApi.Repositories
                 Directory.CreateDirectory(Path.Combine(ArtifactRoot, artifact.ProductInformation.ProductIdentifier));
                 
                 //Move the extracted payload to the right directory
-                Directory.Move(tmpPath, path);
+                Directory.Move(tmpDir.ToString(), path);
                 Logger.LogInformation("The Artifact was successfully stored");
+                
+                //Cleanup the tmp directory
+                tmpDir.Parent.Delete(true);
+
             }
             catch (Exception e)
             {
@@ -200,6 +203,57 @@ namespace ReleaseServer.WebApi.Repositories
 
             return platforms.OrderBy(p => p).ToList();
         }
+        
+        public BackupInformationModel RunBackup()
+        {
+            var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
+            
+            string backupFileName = "backup_" + timeStamp + ".zip";
+            string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName); 
+            
+            //Clear the backup folder first
+            var backupDirectoryInfo = new DirectoryInfo(BackupRoot);
+
+            if (backupDirectoryInfo.Exists)
+            {
+                backupDirectoryInfo.DeleteContent();
+            }
+            else
+            {
+                backupDirectoryInfo.Create();
+            }
+            
+            //Create the backup -> zip the whole ArtifactRoot folder
+            ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
+
+            return new BackupInformationModel
+            {
+                FullPath = backupArchiveFileName,
+                FileName = backupFileName
+            };
+        }
+
+        public void RestoreBackup(ZipArchive backupPayload)
+        {
+            try
+            {
+                //Clear the whole artifact root directory or create it, if it's not existing
+                if (ArtifactRootDir.Exists) 
+                {
+                    ArtifactRootDir.DeleteContent();  
+                }
+                else {
+                    ArtifactRootDir.Create();
+                }
+                
+                backupPayload.ExtractToDirectory(ArtifactRoot);
+            }
+            catch (Exception e)
+            {
+                Logger.LogCritical("unexpected error during restoring the backup: {message}", e.Message);
+                throw;
+            }
+        }
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
@@ -219,13 +273,12 @@ namespace ReleaseServer.WebApi.Repositories
                 throw new Exception("meta information of the specified product does not exist!");
                     
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
-        } 
-        
+        }
     }
     
     public interface IReleaseArtifactRepository     
     {
-        Task StoreArtifact(ReleaseArtifactModel artifact);
+        void StoreArtifact(ReleaseArtifactModel artifact);
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
@@ -233,9 +286,7 @@ namespace ReleaseServer.WebApi.Repositories
         void DeleteProduct(string productName);
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
+        BackupInformationModel RunBackup();
+        void RestoreBackup(ZipArchive backupPayload);
     }
 }
-
-
-
-

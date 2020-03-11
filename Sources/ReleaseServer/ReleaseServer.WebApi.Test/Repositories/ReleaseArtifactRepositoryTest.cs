@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +11,7 @@ using Moq;
 using NSubstitute;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
+using ReleaseServer.WebApi.Test.Utils;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
 
@@ -37,8 +38,10 @@ namespace ReleaseServer.WebApi.Test
         }
         
         [Fact]
-        public async void TestStoringArtifact()
+        public void TestStoringArtifact()
         {
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
 
             var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
 
@@ -50,7 +53,7 @@ namespace ReleaseServer.WebApi.Test
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
                 "amd64", "1.1", testZip);
 
-            await FsReleaseArtifactRepository.StoreArtifact(testArtifact);
+            FsReleaseArtifactRepository.StoreArtifact(testArtifact);
 
             //Assert whether the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
@@ -64,8 +67,11 @@ namespace ReleaseServer.WebApi.Test
         [Fact]
         public void TestGetInfosByProductName()
         {
-            
             //Setup
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
+            
             Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
 
             var expectedProductInfo = new ProductInformationModel
@@ -109,7 +115,6 @@ namespace ReleaseServer.WebApi.Test
             Assert.Equal(expectedPlatforms2, testPlatforms2);
             Assert.Equal(expectedPlatforms3, testPlatforms3);
         }
-        
         
         [Fact]
         public void TestGetVersions()
@@ -187,7 +192,11 @@ namespace ReleaseServer.WebApi.Test
         public void TestDeleteSpecificArtifact()
         {
             //Setup
-            SetupTestDirectory();
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
+            
+            TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
             FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
@@ -203,7 +212,11 @@ namespace ReleaseServer.WebApi.Test
         public void TestDeleteProduct()
         {
             //Setup
-            SetupTestDirectory();
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "producty"));
+            
+            TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
             FsReleaseArtifactRepository.DeleteProduct("producty");
@@ -212,19 +225,101 @@ namespace ReleaseServer.WebApi.Test
             Assert.False(Directory.Exists(Path.Combine(ProjectDirectory, "TestData", "producty")));
         }
 
-        private void SetupTestDirectory()
+        [Fact]
+        public void TestRunBackup()
         {
             //Setup
-            var sourcePath = Path.Combine(ProjectDirectory, "TestData", "productx", "ubuntu", "amd64", "1.1");
-            Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1"));
+            var testArtifactRoot = Path.Combine(ProjectDirectory, "TestArtifactRoot");
+            var testBackupDir = Path.Combine(ProjectDirectory, "TestBackup");
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(testArtifactRoot);
+            TestUtils.CleanupDirIfExists(testBackupDir);
 
-            var files = Directory.GetFiles(sourcePath);
+            //Mock a separate Repository with different directories as the global one
+            var configuration = new Mock<IConfiguration>();
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
+                .Returns(testArtifactRoot);
+            
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "BackupRootDirectory")])
+                .Returns(testBackupDir);
 
-            foreach (var file in files)
-            {
-                var destFile = file.Replace("productx", "producty");
-                File.Copy(file, destFile);
-            }
+
+            var customRepository = new FsReleaseArtifactRepository(
+                Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
+                configuration.Object
+            );
+
+            //Create the test directories
+            Directory.CreateDirectory(testArtifactRoot);
+            Directory.CreateDirectory(testBackupDir);
+            
+            var expectedFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
+
+            //Copy to the test file to the custom ArtifactRootDirectory
+            File.Copy(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"), Path.Combine(testArtifactRoot, "test_zip.zip"));
+            
+            //Act
+            customRepository.RunBackup();
+            
+            var backupFiles = Directory.GetFiles(testBackupDir);
+            
+            //There is only one file -> .First() is used
+            ZipFile.ExtractToDirectory(backupFiles.First(), testBackupDir);
+            File.Delete(backupFiles.First());
+            
+            //Get the actual file in the directory
+            backupFiles = Directory.GetFiles(testBackupDir);
+            var backupFile = File.ReadAllBytes(backupFiles.First());
+            
+            //Assert
+            Assert.Equal(expectedFile, backupFile);
+            
+            //Cleanup
+            Directory.Delete(testBackupDir, true);
+            Directory.Delete(testArtifactRoot, true);
+        }
+
+
+        [Fact]
+        public void TestRestore()
+        {
+            //Setup
+            var testArtifactRoot = Path.Combine(ProjectDirectory, "TestArtifactRoot");
+
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(testArtifactRoot);
+            
+            //Mock a separate Repository with different directories as the global one
+            var configuration = new Mock<IConfiguration>();
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
+                .Returns(testArtifactRoot);
+            
+            var customRepository = new FsReleaseArtifactRepository(
+                Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
+                configuration.Object
+            );
+            
+            Directory.CreateDirectory(testArtifactRoot);
+            
+            var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(ProjectDirectory, "TestData", "restoreTest", "testFile.zip")));
+            var expectedFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "restoreTest", "testFile.txt"));
+            
+            //Act
+            customRepository.RestoreBackup(testBackupZip);
+            
+            //Get the (only) one file in the testArtifactRootDirectory
+            var artifactFiles = Directory.GetFiles(testArtifactRoot);
+            var testFile = File.ReadAllBytes(artifactFiles.First());
+            
+            //Assert
+            Assert.Equal(expectedFile, testFile);
+            
+            //Cleanup
+            Directory.Delete(testArtifactRoot, true);
         }
     }
 }

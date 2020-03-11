@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Mappers;
@@ -13,23 +13,26 @@ namespace ReleaseServer.WebApi.Services
     {
         private IReleaseArtifactRepository FsReleaseArtifactRepository;
         private ILogger Logger;
+        private static SemaphoreSlim DirectoryLock;
 
         public FsReleaseArtifactService( IReleaseArtifactRepository fsReleaseArtifactRepository, ILogger<FsReleaseArtifactService> logger)
         {
             FsReleaseArtifactRepository = fsReleaseArtifactRepository;
             Logger = logger;
+            DirectoryLock = new SemaphoreSlim(1,1);
         }
         
-        public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
+        public void StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
         {
-
             using (var zipMapper = new ZipArchiveMapper())
             {
                 Logger.LogDebug("convert the uploaded payload to a ZIP archive");
                 var zipPayload = zipMapper.FormFileToZipArchive(payload);
                 
                 var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
-                await FsReleaseArtifactRepository.StoreArtifact(artifact);
+
+                lock (DirectoryLock)
+                    FsReleaseArtifactRepository.StoreArtifact(artifact);
             }
         }
         public List<ProductInformationModel> GetProductInfos(string productName)
@@ -73,18 +76,38 @@ namespace ReleaseServer.WebApi.Services
 
         public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
         {
-            FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version);
+            lock(DirectoryLock)
+                FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version);
         }
 
         public void DeleteProduct(string productName)
         {
-            FsReleaseArtifactRepository.DeleteProduct(productName);
+            lock (DirectoryLock)
+                FsReleaseArtifactRepository.DeleteProduct(productName);
+        }
+
+        public BackupInformationModel RunBackup()
+        {
+            lock (DirectoryLock)
+                return  FsReleaseArtifactRepository.RunBackup();
+        }
+
+        public void RestoreBackup(IFormFile payload)
+        {
+            using (var zipMapper = new ZipArchiveMapper())
+            {
+                Logger.LogDebug("convert the uploaded backup payload to a ZIP archive");
+                var zipPayload = zipMapper.FormFileToZipArchive(payload);
+                
+                lock (DirectoryLock)
+                    FsReleaseArtifactRepository.RestoreBackup(zipPayload);
+            }
         }
     }
     
     public interface IReleaseArtifactService
     {
-        Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
+        void StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
         List<ProductInformationModel> GetProductInfos(string productName);
         List<string> GetPlatforms(string productName, string version);
         string GetReleaseInfo(string productName, string os, string architecture, string version);
@@ -94,5 +117,7 @@ namespace ReleaseServer.WebApi.Services
         ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture);
         void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
         void DeleteProduct(string productName);
+        BackupInformationModel RunBackup();
+        void RestoreBackup(IFormFile payload);
     }
 }
