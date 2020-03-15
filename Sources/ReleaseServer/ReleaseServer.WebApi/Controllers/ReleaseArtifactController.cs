@@ -36,23 +36,26 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="os"></param>
         /// <param name="architecture"></param>
         /// <param name="version"></param>
+        /// <param name="artifact"></param>
         /// <response code="200">Upload of the artifact successful.</response>
+        /// <response code="400">No or wrong body provided.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
-        /// <response code="500">Wrong body provided (not 'content-type: multipart/form-data').</response>
+        /// <response code="500">Internal error.</response>
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         [ProducesResponseType(typeof(IActionResult), 200)]
+        [ProducesResponseType(typeof(void), 400)]
         [ProducesResponseType(typeof(void), 401)]
-        [ProducesResponseType(typeof(void), 500)]
+        [ProducesResponseType(typeof(string), 500)]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
-        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, 
+            [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
-            var file = Request.Form.Files.FirstOrDefault();
             
-            if (file == null)
+            if (artifact == null)
                 return BadRequest();
             
-            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
+            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
 
             return Ok("Upload of the artifact successful!");
         }
@@ -295,21 +298,19 @@ namespace ReleaseServer.WebApi.Controllers
         /// <summary>
         /// Restores the uploaded backup file.
         /// </summary>
+        /// <param name="backupFile"></param>
         /// <returns></returns>
         /// <response code="200">The restore process was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
         [HttpPut("restore")]
         [ProducesResponseType(typeof(IActionResult), 200)]
         [ProducesResponseType(typeof(void), 401)]
-        
-        public IActionResult Restore()
+        public IActionResult Restore([Required] IFormFile backupFile)
         {
-            var payload = Request.Form.Files.FirstOrDefault();
-            
-            if (payload == null)
+            if (backupFile == null)
                 return BadRequest();
             
-            ReleaseArtifactService.RestoreBackup(payload);
+            ReleaseArtifactService.RestoreBackup(backupFile);
 
             return Ok("backup successfully restored");
         }
