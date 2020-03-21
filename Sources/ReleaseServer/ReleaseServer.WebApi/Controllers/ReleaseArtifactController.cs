@@ -1,16 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using NSwag.Annotations;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Services;
-
 
 namespace ReleaseServer.WebApi.Controllers
 {
@@ -37,15 +35,10 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="architecture"></param>
         /// <param name="version"></param>
         /// <param name="artifact"></param>
-        /// <response code="200">Upload of the artifact successful.</response>
+        /// <response code="200">Upload of the artifact was successful.</response>
         /// <response code="400">No or wrong body provided.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
-        [ProducesResponseType(typeof(IActionResult), 200)]
-        [ProducesResponseType(typeof(void), 400)]
-        [ProducesResponseType(typeof(void), 401)]
-        [ProducesResponseType(typeof(string), 500)]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
         public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, 
@@ -70,7 +63,6 @@ namespace ReleaseServer.WebApi.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductInformationListResponseModel), 200)]
-        [ProducesResponseType(typeof(void), 500)]
         [HttpGet("versions/{product}")]
         public ProductInformationListResponseModel GetProductInfos([Required] string product)
         {
@@ -108,7 +100,6 @@ namespace ReleaseServer.WebApi.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ChangelogResponseModel), 200)]
-        [ProducesResponseType(typeof(void), 500)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
         public ChangelogResponseModel GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
@@ -127,7 +118,6 @@ namespace ReleaseServer.WebApi.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductVersionListResponseModel), 200)]
-        [ProducesResponseType(typeof(string), 500)]
         [HttpGet("versions/{product}/{os}/{architecture}")]
         public ProductVersionListResponseModel GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
@@ -148,7 +138,6 @@ namespace ReleaseServer.WebApi.Controllers
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
         [ProducesResponseType(typeof(byte), 200)]
-        [ProducesResponseType(typeof(string), 500)]
         public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var provider = new FileExtensionContentTypeProvider();
@@ -178,13 +167,11 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="product"></param>
         /// <param name="os"></param>
         /// <param name="architecture"></param>
-        /// <response code="200">The specified product exists.</response>
+        /// <response code="200">The specified product exists. The ZIP file with the artifact will be retrieved</response>
         /// <response code="500">The product is not available vor the specified platform (OS + arch)</response>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/latest")]
-        [ProducesResponseType(typeof(IActionResult), 200)]
-        [ProducesResponseType(typeof(string), 500)]
         public IActionResult  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
             var provider = new FileExtensionContentTypeProvider();
@@ -209,7 +196,7 @@ namespace ReleaseServer.WebApi.Controllers
         }
 
         /// <summary>
-        /// Retrieves the newest version of a specific product.
+        /// Retrieves the latest version of a specific product.
         /// </summary>
         /// <param name="product"></param>
         /// <param name="os"></param>
@@ -221,7 +208,6 @@ namespace ReleaseServer.WebApi.Controllers
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
         [ProducesResponseType(typeof(ProductVersionResponseModel), 200)]
-        [ProducesResponseType(typeof(string), 500)]
         public ProductVersionResponseModel GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
             return ReleaseArtifactService.GetLatestVersion(product, os, architecture).ToProductVersionResponse();
@@ -256,8 +242,6 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="500">There exists no product with the specified product name.</response>
         [HttpDelete("{product}")]
         [ProducesResponseType(typeof(IActionResult), 200)]
-        [ProducesResponseType(typeof(void), 401)]
-        [ProducesResponseType(typeof(void), 500)]
         public IActionResult DeleteProduct ([Required] string product)
         {
             ReleaseArtifactService.DeleteProduct(product);
@@ -303,8 +287,6 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The restore process was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
         [HttpPut("restore")]
-        [ProducesResponseType(typeof(IActionResult), 200)]
-        [ProducesResponseType(typeof(void), 401)]
         public IActionResult Restore([Required] IFormFile backupFile)
         {
             if (backupFile == null)
@@ -317,8 +299,8 @@ namespace ReleaseServer.WebApi.Controllers
 
         //Commented out, because swagger runs into a fetch error
        [AllowAnonymous]
-       [OpenApiIgnore]
-        [Route("{*url}", Order = 999)]
+       [ApiExplorerSettings(IgnoreApi = true)]
+       [Route("{*url}", Order = 999)]
         public IActionResult CatchAll()
         {
             return NotFound("");

@@ -1,5 +1,3 @@
-using System;
-
 namespace ReleaseServer.WebApi.Models
 {
     public class ProductInformationModel

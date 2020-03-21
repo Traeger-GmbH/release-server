@@ -1,4 +1,7 @@
-using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -7,11 +10,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using NSwag;
 using ReleaseServer.WebApi.Auth;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi
 {
@@ -34,28 +38,38 @@ namespace ReleaseServer.WebApi
         {
             services.AddControllers();
             
-            //Register OpenAPI services
-            services.AddOpenApiDocument(config =>
+            services.AddSwaggerGen(c =>
             {
-                config.AddSecurity("basic", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Type = OpenApiSecuritySchemeType.Basic,
-                });
-                
-                config.PostProcess = document =>
-                {
-                    document.Info.Description = "An application for managing your own release artifacts. " +
-                                                "The release server provides several REST endpoints for the following operations";
-                    document.Info.Version = "v1";
-                    document.Info.Title = "Release Server API";
-                    document.Info.Contact = new NSwag.OpenApiContact
+                    Title = "Release Server API",
+                    Version = "v1",
+                    Description = "An application for managing your own release artifacts. " +
+                                  "The release server provides several REST endpoints for the following operations.",
+                    Contact = new OpenApiContact
                     {
                         Name = "Traeger Industry Components GmbH",
                         Email = "info@traeger.de",
-                        Url = "https://www.traeger.de"
-                    };
-                };
+                        Url = new Uri("https://www.traeger.de")
+                    }
+                });
+                
+               c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "basic" }
+                        }, new List<string>() }
+                });
+                
+               c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ReleaseServer.WebApi.xml"));
+               c.ExampleFilters();
             });
+            
+            services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
@@ -92,8 +106,11 @@ namespace ReleaseServer.WebApi
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             //Register Swagger UI middleware & generator
-            app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Release Server API V1");
+            });
         }
     }
 }
