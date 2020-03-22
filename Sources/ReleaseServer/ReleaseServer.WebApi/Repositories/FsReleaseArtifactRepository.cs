@@ -275,18 +275,4 @@ namespace ReleaseServer.WebApi.Repositories
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
         }
     }
-    
-    public interface IReleaseArtifactRepository     
-    {
-        void StoreArtifact(ReleaseArtifactModel artifact);
-        List<ProductInformationModel> GetInfosByProductName(string productName);
-        string GetReleaseInfo(string product, string os, string architecture, string version);
-        ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
-        void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
-        void DeleteProduct(string productName);
-        List<string> GetVersions(string productName, string os, string architecture);
-        List<string> GetPlatforms(string productName, string version);
-        BackupInformationModel RunBackup();
-        void RestoreBackup(ZipArchive backupPayload);
-    }
 }
