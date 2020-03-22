@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using ReleaseServer.WebApi.Auth;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
+using ReleaseServer.WebApi.SwaggerDocu;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi
@@ -40,6 +41,7 @@ namespace ReleaseServer.WebApi
             
             services.AddSwaggerGen(c =>
             {
+                
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Release Server API",
@@ -54,7 +56,16 @@ namespace ReleaseServer.WebApi
                     }
                 });
                 
-               c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Name = "Authorization",
+                    Scheme = "basic", 
+                    Description = "Input your username and password to access this API",
+                    In = ParameterLocation.Header,
+                });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme

@@ -37,6 +37,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="artifact"></param>
         /// <response code="200">Upload of the artifact was successful.</response>
         /// <response code="400">No or wrong body provided.</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
@@ -132,12 +133,11 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="os"></param>
         /// <param name="architecture"></param>
         /// <param name="version"></param>
-        /// <response code="200">There exists a product with the specified product name / arch / version / os.</response>
-        /// <response code="500">There exists no product with the specified product name / arch / version / os.</response>
+        /// <response code="200">There exists a product with the specified parameters.</response>
+        /// <response code="500">There exists no product with the specified parameters.</response>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
-        [ProducesResponseType(typeof(byte), 200)]
         public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var provider = new FileExtensionContentTypeProvider();
@@ -167,7 +167,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="product"></param>
         /// <param name="os"></param>
         /// <param name="architecture"></param>
-        /// <response code="200">The specified product exists. The ZIP file with the artifact will be retrieved</response>
+        /// <response code="200">The specified product exists (the ZIP file with the artifact will be retrieved)</response>
         /// <response code="500">The product is not available vor the specified platform (OS + arch)</response>
         /// <returns></returns>
         [AllowAnonymous]
@@ -221,7 +221,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="architecture"></param>
         /// <param name="version"></param>
         /// <response code="200">The specified product got deleted successfully.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">There exists no product with the specified product name.</response>
         /// <returns></returns>
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
@@ -238,10 +238,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="product"></param>
         /// <returns></returns>
         /// <response code="200">All products of the specified product name got deleted successfully.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">There exists no product with the specified product name.</response>
         [HttpDelete("{product}")]
-        [ProducesResponseType(typeof(IActionResult), 200)]
         public IActionResult DeleteProduct ([Required] string product)
         {
             ReleaseArtifactService.DeleteProduct(product);
@@ -254,10 +253,8 @@ namespace ReleaseServer.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         /// <response code="200">The artifact directory backup was successful.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpGet("backup")]
-        [ProducesResponseType(typeof(IActionResult), 200)]
-        [ProducesResponseType(typeof(void), 401)]
         public FileStreamResult Backup()
         {
             var provider = new FileExtensionContentTypeProvider();
@@ -285,7 +282,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="backupFile"></param>
         /// <returns></returns>
         /// <response code="200">The restore process was successful.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header.</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpPut("restore")]
         public IActionResult Restore([Required] IFormFile backupFile)
         {
