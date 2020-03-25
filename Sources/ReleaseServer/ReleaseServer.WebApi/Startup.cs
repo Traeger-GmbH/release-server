@@ -65,19 +65,10 @@ namespace ReleaseServer.WebApi
                     In = ParameterLocation.Header,
                 });
                 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "basic" }
-                        }, new List<string>() }
-                });
+                c.OperationFilter<BasicAuthOperationsFilter>();
                 
-               c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ReleaseServer.WebApi.xml"));
-               c.ExampleFilters();
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ReleaseServer.WebApi.xml"));
+                c.ExampleFilters();
             });
             
             services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
