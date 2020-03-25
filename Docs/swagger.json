@@ -1,925 +1,945 @@
 {
-    "openapi": "3.0.1",
-    "info": {
-      "title": "Release Server API",
-      "description": "An application for managing your own release artifacts. The release server provides several REST endpoints for the following operations.",
-      "contact": {
-        "name": "Traeger Industry Components GmbH",
-        "url": "https://www.traeger.de",
-        "email": "info@traeger.de"
-      },
-      "version": "v1"
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Release Server API",
+    "description": "An application for managing your own release artifacts. The release server provides several REST endpoints for the following operations.",
+    "contact": {
+      "name": "Traeger Industry Components GmbH",
+      "url": "https://www.traeger.de",
+      "email": "info@traeger.de"
     },
-    "paths": {
-      "/ReleaseArtifact/upload/{product}/{os}/{architecture}/{version}": {
-        "put": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Uploads a specific release artifact.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "version",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
+    "version": "v1"
+  },
+  "paths": {
+    "/ReleaseArtifact/upload/{product}/{os}/{architecture}/{version}": {
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Uploads a specific release artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
             }
-          ],
-          "requestBody": {
-            "content": {
-              "multipart/form-data": {
-                "schema": {
-                  "required": [
-                    "artifact"
-                  ],
-                  "type": "object",
-                  "properties": {
-                    "artifact": {
-                      "type": "string",
-                      "description": "",
-                      "format": "binary"
-                    }
-                  }
-                },
-                "encoding": {
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "artifact"
+                ],
+                "type": "object",
+                "properties": {
                   "artifact": {
-                    "style": "form"
+                    "type": "string",
+                    "description": "",
+                    "format": "binary"
                   }
+                }
+              },
+              "encoding": {
+                "artifact": {
+                  "style": "form"
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload of the artifact was successful."
           },
-          "responses": {
-            "200": {
-              "description": "Upload of the artifact was successful."
-            },
-            "400": {
-              "description": "No or wrong body provided."
-            },
-            "401": {
-              "description": "The user is not authorized (wrong credentials or missing auth header)."
-            },
-            "500": {
-              "description": "Internal error."
-            }
+          "400": {
+            "description": "No or wrong body provided."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "Internal error."
           }
-        }
-      },
-      "/ReleaseArtifact/versions/{product}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves all available products.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A product with the specified product name exists.\r\n            Empty productInformation, if there exists no product with the specified product name",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductInformationListResponseModel"
-                  },
-                  "example": {
-  
-    "productInformation": [
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.0",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
-      },
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.1-beta",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
       }
-  
-    ]
-  
-  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductInformationListResponseModel"
-                  },
-                  "example": {
-  
-    "productInformation": [
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.0",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
-      },
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.1-beta",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
-      }
-  
-    ]
-  
-  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductInformationListResponseModel"
-                  },
-                  "example": {
-  
-    "productInformation": [
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.0",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
-      },
-  
-      {
-  
-        "identifier": "softwareX",
-  
-        "version": "1.1-beta",
-  
-        "os": "debian",
-  
-        "architecture": "amd64"
-  
-      }
-  
-    ]
-  
-  }
-                }
-              }
-            },
-            "500": {
-              "description": "Wrong body provided (not 'content-type: multipart/form-data')."
+    },
+    "/ReleaseArtifact/versions/{product}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves all available products.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
             }
           }
-        }
-      },
-      "/ReleaseArtifact/platforms/{product}/{version}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves all available platforms for a specific product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "version",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "There are existing Platforms for the specified product name. Empty platforms array, if\r\n            there exists no platforms for the specified product name",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/PlatformsResponseModel"
-                  },
-                  "example": {
-  
-    "platforms": [
-  
-      "debian-amd64",
-  
-      "debian-arm64"
-  
-    ]
-  
-  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/PlatformsResponseModel"
-                  },
-                  "example": {
-  
-    "platforms": [
-  
-      "debian-amd64",
-  
-      "debian-arm64"
-  
-    ]
-  
-  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/PlatformsResponseModel"
-                  },
-                  "example": {
-  
-    "platforms": [
-  
-      "debian-amd64",
-  
-      "debian-arm64"
-  
-    ]
-  
-  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/info/{product}/{os}/{architecture}/{version}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves the changelog of a specific product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "version",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "The specific product exists.",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ChangelogResponseModel"
-                  },
-                  "example": {
-  
-    "changelog": "Release 1.0.0 - This is an example."
-  
-  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ChangelogResponseModel"
-                  },
-                  "example": {
-  
-    "changelog": "Release 1.0.0 - This is an example."
-  
-  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ChangelogResponseModel"
-                  },
-                  "example": {
-  
-    "changelog": "Release 1.0.0 - This is an example."
-  
-  }
-                }
-              }
-            },
-            "500": {
-              "description": "The product with the specified product name does not exist\r\n            or there is no changelog available."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/versions/{product}/{os}/{architecture}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves all available versions that are fitting to a specific product / platform (HW architecture + OS).",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "There are existing versions for the specified platform and product.\r\n            Empty versions array, if there exists no version for the specified platform / product.",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionListResponseModel"
-                  },
-                  "example": {
-  
-    "versions": [
-  
-      "1.1",
-  
-      "1.0"
-  
-    ]
-  
-  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionListResponseModel"
-                  },
-                  "example": {
-  
-    "versions": [
-  
-      "1.1",
-  
-      "1.0"
-  
-    ]
-  
-  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionListResponseModel"
-                  },
-                  "example": {
-  
-    "versions": [
-  
-      "1.1",
-  
-      "1.0"
-  
-    ]
-  
-  }
-                }
-              }
-            },
-            "500": {
-              "description": "There exists no product with the specified product name."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/download/{product}/{os}/{architecture}/{version}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves the artifact of the specified product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "version",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": "",
-                "nullable": true
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "There exists a product with the specified parameters."
-            },
-            "500": {
-              "description": "There exists no product with the specified parameters."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/download/{product}/{os}/{architecture}/latest": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves the latest artifact of a specific product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "The specified product exists (the ZIP file with the artifact will be retrieved)"
-            },
-            "500": {
-              "description": "The product is not available vor the specified platform (OS + arch)"
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/latest/{product}/{os}/{architecture}": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Retrieves the latest version of a specific product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "The specified product exists.",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionResponseModel"
-                  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionResponseModel"
-                  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ProductVersionResponseModel"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "The product is not available for the specified platform (OS + HW architecture)\r\n            or the product with the specified product name does not exist"
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/{product}/{os}/{architecture}/{version}": {
-        "delete": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Deletes the specified product.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "os",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "architecture",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            },
-            {
-              "name": "version",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "The specified product got deleted successfully."
-            },
-            "401": {
-              "description": "The user is not authorized (wrong credentials or missing auth header)."
-            },
-            "500": {
-              "description": "There exists no product with the specified product name."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/{product}": {
-        "delete": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Deletes all products of a specific product name.",
-          "parameters": [
-            {
-              "name": "product",
-              "in": "path",
-              "description": "",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "description": ""
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "All products of the specified product name got deleted successfully."
-            },
-            "401": {
-              "description": "The user is not authorized (wrong credentials or missing auth header)."
-            },
-            "500": {
-              "description": "There exists no product with the specified product name."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/backup": {
-        "get": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Backups the whole artifact directory and retrieves it as a ZIP file.",
-          "responses": {
-            "200": {
-              "description": "The artifact directory backup was successful."
-            },
-            "401": {
-              "description": "The user is not authorized (wrong credentials or missing auth header)."
-            }
-          }
-        }
-      },
-      "/ReleaseArtifact/restore": {
-        "put": {
-          "tags": [
-            "ReleaseArtifact"
-          ],
-          "summary": "Restores the uploaded backup file.",
-          "requestBody": {
+        ],
+        "responses": {
+          "200": {
+            "description": "A product with the specified product name exists.\r\n            Empty productInformation, if there exists no product with the specified product name",
             "content": {
-              "multipart/form-data": {
+              "text/plain": {
                 "schema": {
-                  "required": [
-                    "backupFile"
-                  ],
-                  "type": "object",
-                  "properties": {
-                    "backupFile": {
-                      "type": "string",
-                      "description": "",
-                      "format": "binary"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ProductInformationListResponseModel"
                 },
-                "encoding": {
-                  "backupFile": {
-                    "style": "form"
-                  }
+                "example": {
+
+                  "productInformation": [
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.0",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    },
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.1-beta",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    }
+
+                  ]
+
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformationListResponseModel"
+                },
+                "example": {
+
+                  "productInformation": [
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.0",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    },
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.1-beta",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    }
+
+                  ]
+
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformationListResponseModel"
+                },
+                "example": {
+
+                  "productInformation": [
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.0",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    },
+
+                    {
+
+                      "identifier": "softwareX",
+
+                      "version": "1.1-beta",
+
+                      "os": "debian",
+
+                      "architecture": "amd64"
+
+                    }
+
+                  ]
+
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "The restore process was successful."
-            },
-            "401": {
-              "description": "The user is not authorized (wrong credentials or missing auth header)."
+          "500": {
+            "description": "Wrong body provided (not 'content-type: multipart/form-data')."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/platforms/{product}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves all available platforms for a specific product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "There are existing Platforms for the specified product name. Empty platforms array, if\r\n            there exists no platforms for the specified product name",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsResponseModel"
+                },
+                "example": {
+
+                  "platforms": [
+
+                    "debian-amd64",
+
+                    "debian-arm64"
+
+                  ]
+
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsResponseModel"
+                },
+                "example": {
+
+                  "platforms": [
+
+                    "debian-amd64",
+
+                    "debian-arm64"
+
+                  ]
+
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsResponseModel"
+                },
+                "example": {
+
+                  "platforms": [
+
+                    "debian-amd64",
+
+                    "debian-arm64"
+
+                  ]
+
+                }
+              }
             }
           }
         }
       }
     },
-    "components": {
-      "schemas": {
-        "ProductInformationResponseModel": {
-          "type": "object",
-          "properties": {
-            "identifier": {
+    "/ReleaseArtifact/info/{product}/{os}/{architecture}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the changelog of a specific product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
-            },
-            "version": {
+              "description": ""
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
-            },
-            "os": {
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
-            },
-            "architecture": {
+              "description": ""
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
+              "description": ""
             }
           }
-        },
-        "ProductInformationListResponseModel": {
-          "type": "object",
-          "properties": {
-            "productInformation": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ProductInformationResponseModel"
+        ],
+        "responses": {
+          "200": {
+            "description": "The specific product exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangelogResponseModel"
+                },
+                "example": {
+
+                  "changelog": "Release 1.0.0 - This is an example."
+
+                }
               },
-              "nullable": true
-            }
-          }
-        },
-        "PlatformsResponseModel": {
-          "type": "object",
-          "properties": {
-            "platforms": {
-              "type": "array",
-              "items": {
-                "type": "string"
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangelogResponseModel"
+                },
+                "example": {
+
+                  "changelog": "Release 1.0.0 - This is an example."
+
+                }
               },
-              "nullable": true
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangelogResponseModel"
+                },
+                "example": {
+
+                  "changelog": "Release 1.0.0 - This is an example."
+
+                }
+              }
             }
+          },
+          "500": {
+            "description": "The product with the specified product name does not exist\r\n            or there is no changelog available."
           }
-        },
-        "ChangelogResponseModel": {
-          "type": "object",
-          "properties": {
-            "changelog": {
+        }
+      }
+    },
+    "/ReleaseArtifact/versions/{product}/{os}/{architecture}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves all available versions that are fitting to a specific product / platform (HW architecture + OS).",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
+              "description": ""
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
             }
           }
-        },
-        "ProductVersionListResponseModel": {
-          "type": "object",
-          "properties": {
-            "versions": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        ],
+        "responses": {
+          "200": {
+            "description": "There are existing versions for the specified platform and product.\r\n            Empty versions array, if there exists no version for the specified platform / product.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionListResponseModel"
+                },
+                "example": {
+
+                  "versions": [
+
+                    "1.1",
+
+                    "1.0"
+
+                  ]
+
+                }
               },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionListResponseModel"
+                },
+                "example": {
+
+                  "versions": [
+
+                    "1.1",
+
+                    "1.0"
+
+                  ]
+
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionListResponseModel"
+                },
+                "example": {
+
+                  "versions": [
+
+                    "1.1",
+
+                    "1.0"
+
+                  ]
+
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "There exists no product with the specified product name."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/download/{product}/{os}/{architecture}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the artifact of the specified product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "",
               "nullable": true
             }
           }
-        },
-        "ProductVersionResponseModel": {
-          "type": "object",
-          "properties": {
-            "version": {
+        ],
+        "responses": {
+          "200": {
+            "description": "There exists a product with the specified parameters."
+          },
+          "500": {
+            "description": "There exists no product with the specified parameters."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/download/{product}/{os}/{architecture}/latest": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the latest artifact of a specific product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
               "type": "string",
-              "nullable": true
+              "description": ""
             }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified product exists (the ZIP file with the artifact will be retrieved)"
+          },
+          "500": {
+            "description": "The product is not available vor the specified platform (OS + arch)"
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/latest/{product}/{os}/{architecture}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the latest version of a specific product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified product exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponseModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponseModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The product is not available for the specified platform (OS + HW architecture)\r\n            or the product with the specified product name does not exist"
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/{product}/{os}/{architecture}/{version}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes the specified product.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified product got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "There exists no product with the specified product name."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/{product}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes all products of a specific product name.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All products of the specified product name got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "There exists no product with the specified product name."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/backup": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Backups the whole artifact directory and retrieves it as a ZIP file.",
+        "responses": {
+          "200": {
+            "description": "The artifact directory backup was successful."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/restore": {
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Restores the uploaded backup file.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "backupFile"
+                ],
+                "type": "object",
+                "properties": {
+                  "backupFile": {
+                    "type": "string",
+                    "description": "",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "backupFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The restore process was successful."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductInformationResponseModel": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "os": {
+            "type": "string",
+            "nullable": true
+          },
+          "architecture": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
-      "securitySchemes": {
-        "basic": {
-          "type": "http",
-          "description": "Input your username and password to access this API",
-          "scheme": "basic"
+      "ProductInformationListResponseModel": {
+        "type": "object",
+        "properties": {
+          "productInformation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductInformationResponseModel"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "PlatformsResponseModel": {
+        "type": "object",
+        "properties": {
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ChangelogResponseModel": {
+        "type": "object",
+        "properties": {
+          "changelog": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProductVersionListResponseModel": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ProductVersionResponseModel": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "nullable": true
+          }
         }
       }
     },
-    "security": [
-      {
-        "basic": [ ]
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "description": "Input your username and password to access this API",
+        "scheme": "basic"
       }
-    ]
+    }
   }
+}
