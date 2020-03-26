@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Mappers;
@@ -22,7 +24,7 @@ namespace ReleaseServer.WebApi.Services
             DirectoryLock = new SemaphoreSlim(1,1);
         }
         
-        public void StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
+        public async Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload)
         {
             using (var zipMapper = new ZipArchiveMapper())
             {
@@ -31,93 +33,142 @@ namespace ReleaseServer.WebApi.Services
                 
                 var artifact = ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
 
-                lock (DirectoryLock)
-                    FsReleaseArtifactRepository.StoreArtifact(artifact);
+                await DirectoryLock.WaitAsync();
+
+                //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+                try
+                {
+                    await Task.Run(() => FsReleaseArtifactRepository.StoreArtifact(artifact));
+                }
+                finally
+                {
+                    DirectoryLock.Release();
+                }
             }
         }
-        public List<ProductInformationModel> GetProductInfos(string productName)
+        public async Task<List<ProductInformationModel>> GetProductInfos(string productName)
         {
-            return FsReleaseArtifactRepository.GetInfosByProductName(productName);
+            return await Task.Run(() => FsReleaseArtifactRepository.GetInfosByProductName(productName));
         }
 
-        public List<string> GetPlatforms(string productName, string version)
+        public async Task<List<string>> GetPlatforms(string productName, string version)
         {
-            return FsReleaseArtifactRepository.GetPlatforms(productName, version);
+            return await Task.Run(() => FsReleaseArtifactRepository.GetPlatforms(productName, version));
         }
 
-        public string GetReleaseInfo(string productName, string os, string architecture, string version)
+        public async Task<string> GetReleaseInfo(string productName, string os, string architecture, string version)
         {
-            return FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version);
+            return await Task.Run(() => FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
         }
 
-        public List<string> GetVersions(string productName, string os, string architecture)
+        public async Task<List<string>> GetVersions(string productName, string os, string architecture)
         {
-            return FsReleaseArtifactRepository.GetVersions(productName, os, architecture);
+            return await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
         }
 
-        public string GetLatestVersion(string productName, string os, string architecture)
+        public async Task<string> GetLatestVersion(string productName, string os, string architecture)
         {
-            var versions = FsReleaseArtifactRepository.GetVersions(productName, os, architecture);
+            var versions = await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
             
             return versions.First();
         }
 
-        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version)
+        public async Task<ArtifactDownloadModel> GetSpecificArtifact(string productName, string os, string architecture, string version)
         {
-           return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version);
+           return await Task.Run(() => FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version));
         }
 
-        public ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture)
+        public async Task<ArtifactDownloadModel> GetLatestArtifact(string productName, string os, string architecture)
         {
-            var latestVersion = GetLatestVersion(productName, os, architecture);
+            var latestVersion = await Task.Run(() => GetLatestVersion(productName, os, architecture));
 
-            return FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion);
+            return await Task.Run(() => FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion));
         }
 
-        public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        public async Task DeleteSpecificArtifact(string productName, string os, string architecture, string version)
         {
-            lock(DirectoryLock)
-                FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version);
+            await DirectoryLock.WaitAsync();
+
+            //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+            try
+            {
+                await Task.Run(() => FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version));
+            }
+            finally
+            {
+                DirectoryLock.Release();
+            }
         }
 
-        public void DeleteProduct(string productName)
+        public async Task DeleteProduct(string productName)
         {
-            lock (DirectoryLock)
-                FsReleaseArtifactRepository.DeleteProduct(productName);
+            await DirectoryLock.WaitAsync();
+
+            //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+            try
+            {
+                await Task.Run(() => FsReleaseArtifactRepository.DeleteProduct(productName));
+            }
+            finally
+            {
+                DirectoryLock.Release();
+            }
         }
 
-        public BackupInformationModel RunBackup()
+        public async Task<BackupInformationModel> RunBackup()
         {
-            lock (DirectoryLock)
-                return  FsReleaseArtifactRepository.RunBackup();
+            BackupInformationModel backup;
+            
+            await DirectoryLock.WaitAsync();
+            
+            //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+            try
+            {
+                backup = await Task.Run(() =>FsReleaseArtifactRepository.RunBackup());
+            }
+            finally
+            {
+                DirectoryLock.Release();
+            }
+
+            return backup;
         }
 
-        public void RestoreBackup(IFormFile payload)
+        public async Task RestoreBackup(IFormFile payload)
         {
             using (var zipMapper = new ZipArchiveMapper())
             {
                 Logger.LogDebug("convert the uploaded backup payload to a ZIP archive");
                 var zipPayload = zipMapper.FormFileToZipArchive(payload);
                 
-                lock (DirectoryLock)
-                    FsReleaseArtifactRepository.RestoreBackup(zipPayload);
+                await DirectoryLock.WaitAsync();
+
+                //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+                try
+                {
+                    await Task.Run(() => FsReleaseArtifactRepository.RestoreBackup(zipPayload));
+                }
+                finally
+                {
+                    DirectoryLock.Release();
+                }
             }
         }
     }
     
     public interface IReleaseArtifactService
     {
-        void StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
-        List<ProductInformationModel> GetProductInfos(string productName);
-        List<string> GetPlatforms(string productName, string version);
-        string GetReleaseInfo(string productName, string os, string architecture, string version);
-        List<string> GetVersions(string productName, string os, string architecture);
-        string GetLatestVersion(string productName, string os, string architecture);
-        ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
-        ArtifactDownloadModel GetLatestArtifact(string productName, string os, string architecture);
-        void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
-        void DeleteProduct(string productName);
-        BackupInformationModel RunBackup();
-        void RestoreBackup(IFormFile payload);
+        Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
+        Task<List<ProductInformationModel>> GetProductInfos(string productName);
+        Task<List<string>> GetPlatforms(string productName, string version);
+        Task<string> GetReleaseInfo(string productName, string os, string architecture, string version);
+        Task<List<string>> GetVersions(string productName, string os, string architecture);
+        Task<string> GetLatestVersion(string productName, string os, string architecture);
+        Task<ArtifactDownloadModel> GetSpecificArtifact(string productName, string os, string architecture, string version);
+        Task<ArtifactDownloadModel> GetLatestArtifact(string productName, string os, string architecture);
+        Task DeleteSpecificArtifact(string productName, string os, string architecture, string version);
+        Task DeleteProduct(string productName);
+        Task<BackupInformationModel> RunBackup();
+        Task RestoreBackup(IFormFile payload);
     }
 }

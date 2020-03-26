@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,15 +43,15 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
-        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, 
+        public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, 
             [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
             
             if (artifact == null)
                 return BadRequest();
             
-            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
-
+            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
+            
             return Ok("Upload of the artifact successful!");
         }
         
@@ -61,13 +62,14 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">A product with the specified product name exists.
         /// Empty productInformation, if there exists no product with the specified product name</response>
         /// <response code="500">Wrong body provided (not 'content-type: multipart/form-data').</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductInformationListResponseModel), 200)]
         [HttpGet("versions/{product}")]
-        public ProductInformationListResponseModel GetProductInfos([Required] string product)
+        public async Task<ProductInformationListResponseModel> GetProductInfos([Required] string product)
         {
-            return ReleaseArtifactService.GetProductInfos(product).ToProductInfoListResponse();
+            var productInfos = await ReleaseArtifactService.GetProductInfos(product);
+            
+            return productInfos.ToProductInfoListResponse();
         }
 
         /// <summary>
@@ -77,13 +79,12 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="version"></param>
         /// <response code="200">There are existing Platforms for the specified product name. Empty platforms array, if
         /// there exists no platforms for the specified product name</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(PlatformsResponseModel), 200)]
         [HttpGet("platforms/{product}/{version}")]
-        public PlatformsResponseModel GetPlatforms([Required] string product, [Required]string version)
+        public async Task<PlatformsResponseModel> GetPlatforms([Required] string product, [Required]string version)
         {
-            var platformsList = ReleaseArtifactService.GetPlatforms(product, version);
+            var platformsList = await ReleaseArtifactService.GetPlatforms(product, version);
 
             return platformsList.ToPlatformsResponse();
         }
@@ -98,13 +99,14 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specific product exists.</response>
         /// <response code="500">The product with the specified product name does not exist
         /// or there is no changelog available.</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ChangelogResponseModel), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public ChangelogResponseModel GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ChangelogResponseModel> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            return ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version).toChangelogResponse();
+            var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+
+            return releaseInfo.toChangelogResponse();
         }
         
         /// <summary>
@@ -116,15 +118,15 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing versions for the specified platform and product.
         /// Empty versions array, if there exists no version for the specified platform / product.</response>
         /// <response code="500">There exists no product with the specified product name.</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductVersionListResponseModel), 200)]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public ProductVersionListResponseModel GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ProductVersionListResponseModel> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetVersions(product, os, architecture).ToProductVersionListResponse();
+            var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
+
+            return productVersions.ToProductVersionListResponse();
         }
-        
         
         /// <summary>
         /// Retrieves the artifact of the specified product.
@@ -138,12 +140,12 @@ namespace ReleaseServer.WebApi.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
-        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
+        public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
+            var response = await ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -169,15 +171,14 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="architecture"></param>
         /// <response code="200">The specified product exists (the ZIP file with the artifact will be retrieved)</response>
         /// <response code="500">The product is not available vor the specified platform (OS + arch)</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/latest")]
-        public IActionResult  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
+            var response = await ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -204,13 +205,14 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specified product exists.</response>
         /// <response code="500">The product is not available for the specified platform (OS + HW architecture)
         /// or the product with the specified product name does not exist</response>
-        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
         [ProducesResponseType(typeof(ProductVersionResponseModel), 200)]
-        public ProductVersionResponseModel GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ProductVersionResponseModel> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetLatestVersion(product, os, architecture).ToProductVersionResponse();
+            var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
+
+            return latestVersion.ToProductVersionResponse();
         }
         
         /// <summary>
@@ -223,11 +225,10 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specified product got deleted successfully.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">There exists no product with the specified product name.</response>
-        /// <returns></returns>
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
-        public IActionResult DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+            await ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
 
             return Ok("artifact successfully deleted");
         }
@@ -241,9 +242,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">There exists no product with the specified product name.</response>
         [HttpDelete("{product}")]
-        public IActionResult DeleteProduct ([Required] string product)
+        public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
-            ReleaseArtifactService.DeleteProduct(product);
+            await ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
         }
@@ -255,12 +256,12 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The artifact directory backup was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpGet("backup")]
-        public FileStreamResult Backup()
+        public async Task<FileStreamResult> Backup()
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var backupInfo = ReleaseArtifactService.RunBackup();
+            var backupInfo = await ReleaseArtifactService.RunBackup();
             
             var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
 
@@ -284,12 +285,12 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The restore process was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpPut("restore")]
-        public IActionResult Restore([Required] IFormFile backupFile)
+        public async Task<IActionResult> Restore([Required] IFormFile backupFile)
         {
             if (backupFile == null)
                 return BadRequest();
             
-            ReleaseArtifactService.RestoreBackup(backupFile);
+            await ReleaseArtifactService.RestoreBackup(backupFile);
 
             return Ok("backup successfully restored");
         }
