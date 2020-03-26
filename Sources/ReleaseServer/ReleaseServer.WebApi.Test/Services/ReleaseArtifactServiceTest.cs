@@ -38,11 +38,11 @@ namespace ReleaseServer.WebApi.Test.TestData
         }
 
         [Fact]
-        public void TestGetLatestVersion()
+        public async void TestGetLatestVersion()
         {
            //Act
-            var testVersions1 = FsReleaseArtifactService.GetLatestVersion("productx", "debian", "amd64");
-            var testVersions2 = FsReleaseArtifactService.GetLatestVersion("productx", "ubuntu", "amd64");
+            var testVersions1 = await FsReleaseArtifactService.GetLatestVersion("productx", "debian", "amd64");
+            var testVersions2 = await FsReleaseArtifactService.GetLatestVersion("productx", "ubuntu", "amd64");
 
             //Assert
             Assert.Equal("1.2-beta", testVersions1);
