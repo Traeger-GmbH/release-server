@@ -29,7 +29,7 @@ namespace ReleaseServer.WebApi.Repositories
         public void StoreArtifact(ReleaseArtifactModel artifact)
         {
             
-           var path = GenerateArtifactPath(
+           var artifactPath = GenerateArtifactPath(
                 artifact.ProductInformation.ProductIdentifier,
                 artifact.ProductInformation.Os,
                 artifact.ProductInformation.HwArchitecture,
@@ -47,29 +47,20 @@ namespace ReleaseServer.WebApi.Repositories
                 artifact.Payload.ExtractToDirectory(tmpDir.ToString());
                 Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
                 
+                var artifactDirectory = new DirectoryInfo(artifactPath);
+                
                 //If the directory already exists, delete the old content in there
-                if (Directory.Exists(path))
+                if (artifactDirectory.Exists)
                 {
-                    Logger.LogInformation("This path already exits! Old content will be deleted!");
-                    
-                    var dirInfo = new DirectoryInfo(path);
-                    dirInfo.Delete(true);
-                    
-                    Logger.LogInformation("Old path successfully deleted!");
+                    Logger.LogDebug("This path already exits! Old content will be deleted!");
                 }
                 else
                 {
-                    //Create the directory & delete the last directory hierarchy of the path
-                    //(this is necessary, so that Directory.Move() below does not fail with "Directory already exists" 
-                    var dirInfo = Directory.CreateDirectory(path);
-                    dirInfo.Delete();
-                    Logger.LogInformation("The directory {0} was successfully created", dirInfo.Parent.FullName);
+                    artifactDirectory.Create();
                 }
                 
-                Directory.CreateDirectory(Path.Combine(ArtifactRoot, artifact.ProductInformation.ProductIdentifier));
+                tmpDir.Move(artifactDirectory, true);
                 
-                //Move the extracted payload to the right directory
-                Directory.Move(tmpDir.ToString(), path);
                 Logger.LogInformation("The Artifact was successfully stored");
                 
                 //Cleanup the tmp directory
