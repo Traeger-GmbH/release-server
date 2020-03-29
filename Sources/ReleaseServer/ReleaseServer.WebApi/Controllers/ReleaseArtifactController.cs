@@ -33,56 +33,62 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
-        public IActionResult UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var file = Request.Form.Files.FirstOrDefault();
             
             if (file == null)
                 return BadRequest();
             
-            ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
+            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, file);
 
             return Ok("Upload of the artifact successful!");
         }
         
         [AllowAnonymous]
         [HttpGet("versions/{product}")]
-        public ProductInformationListResponseModel GetProductInfos([Required] string product)
+        public async Task<ProductInformationListResponseModel> GetProductInfos([Required] string product)
         {
-            return ReleaseArtifactService.GetProductInfos(product).ToProductInfoListResponse();
+            var productInfos = await ReleaseArtifactService.GetProductInfos(product);
+            
+            return productInfos.ToProductInfoListResponse();
         }
 
         [AllowAnonymous]
         [HttpGet("platforms/{product}/{version}")]
-        public PlatformsResponseModel GetPlatforms([Required] string product, [Required]string version)
+        public async Task<PlatformsResponseModel> GetPlatforms([Required] string product, [Required]string version)
         {
-            var platformsList = ReleaseArtifactService.GetPlatforms(product, version);
+            var platformsList = await ReleaseArtifactService.GetPlatforms(product, version);
 
             return platformsList.ToPlatformsResponse();
         }
         
         [AllowAnonymous]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public ChangelogResponseModel GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ChangelogResponseModel> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            return ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version).toChangelogResponse();
+            var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+
+            return releaseInfo.toChangelogResponse();
         }
         
         [AllowAnonymous]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public ProductVersionListResponseModel GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ProductVersionListResponseModel> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetVersions(product, os, architecture).ToProductVersionListResponse();
+            var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
+
+            return productVersions.ToProductVersionListResponse();
         }
         
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
-        public IActionResult  GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
+        public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
+            var response = await ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -102,12 +108,12 @@ namespace ReleaseServer.WebApi.Controllers
         
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/latest")]
-        public IActionResult  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
+            var response = await ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -127,34 +133,36 @@ namespace ReleaseServer.WebApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
-        public ProductVersionResponseModel GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ProductVersionResponseModel> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
-            return ReleaseArtifactService.GetLatestVersion(product, os, architecture).ToProductVersionResponse();
+            var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
+
+            return latestVersion.ToProductVersionResponse();
         }
         
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
-        public IActionResult DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+            await ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
 
             return Ok("artifact successfully deleted");
         }
         
         [HttpDelete("{product}")]
-        public IActionResult DeleteProduct ([Required] string product)
+        public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
-            ReleaseArtifactService.DeleteProduct(product);
+            await ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
         }
         
         [HttpGet("backup")]
-        public FileStreamResult Backup()
+        public async Task<FileStreamResult> Backup()
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var backupInfo = ReleaseArtifactService.RunBackup();
+            var backupInfo = await ReleaseArtifactService.RunBackup();
             
             var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
 
@@ -171,14 +179,14 @@ namespace ReleaseServer.WebApi.Controllers
         }
 
         [HttpPut("restore")]
-        public IActionResult Restore()
+        public async Task<IActionResult> Restore()
         {
             var payload = Request.Form.Files.FirstOrDefault();
             
             if (payload == null)
                 return BadRequest();
             
-            ReleaseArtifactService.RestoreBackup(payload);
+            await ReleaseArtifactService.RestoreBackup(payload);
 
             return Ok("backup successfully restored");
         }
