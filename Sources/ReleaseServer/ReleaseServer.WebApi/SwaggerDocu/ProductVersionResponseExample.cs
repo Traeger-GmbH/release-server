@@ -1,20 +1,15 @@
-using System.Collections.Generic;
 using ReleaseServer.WebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ProductVersionResponseExample : IExamplesProvider<ProductVersionListResponseModel>
+    public class ProductVersionResponseExample : IExamplesProvider<ProductVersionResponseModel>
     {
-        public ProductVersionListResponseModel GetExamples()
+        public ProductVersionResponseModel GetExamples()
         {
-            return new ProductVersionListResponseModel
+            return new ProductVersionResponseModel
             {
-                Versions = new List<string>()
-                {
-                    "1.1",
-                    "1.0"
-                }
+                Version = "1.5"
             };
         }
     }

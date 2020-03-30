@@ -219,7 +219,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="os"></param>
         /// <param name="architecture"></param>
         /// <response code="200">The specified product exists.</response>
-        /// <response code="500">The product is not available for the specified platform (OS + HW architecture)
+        /// <response code="404">The product is not available for the specified platform (OS + HW architecture)
         /// or the product with the specified product name does not exist</response>
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
