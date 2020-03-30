@@ -48,5 +48,15 @@ namespace ReleaseServer.WebApi.Test.TestData
             Assert.Equal("1.2-beta", testVersions1);
             Assert.Equal("1.1", testVersions2);
         }
+        
+        [Fact]
+        public async void TestGetLatestVersion_Not_Found()
+        {
+            //Act
+            var testVersion = await FsReleaseArtifactService.GetLatestVersion("nonExistentProduct", "noOs", "noArch");
+
+            //Assert
+            Assert.Null(testVersion);
+        }
     }
 }

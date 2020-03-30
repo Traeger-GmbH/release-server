@@ -166,6 +166,16 @@ namespace ReleaseServer.WebApi.Test
             //Assert 
             testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo);
         }
+        
+        [Fact]
+        public void TestGetReleaseInfo_Not_Found()
+        {
+            //Act
+            var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("nonexistentProduct", "noOS", "noArch", "0");
+            
+            //Assert 
+            Assert.Null(testReleaseInfo);
+        }
 
         [Fact]
         public void TestGetSpecificArtifact()
@@ -187,6 +197,16 @@ namespace ReleaseServer.WebApi.Test
             //Assert
             testArtifact.Should().BeEquivalentTo(expectedArtifact);
         }
+        
+        [Fact]
+        public void TestGetSpecificArtifact_Not_Found()
+        {
+            //Act
+            var testArtifact = FsReleaseArtifactRepository.GetSpecificArtifact("nonexistentProduct", "noOS", "noArch", "0");
+            
+            //Assert
+            Assert.Null(testArtifact);
+        }
 
         [Fact]
         public void TestDeleteSpecificArtifact()
@@ -199,13 +219,24 @@ namespace ReleaseServer.WebApi.Test
             TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
-            FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
+            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
             
             //Assert
+            Assert.True(productFound);
             Assert.False(Directory.Exists(Path.Combine(ProjectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1")));
             
             //Cleanup
             Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "producty"), true);
+        }
+        
+        [Fact]
+        public void TestDeleteSpecificArtifact_Not_Found()
+        {
+            //Act 
+            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifact("nonexistentProduct", "noOS", "noArch", "0");
+            
+            //Assert
+            Assert.False(productFound);
         }
         
         [Fact]
@@ -219,11 +250,21 @@ namespace ReleaseServer.WebApi.Test
             TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
-            FsReleaseArtifactRepository.DeleteProduct("producty");
+            var artifactFound = FsReleaseArtifactRepository.DeleteProduct("producty");
             
             //Assert
+            Assert.True(artifactFound);
             Assert.False(Directory.Exists(Path.Combine(ProjectDirectory, "TestData", "producty")));
         }
+        
+        [Fact]
+        public void TestDeleteProduct_Not_Found()
+        {
+            //Act 
+            var artifactFound = FsReleaseArtifactRepository.DeleteProduct("nonexistentProduct");
+            
+            //Assert
+            Assert.False(artifactFound); }
 
         [Fact]
         public void TestRunBackup()
