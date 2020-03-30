@@ -52,7 +52,7 @@ namespace ReleaseServer.WebApi.Repositories
                 //If the directory already exists, delete the old content in there
                 if (artifactDirectory.Exists)
                 {
-                    Logger.LogDebug("This path already exits! Old content will be deleted!");
+                    Logger.LogDebug("This path already exists! Old content will be deleted!");
                 }
                 else
                 {
