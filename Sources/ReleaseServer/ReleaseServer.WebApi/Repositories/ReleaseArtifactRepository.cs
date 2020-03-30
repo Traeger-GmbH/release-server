@@ -119,7 +119,8 @@ namespace ReleaseServer.WebApi.Repositories
                     return changelog;
                 }
                 
-                throw new FileNotFoundException("Error: Release notes for this artifact not found!");
+                //The artifact directory (thus the specified artifact) does not exist.
+                return null;
                 
             }
             catch (Exception e)
@@ -150,8 +151,8 @@ namespace ReleaseServer.WebApi.Repositories
                     };
                     
                 }
-                Logger.LogInformation("The directory {0} does not exist!", path);
-                throw new FileNotFoundException();
+                Logger.LogWarning("The directory {0} does not exist!", path);
+                return null;
             }
             
             catch (Exception e)
@@ -161,18 +162,28 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        public bool DeleteSpecificArtifact(string productName, string os, string architecture, string version)
         {
             var path = GenerateArtifactPath(productName, os, architecture, version);
             
+            if (!Directory.Exists(path))
+                return false;
+            
             Directory.Delete(path, true);
+            
+            return true;
         }
 
-        public void DeleteProduct(string productName)
+        public bool DeleteProduct(string productName)
         {
             var path = Path.Combine(ArtifactRoot, productName);
             
+            if (!Directory.Exists(path))
+                return false;
+            
             Directory.Delete(path, true);
+
+            return true;
         }
 
         public List<string> GetVersions(string productName, string os, string architecture)
@@ -282,8 +293,8 @@ namespace ReleaseServer.WebApi.Repositories
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
-        void DeleteSpecificArtifact(string productName, string os, string architecture, string version);
-        void DeleteProduct(string productName);
+        bool DeleteSpecificArtifact(string productName, string os, string architecture, string version);
+        bool DeleteProduct(string productName);
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
         BackupInformationModel RunBackup();
