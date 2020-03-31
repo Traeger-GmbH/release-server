@@ -27,12 +27,7 @@ namespace ReleaseServer.WebApi.Test.Common
             
             var testDirInfo = Directory.CreateDirectory(testDir);
             
-            //Create test data (test file & test subdirectories)
-            using (var fs = File.Create(Path.Combine(testDirInfo.ToString(), "testFile")))
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes("This is a test file.");
-                fs.Write(info, 0, info.Length);
-            }
+            TestUtils.CreateTestFile(testDir);
 
             Directory.CreateDirectory(Path.Combine(testDirInfo.ToString(), "testSubDir1"));
             Directory.CreateDirectory(Path.Combine(testDirInfo.ToString(), "testSubDir2"));
@@ -46,6 +41,61 @@ namespace ReleaseServer.WebApi.Test.Common
             
             //Cleanup
             testDirInfo.Delete(true);
+        }
+
+        [Fact]
+        public void MoveDirectory_Success()
+        {
+            //Setup
+            var testDestinationDir = Path.Combine(ProjectDirectory, "TestDestinationDir");
+            var testSourceDir = Path.Combine(ProjectDirectory, "TestSourceDir");
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(testDestinationDir);
+            TestUtils.CleanupDirIfExists(testSourceDir);
+            
+            var testSourceDirInfo = Directory.CreateDirectory(testSourceDir);
+            var testDestinationDirInfo = Directory.CreateDirectory(testDestinationDir);
+            
+            var testFilePath = TestUtils.CreateTestFile(testSourceDirInfo.ToString());
+
+            var bytesBeforeMoving = File.ReadAllBytes(testFilePath);
+            
+            //Act
+            //Use the Move() function with the string argument so that we can test the all Move() implementations.
+            testSourceDirInfo.Move(testDestinationDirInfo.ToString(), true);
+
+            var bytesAfterMoving = File.ReadAllBytes(Path.Combine(testDestinationDirInfo.ToString(), "testFile"));
+
+            Assert.Equal(bytesBeforeMoving,bytesAfterMoving);
+            
+            //Cleanup
+            Directory.Delete(testDestinationDir, true);
+        }
+
+        [Fact]
+        public void MoveDirectory_Error()
+        {
+            //Setup
+            var testDestinationDir = Path.Combine(ProjectDirectory, "TestDestinationDir");
+            var testSourceDir = Path.Combine(ProjectDirectory, "TestSourceDir");
+            
+            //Cleanup test dir from old tests (if they failed before)
+            TestUtils.CleanupDirIfExists(testDestinationDir);
+            TestUtils.CleanupDirIfExists(testSourceDir);
+            
+            var testSourceDirInfo = Directory.CreateDirectory(testSourceDir);
+            var testDestinationDirInfo = Directory.CreateDirectory(testDestinationDir);
+            
+            TestUtils.CreateTestFile(testSourceDirInfo.ToString());
+            
+            //Act & Assert
+            //Use the Move() function with the string argument so that we can test the all Move() implementations.
+            Assert.Throws<IOException>(() => testSourceDirInfo.Move(testDestinationDirInfo.ToString()));
+            
+            //Cleanup
+            Directory.Delete(testSourceDir, true);            
+            Directory.Delete(testDestinationDir, true);
         }
     }
 }
