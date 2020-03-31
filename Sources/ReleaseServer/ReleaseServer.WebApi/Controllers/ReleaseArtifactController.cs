@@ -141,9 +141,9 @@ namespace ReleaseServer.WebApi.Controllers
         }
         
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
-        public IActionResult DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+            await ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
 
             return Ok("artifact successfully deleted");
         }
@@ -151,7 +151,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}")]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
-            ReleaseArtifactService.DeleteProduct(product);
+            await ReleaseArtifactService.DeleteProduct(product);
 
             return Ok("product successfully deleted");
         }

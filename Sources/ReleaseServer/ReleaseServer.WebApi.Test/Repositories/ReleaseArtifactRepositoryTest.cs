@@ -43,25 +43,50 @@ namespace ReleaseServer.WebApi.Test
             //Cleanup test dir from old tests (if they failed before)
             TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
 
+            var testPath = Path.Combine(ProjectDirectory, "TestData", "product", "ubuntu", "amd64", "1.1");
+            
+            //Create test artifact from a zip file
             var testFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
-
             using var stream = new MemoryStream(testFile);
             var testZip = new ZipArchive(stream);
-            var testPath = Path.Combine(ProjectDirectory, "TestData", "product", "ubuntu", "amd64", "1.1");
-                    
-            //Act
+            
             var testArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
                 "amd64", "1.1", testZip);
+            
+            //Create the update test artifact from a zip file
+            var testUpdateFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "update_test_zip.zip"));
+            using var updateStream = new MemoryStream(testUpdateFile);
+            var testUpdateZip = new ZipArchive(updateStream);
+            
+            var testUpdateArtifact = ReleaseArtifactMapper.ConvertToReleaseArtifact("product", "ubuntu",
+                "amd64", "1.1", testUpdateZip);
 
+            //Act
+            
+            //########################################
+            //1. Store the first artifact -> product folder will be created
+            //########################################
             FsReleaseArtifactRepository.StoreArtifact(testArtifact);
 
-            //Assert whether the directory and the unzipped files exist
+            //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
             Assert.True(File.Exists(Path.Combine(testPath, "changelog.txt")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram.exe")));
+            Assert.True(File.Exists(Path.Combine(testPath, "deployment.json")));
+            
+            //########################################
+            //2. Update the already existing product with the same artifact -> artifact folder & content will be updated 
+            //########################################
+            FsReleaseArtifactRepository.StoreArtifact(testUpdateArtifact);
+
+            //Assert if the directory and the unzipped files exist
+            Assert.True(Directory.Exists(testPath));
+            Assert.True(File.Exists(Path.Combine(testPath, "changelog_update.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
+            Assert.True(File.Exists(Path.Combine(testPath, "deployment_update.json")));
 
             //Cleanup
-            Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
+            //Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
         }
 
         [Fact]
