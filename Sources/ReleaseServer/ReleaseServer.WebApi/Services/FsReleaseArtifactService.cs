@@ -99,7 +99,7 @@ namespace ReleaseServer.WebApi.Services
                 FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion));
         }
 
-        public async Task<bool> DeleteSpecificArtifact(string productName, string os, string architecture,
+        public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
             string version)
         {
             await DirectoryLock.WaitAsync();
