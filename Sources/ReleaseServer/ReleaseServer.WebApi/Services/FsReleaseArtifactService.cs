@@ -108,7 +108,7 @@ namespace ReleaseServer.WebApi.Services
             try
             {
                 return await Task.Run(() =>
-                    FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version));
+                    FsReleaseArtifactRepository.DeleteSpecificArtifactIfExists(productName, os, architecture, version));
             }
             finally
             {
@@ -116,14 +116,14 @@ namespace ReleaseServer.WebApi.Services
             }
         }
 
-        public async Task<bool> DeleteProduct(string productName)
+        public async Task<bool> DeleteProductIfExists(string productName)
         {
             await DirectoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                return await Task.Run(() => FsReleaseArtifactRepository.DeleteProduct(productName));
+                return await Task.Run(() => FsReleaseArtifactRepository.DeleteProductIfExists(productName));
             }
             finally
             {

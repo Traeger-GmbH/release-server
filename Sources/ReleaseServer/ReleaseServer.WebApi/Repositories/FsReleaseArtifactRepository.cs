@@ -155,7 +155,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public bool DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        public bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version)
         {
             var path = GenerateArtifactPath(productName, os, architecture, version);
 
@@ -167,7 +167,7 @@ namespace ReleaseServer.WebApi.Repositories
             return true;
         }
 
-        public bool DeleteProduct(string productName)
+        public bool DeleteProductIfExists(string productName)
         {
             var path = Path.Combine(ArtifactRoot, productName);
 

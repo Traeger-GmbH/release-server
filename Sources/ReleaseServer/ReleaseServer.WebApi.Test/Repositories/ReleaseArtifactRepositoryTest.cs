@@ -244,7 +244,7 @@ namespace ReleaseServer.WebApi.Test
             TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
-            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifact("producty", "ubuntu", "amd64", "1.1");
+            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifactIfExists("producty", "ubuntu", "amd64", "1.1");
             
             //Assert
             Assert.True(productFound);
@@ -258,7 +258,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestDeleteSpecificArtifact_Not_Found()
         {
             //Act 
-            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifact("nonexistentProduct", "noOS", "noArch", "0");
+            var productFound = FsReleaseArtifactRepository.DeleteSpecificArtifactIfExists("nonexistentProduct", "noOS", "noArch", "0");
             
             //Assert
             Assert.False(productFound);
@@ -275,7 +275,7 @@ namespace ReleaseServer.WebApi.Test
             TestUtils.SetupTestDirectory(ProjectDirectory);
             
             //Act 
-            var artifactFound = FsReleaseArtifactRepository.DeleteProduct("producty");
+            var artifactFound = FsReleaseArtifactRepository.DeleteProductIfExists("producty");
             
             //Assert
             Assert.True(artifactFound);
@@ -283,10 +283,10 @@ namespace ReleaseServer.WebApi.Test
         }
         
         [Fact]
-        public void TestDeleteProduct_Not_Found()
+        public void TestDeleteProductI_Not_Found()
         {
             //Act 
-            var artifactFound = FsReleaseArtifactRepository.DeleteProduct("nonexistentProduct");
+            var artifactFound = FsReleaseArtifactRepository.DeleteProductIfExists("nonexistentProduct");
             
             //Assert
             Assert.False(artifactFound); }

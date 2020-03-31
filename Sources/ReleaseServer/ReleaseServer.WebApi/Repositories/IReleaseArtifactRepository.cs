@@ -10,8 +10,8 @@ namespace ReleaseServer.WebApi.Repositories
         List<ProductInformationModel> GetInfosByProductName(string productName);
         string GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
-        bool DeleteSpecificArtifact(string productName, string os, string architecture, string version);
-        bool DeleteProduct(string productName);
+        bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
+        bool DeleteProductIfExists(string productName);
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
         BackupInformationModel RunBackup();

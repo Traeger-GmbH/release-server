@@ -247,7 +247,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            var artifactFound = await ReleaseArtifactService.DeleteSpecificArtifact(product, os, architecture, version);
+            var artifactFound = await ReleaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
             
             if (!artifactFound) 
                 return NotFound("The product you want to delete does not exist!");
@@ -266,7 +266,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}")]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
-            var productFound = await ReleaseArtifactService.DeleteProduct(product);
+            var productFound = await ReleaseArtifactService.DeleteProductIfExists(product);
             
             if (!productFound)
                 return NotFound("The products you want to delete do not exist!");
