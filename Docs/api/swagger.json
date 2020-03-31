@@ -99,7 +99,7 @@
         },
         "security": [
           {
-            "basic": [ ]
+            "basic": []
           }
         ]
       }
@@ -109,7 +109,7 @@
         "tags": [
           "ReleaseArtifact"
         ],
-        "summary": "Retrieves all available products.",
+        "summary": "Retrieves a list of all available versions of the specified product.",
         "parameters": [
           {
             "name": "product",
@@ -124,42 +124,27 @@
         ],
         "responses": {
           "200": {
-            "description": "A product with the specified product name exists.\r\n            Empty productInformation, if there exists no product with the specified product name",
+            "description": "A product with the specified product name exists.",
             "content": {
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductInformationListResponseModel"
                 },
                 "example": {
-
                   "productInformation": [
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.0",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     },
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.1-beta",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     }
-
                   ]
-
                 }
               },
               "application/json": {
@@ -167,35 +152,20 @@
                   "$ref": "#/components/schemas/ProductInformationListResponseModel"
                 },
                 "example": {
-
                   "productInformation": [
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.0",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     },
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.1-beta",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     }
-
                   ]
-
                 }
               },
               "text/json": {
@@ -203,41 +173,26 @@
                   "$ref": "#/components/schemas/ProductInformationListResponseModel"
                 },
                 "example": {
-
                   "productInformation": [
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.0",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     },
-
                     {
-
                       "identifier": "softwareX",
-
                       "version": "1.1-beta",
-
                       "os": "debian",
-
                       "architecture": "amd64"
-
                     }
-
                   ]
-
                 }
               }
             }
           },
-          "500": {
-            "description": "Wrong body provided (not 'content-type: multipart/form-data')."
+          "404": {
+            "description": "The specified product does not exist."
           }
         }
       }
@@ -272,22 +227,17 @@
         ],
         "responses": {
           "200": {
-            "description": "There are existing Platforms for the specified product name. Empty platforms array, if\r\n            there exists no platforms for the specified product name",
+            "description": "There are existing Platforms for the specified product name.",
             "content": {
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PlatformsResponseModel"
                 },
                 "example": {
-
                   "platforms": [
-
                     "debian-amd64",
-
                     "debian-arm64"
-
                   ]
-
                 }
               },
               "application/json": {
@@ -295,15 +245,10 @@
                   "$ref": "#/components/schemas/PlatformsResponseModel"
                 },
                 "example": {
-
                   "platforms": [
-
                     "debian-amd64",
-
                     "debian-arm64"
-
                   ]
-
                 }
               },
               "text/json": {
@@ -311,18 +256,16 @@
                   "$ref": "#/components/schemas/PlatformsResponseModel"
                 },
                 "example": {
-
                   "platforms": [
-
                     "debian-amd64",
-
                     "debian-arm64"
-
                   ]
-
                 }
               }
             }
+          },
+          "404": {
+            "description": "The product does not exist or there exists no platform for the specified product."
           }
         }
       }
@@ -384,9 +327,7 @@
                   "$ref": "#/components/schemas/ChangelogResponseModel"
                 },
                 "example": {
-
                   "changelog": "Release 1.0.0 - This is an example."
-
                 }
               },
               "application/json": {
@@ -394,9 +335,7 @@
                   "$ref": "#/components/schemas/ChangelogResponseModel"
                 },
                 "example": {
-
                   "changelog": "Release 1.0.0 - This is an example."
-
                 }
               },
               "text/json": {
@@ -404,15 +343,13 @@
                   "$ref": "#/components/schemas/ChangelogResponseModel"
                 },
                 "example": {
-
                   "changelog": "Release 1.0.0 - This is an example."
-
                 }
               }
             }
           },
-          "500": {
-            "description": "The product with the specified product name does not exist\r\n            or there is no changelog available."
+          "404": {
+            "description": "The product with the specified product name does not exist. Therefore the changelog does not exist."
           }
         }
       }
@@ -457,22 +394,17 @@
         ],
         "responses": {
           "200": {
-            "description": "There are existing versions for the specified platform and product.\r\n            Empty versions array, if there exists no version for the specified platform / product.",
+            "description": "There are existing versions for the specified platform and product.",
             "content": {
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductVersionListResponseModel"
                 },
                 "example": {
-
                   "versions": [
-
                     "1.1",
-
                     "1.0"
-
                   ]
-
                 }
               },
               "application/json": {
@@ -480,15 +412,10 @@
                   "$ref": "#/components/schemas/ProductVersionListResponseModel"
                 },
                 "example": {
-
                   "versions": [
-
                     "1.1",
-
                     "1.0"
-
                   ]
-
                 }
               },
               "text/json": {
@@ -496,21 +423,16 @@
                   "$ref": "#/components/schemas/ProductVersionListResponseModel"
                 },
                 "example": {
-
                   "versions": [
-
                     "1.1",
-
                     "1.0"
-
                   ]
-
                 }
               }
             }
           },
-          "500": {
-            "description": "There exists no product with the specified product name."
+          "404": {
+            "description": "There exists no version for the specified platform / product."
           }
         }
       }
@@ -568,7 +490,7 @@
           "200": {
             "description": "There exists a product with the specified parameters."
           },
-          "500": {
+          "404": {
             "description": "There exists no product with the specified parameters."
           }
         }
@@ -616,7 +538,7 @@
           "200": {
             "description": "The specified product exists (the ZIP file with the artifact will be retrieved)"
           },
-          "500": {
+          "404": {
             "description": "The product is not available vor the specified platform (OS + arch)"
           }
         }
@@ -667,21 +589,30 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductVersionResponseModel"
+                },
+                "example": {
+                  "version": "1.5"
                 }
               },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductVersionResponseModel"
+                },
+                "example": {
+                  "version": "1.5"
                 }
               },
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductVersionResponseModel"
+                },
+                "example": {
+                  "version": "1.5"
                 }
               }
             }
           },
-          "500": {
+          "404": {
             "description": "The product is not available for the specified platform (OS + HW architecture)\r\n            or the product with the specified product name does not exist"
           }
         }
@@ -742,13 +673,13 @@
           "401": {
             "description": "The user is not authorized (wrong credentials or missing auth header)."
           },
-          "500": {
+          "404": {
             "description": "There exists no product with the specified product name."
           }
         },
         "security": [
           {
-            "basic": [ ]
+            "basic": []
           }
         ]
       }
@@ -778,13 +709,13 @@
           "401": {
             "description": "The user is not authorized (wrong credentials or missing auth header)."
           },
-          "500": {
+          "404": {
             "description": "There exists no product with the specified product name."
           }
         },
         "security": [
           {
-            "basic": [ ]
+            "basic": []
           }
         ]
       }
@@ -805,7 +736,7 @@
         },
         "security": [
           {
-            "basic": [ ]
+            "basic": []
           }
         ]
       }
@@ -844,13 +775,16 @@
           "200": {
             "description": "The restore process was successful."
           },
+          "400": {
+            "description": "No body provided."
+          },
           "401": {
             "description": "The user is not authorized (wrong credentials or missing auth header)."
           }
         },
         "security": [
           {
-            "basic": [ ]
+            "basic": []
           }
         ]
       }
