@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Mappers;
@@ -74,6 +75,9 @@ namespace ReleaseServer.WebApi.Services
         {
             var versions = await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
 
+            if (versions.IsNullOrEmpty())
+                return null;
+
             return versions.First();
         }
 
@@ -88,19 +92,23 @@ namespace ReleaseServer.WebApi.Services
         {
             var latestVersion = await Task.Run(() => GetLatestVersion(productName, os, architecture));
 
+            if (latestVersion == null)
+                return null;
+
             return await Task.Run(() =>
                 FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion));
         }
 
-        public async Task DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
+            string version)
         {
             await DirectoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                await Task.Run(() =>
-                    FsReleaseArtifactRepository.DeleteSpecificArtifact(productName, os, architecture, version));
+                return await Task.Run(() =>
+                    FsReleaseArtifactRepository.DeleteSpecificArtifactIfExists(productName, os, architecture, version));
             }
             finally
             {
@@ -108,14 +116,14 @@ namespace ReleaseServer.WebApi.Services
             }
         }
 
-        public async Task DeleteProduct(string productName)
+        public async Task<bool> DeleteProductIfExists(string productName)
         {
             await DirectoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                await Task.Run(() => FsReleaseArtifactRepository.DeleteProduct(productName));
+                return await Task.Run(() => FsReleaseArtifactRepository.DeleteProductIfExists(productName));
             }
             finally
             {

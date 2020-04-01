@@ -23,6 +23,7 @@ You have two options to setup the release server.
 4. Run the application with docker-compose: `docker-compose -f "docker-compose.yml" up -d --build`
 
 Now, the release server is reachable at https://localhost:5001.
+The Swagger UI can be found at https://localhost:5001/swagger.
 
 ### Run with Docker
 
@@ -37,12 +38,13 @@ Now, the release server is reachable at https://localhost:5001.
     __Note:__ You have to replace the placeholder of the docker run command!  
 
 Now, the release server is reachable at https://localhost:5001.
+The Swagger UI can be found at https://localhost:5001/swagger.
 
 ## Usage
 
 The first two REST endpoint examples are documented above. 
 
-For more information about the other endpoints and their usage, read the [API documentation](https://github.com/Traeger-GmbH/release-server/blob/master/Docs/api/API.md).
+For more information about the other endpoints and their usage, read the [Swagger documentation](https://github.com/Traeger-GmbH/release-server/blob/master/Docs/api/swagger.json) .
 
 ### Upload an Artifact
 

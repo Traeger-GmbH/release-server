@@ -25,30 +25,30 @@ namespace ReleaseServer.WebApi.Repositories
             ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
             Logger = logger;
         }
-        
+
         public void StoreArtifact(ReleaseArtifactModel artifact)
         {
-            
-           var artifactPath = GenerateArtifactPath(
+
+            var artifactPath = GenerateArtifactPath(
                 artifact.ProductInformation.ProductIdentifier,
                 artifact.ProductInformation.Os,
                 artifact.ProductInformation.HwArchitecture,
                 artifact.ProductInformation.Version.ToString());
 
-           var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
+            var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
 
             try
             {
                 //Create the temporary directory
                 if (!tmpDir.Exists)
                     tmpDir.Create();
-                
+
                 //Extract the payload to the temporary directory
                 artifact.Payload.ExtractToDirectory(tmpDir.ToString());
                 Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
-                
+
                 var artifactDirectory = new DirectoryInfo(artifactPath);
-                
+
                 //If the directory already exists, delete the old content in there
                 if (artifactDirectory.Exists)
                 {
@@ -58,11 +58,11 @@ namespace ReleaseServer.WebApi.Repositories
                 {
                     artifactDirectory.Create();
                 }
-                
+
                 tmpDir.Move(artifactDirectory, true);
-                
+
                 Logger.LogInformation("The Artifact was successfully stored");
-                
+
                 //Cleanup the tmp directory
                 tmpDir.Parent.Delete(true);
 
@@ -103,15 +103,16 @@ namespace ReleaseServer.WebApi.Repositories
                 {
                     var dir = new DirectoryInfo(path);
                     var files = dir.GetFiles();
-                    
+
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
                     var changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName));
                     return changelog;
                 }
-                
-                throw new FileNotFoundException("Error: Release notes for this artifact not found!");
-                
+
+                //The artifact directory (thus the specified artifact) does not exist.
+                return null;
+
             }
             catch (Exception e)
             {
@@ -120,31 +121,33 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version)
+        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture,
+            string version)
         {
             try
             {
                 var path = GenerateArtifactPath(productName, os, architecture, version);
-                
+
                 if (Directory.Exists(path))
                 {
                     var dir = new DirectoryInfo(path);
                     var files = dir.GetFiles();
-                    
+
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
-                    
-                    
+
+
                     return new ArtifactDownloadModel
                     {
                         Payload = File.ReadAllBytes(Path.Combine(path, deploymentMetaInfo.ArtifactFileName)),
                         FileName = deploymentMetaInfo.ArtifactFileName,
                     };
-                    
+
                 }
-                Logger.LogInformation("The directory {0} does not exist!", path);
-                throw new FileNotFoundException();
+
+                Logger.LogWarning("The directory {0} does not exist!", path);
+                return null;
             }
-            
+
             catch (Exception e)
             {
                 Logger.LogCritical(e.Message);
@@ -152,18 +155,28 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public void DeleteSpecificArtifact(string productName, string os, string architecture, string version)
+        public bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version)
         {
             var path = GenerateArtifactPath(productName, os, architecture, version);
-            
+
+            if (!Directory.Exists(path))
+                return false;
+
             Directory.Delete(path, true);
+
+            return true;
         }
 
-        public void DeleteProduct(string productName)
+        public bool DeleteProductIfExists(string productName)
         {
             var path = Path.Combine(ArtifactRoot, productName);
-            
+
+            if (!Directory.Exists(path))
+                return false;
+
             Directory.Delete(path, true);
+
+            return true;
         }
 
         public List<string> GetVersions(string productName, string os, string architecture)
@@ -177,7 +190,7 @@ namespace ReleaseServer.WebApi.Repositories
                 where hwArchDir.Name == architecture
                 from versionDir in hwArchDir.EnumerateDirectories()
                 select versionDir.Name;
-        
+
             return versions.OrderByDescending(v => v).ToList();
         }
 
@@ -194,14 +207,14 @@ namespace ReleaseServer.WebApi.Repositories
 
             return platforms.OrderBy(p => p).ToList();
         }
-        
+
         public BackupInformationModel RunBackup()
         {
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
-            
+
             string backupFileName = "backup_" + timeStamp + ".zip";
-            string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName); 
-            
+            string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName);
+
             //Clear the backup folder first
             var backupDirectoryInfo = new DirectoryInfo(BackupRoot);
 
@@ -213,7 +226,7 @@ namespace ReleaseServer.WebApi.Repositories
             {
                 backupDirectoryInfo.Create();
             }
-            
+
             //Create the backup -> zip the whole ArtifactRoot folder
             ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
 
@@ -229,14 +242,15 @@ namespace ReleaseServer.WebApi.Repositories
             try
             {
                 //Clear the whole artifact root directory or create it, if it's not existing
-                if (ArtifactRootDir.Exists) 
+                if (ArtifactRootDir.Exists)
                 {
-                    ArtifactRootDir.DeleteContent();  
+                    ArtifactRootDir.DeleteContent();
                 }
-                else {
+                else
+                {
                     ArtifactRootDir.Create();
                 }
-                
+
                 backupPayload.ExtractToDirectory(ArtifactRoot);
             }
             catch (Exception e)
@@ -250,7 +264,7 @@ namespace ReleaseServer.WebApi.Repositories
         {
             return Path.Combine(ArtifactRoot, product, os, architecture, version);
         }
-        
+
         private string GenerateTemporaryPath()
         {
             return Path.Combine(ArtifactRoot, "temp", Guid.NewGuid().ToString());
@@ -259,10 +273,10 @@ namespace ReleaseServer.WebApi.Repositories
         private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
         {
             var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
-                    
+
             if (deploymentMetaName == null)
                 throw new Exception("meta information of the specified product does not exist!");
-                    
+
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
         }
     }

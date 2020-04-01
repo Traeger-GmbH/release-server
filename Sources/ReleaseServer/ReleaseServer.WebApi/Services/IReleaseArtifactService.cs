@@ -15,8 +15,8 @@ namespace ReleaseServer.WebApi.Services
         Task<string> GetLatestVersion(string productName, string os, string architecture);
         Task<ArtifactDownloadModel> GetSpecificArtifact(string productName, string os, string architecture, string version);
         Task<ArtifactDownloadModel> GetLatestArtifact(string productName, string os, string architecture);
-        Task DeleteSpecificArtifact(string productName, string os, string architecture, string version);
-        Task DeleteProduct(string productName);
+        Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
+        Task<bool> DeleteProductIfExists(string productName);
         Task<BackupInformationModel> RunBackup();
         Task RestoreBackup(IFormFile payload);
     }
