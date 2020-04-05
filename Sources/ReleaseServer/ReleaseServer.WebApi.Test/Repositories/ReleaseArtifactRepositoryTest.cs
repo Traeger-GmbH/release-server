@@ -302,6 +302,10 @@ namespace ReleaseServer.WebApi.Test
             TestUtils.CleanupDirIfExists(testArtifactRoot);
             TestUtils.CleanupDirIfExists(testBackupDir);
 
+            //Create the test directories
+            Directory.CreateDirectory(testArtifactRoot);
+            Directory.CreateDirectory(testBackupDir);
+            
             //Mock a separate Repository with different directories as the global one
             var configuration = new Mock<IConfiguration>();
             configuration
@@ -317,10 +321,7 @@ namespace ReleaseServer.WebApi.Test
                 Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                 configuration.Object
             );
-
-            //Create the test directories
-            Directory.CreateDirectory(testArtifactRoot);
-            Directory.CreateDirectory(testBackupDir);
+            
             
             var expectedFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "test_zip.zip"));
 
@@ -358,6 +359,9 @@ namespace ReleaseServer.WebApi.Test
             //Cleanup test dir from old tests (if they failed before)
             TestUtils.CleanupDirIfExists(testArtifactRoot);
             
+            //Create test directory 
+            Directory.CreateDirectory(testArtifactRoot);
+            
             //Mock a separate Repository with different directories as the global one
             var configuration = new Mock<IConfiguration>();
             configuration
@@ -368,8 +372,6 @@ namespace ReleaseServer.WebApi.Test
                 Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                 configuration.Object
             );
-            
-            Directory.CreateDirectory(testArtifactRoot);
             
             var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(ProjectDirectory, "TestData", "restoreTest", "testFile.zip")));
             var expectedFile = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "restoreTest", "testFile.txt"));

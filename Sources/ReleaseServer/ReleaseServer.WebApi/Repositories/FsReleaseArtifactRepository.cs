@@ -286,6 +286,9 @@ namespace ReleaseServer.WebApi.Repositories
 
         private void CheckPermissions(string directoryToTest)
         {
+            if (directoryToTest == null)
+                return; 
+                    
             var canWrite = FileSystemPermissions.CanWriteDirectory(directoryToTest);
             
             if (!canWrite)
