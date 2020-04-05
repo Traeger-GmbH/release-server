@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication;
@@ -38,7 +37,6 @@ namespace ReleaseServer.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
             services.AddSwaggerGen(c =>
             {
                 
@@ -83,6 +81,9 @@ namespace ReleaseServer.WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //Warmup the ReleaseArtifactRepository to check the file permissions before continuing
+            app.ApplicationServices.GetService<IReleaseArtifactRepository>();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

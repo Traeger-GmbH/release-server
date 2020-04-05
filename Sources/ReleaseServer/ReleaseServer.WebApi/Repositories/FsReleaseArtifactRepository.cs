@@ -24,6 +24,10 @@ namespace ReleaseServer.WebApi.Repositories
             BackupRoot = configuration["BackupRootDirectory"];
             ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
             Logger = logger;
+
+            //Check filesystem permissions
+            CheckPermissions(ArtifactRoot);
+            CheckPermissions(BackupRoot);
         }
 
         public void StoreArtifact(ReleaseArtifactModel artifact)
@@ -278,6 +282,17 @@ namespace ReleaseServer.WebApi.Repositories
                 throw new Exception("meta information of the specified product does not exist!");
 
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
+        }
+
+        private void CheckPermissions(string directoryToTest)
+        {
+            var canWrite = FileSystemPermissions.CanWriteDirectory(directoryToTest);
+            
+            if (!canWrite)
+            {
+                Logger.LogError("Unable to write to the directory {0}. Please check your permissions!", directoryToTest);
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            }
         }
     }
 }
