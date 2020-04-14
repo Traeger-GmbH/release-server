@@ -9,11 +9,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using NLog.Fluent;
 using ReleaseServer.WebApi.Auth;
-using ReleaseServer.WebApi.Repositories;
-using ReleaseServer.WebApi.Services;
+using ReleaseServer.WebApi.Common;
 using ReleaseServer.WebApi.SwaggerDocu;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -73,17 +74,14 @@ namespace ReleaseServer.WebApi
 
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
-
-            services.AddSingleton<IReleaseArtifactRepository, FsReleaseArtifactRepository>();
-            services.AddSingleton<IReleaseArtifactService, FsReleaseArtifactService>();
+            
+            services.AddFsReleaseArtifactService(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //Warmup the ReleaseArtifactRepository to check the file permissions before continuing
-            app.ApplicationServices.GetService<IReleaseArtifactRepository>();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
