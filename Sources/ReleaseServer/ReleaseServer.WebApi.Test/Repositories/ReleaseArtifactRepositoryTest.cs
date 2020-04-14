@@ -30,6 +30,11 @@ namespace ReleaseServer.WebApi.Test
             configuration
                 .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
                 .Returns(Path.Combine(ProjectDirectory, "TestData"));
+            
+            //BackupRootDirectory not needed
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "BackupRootDirectory")])
+                .Returns(Path.Combine(ProjectDirectory, "TestBackupDir"));
 
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
                     Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
@@ -368,6 +373,11 @@ namespace ReleaseServer.WebApi.Test
                 .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
                 .Returns(testArtifactRoot);
             
+            //BackupRootDirectory not needed
+            configuration
+                .SetupGet(x => x[It.Is<string>(s => s == "BackupRootDirectory")])
+                .Returns(Path.Combine(ProjectDirectory, "TestBackupDir"));
+
             var customRepository = new FsReleaseArtifactRepository(
                 Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                 configuration.Object

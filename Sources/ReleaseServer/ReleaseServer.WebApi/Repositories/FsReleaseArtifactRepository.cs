@@ -14,20 +14,14 @@ namespace ReleaseServer.WebApi.Repositories
 {
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
-        private readonly string ArtifactRoot, BackupRoot;
-        private readonly DirectoryInfo ArtifactRootDir;
+        private readonly DirectoryInfo ArtifactRootDir, BackupRootDir;
         private ILogger Logger;
 
         public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, IConfiguration configuration)
         {
-            ArtifactRoot = configuration["ArtifactRootDirectory"];
-            BackupRoot = configuration["BackupRootDirectory"];
-            ArtifactRootDir = new DirectoryInfo(ArtifactRoot);
+            ArtifactRootDir = new DirectoryInfo(configuration["ArtifactRootDirectory"]);
+            BackupRootDir = new DirectoryInfo(configuration["BackupRootDirectory"]);
             Logger = logger;
-
-            //Check filesystem permissions
-            CheckPermissions(ArtifactRoot);
-            CheckPermissions(BackupRoot);
         }
 
         public void StoreArtifact(ReleaseArtifactModel artifact)
@@ -173,7 +167,7 @@ namespace ReleaseServer.WebApi.Repositories
 
         public bool DeleteProductIfExists(string productName)
         {
-            var path = Path.Combine(ArtifactRoot, productName);
+            var path = Path.Combine(ArtifactRootDir.ToString(), productName);
 
             if (!Directory.Exists(path))
                 return false;
@@ -217,22 +211,20 @@ namespace ReleaseServer.WebApi.Repositories
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
 
             string backupFileName = "backup_" + timeStamp + ".zip";
-            string backupArchiveFileName = Path.Combine(BackupRoot, backupFileName);
+            string backupArchiveFileName = Path.Combine(BackupRootDir.ToString(), backupFileName);
 
             //Clear the backup folder first
-            var backupDirectoryInfo = new DirectoryInfo(BackupRoot);
-
-            if (backupDirectoryInfo.Exists)
+            if (BackupRootDir.Exists)
             {
-                backupDirectoryInfo.DeleteContent();
+                BackupRootDir.DeleteContent();
             }
             else
             {
-                backupDirectoryInfo.Create();
+                BackupRootDir.Create();
             }
 
             //Create the backup -> zip the whole ArtifactRoot folder
-            ZipFile.CreateFromDirectory(ArtifactRoot, backupArchiveFileName);
+            ZipFile.CreateFromDirectory(ArtifactRootDir.ToString(), backupArchiveFileName);
 
             return new BackupInformationModel
             {
@@ -255,7 +247,7 @@ namespace ReleaseServer.WebApi.Repositories
                     ArtifactRootDir.Create();
                 }
 
-                backupPayload.ExtractToDirectory(ArtifactRoot);
+                backupPayload.ExtractToDirectory(ArtifactRootDir.ToString());
             }
             catch (Exception e)
             {
@@ -266,12 +258,12 @@ namespace ReleaseServer.WebApi.Repositories
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
-            return Path.Combine(ArtifactRoot, product, os, architecture, version);
+            return Path.Combine(ArtifactRootDir.ToString(), product, os, architecture, version);
         }
 
         private string GenerateTemporaryPath()
         {
-            return Path.Combine(ArtifactRoot, "temp", Guid.NewGuid().ToString());
+            return Path.Combine(ArtifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
         private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
@@ -282,20 +274,6 @@ namespace ReleaseServer.WebApi.Repositories
                 throw new Exception("meta information of the specified product does not exist!");
 
             return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
-        }
-
-        private void CheckPermissions(string directoryToTest)
-        {
-            if (directoryToTest == null)
-                return; 
-                    
-            var canWrite = FileSystemPermissions.CanWriteDirectory(directoryToTest);
-            
-            if (!canWrite)
-            {
-                Logger.LogError("Unable to write to the directory {0}. Please check your permissions!", directoryToTest);
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            }
         }
     }
 }
