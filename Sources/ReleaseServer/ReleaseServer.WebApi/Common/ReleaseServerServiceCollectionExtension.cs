@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,9 +36,11 @@ namespace ReleaseServer.WebApi.Common
         private static void CheckPermissions(string directoryToTest)
         {
             if (directoryToTest == null)
-                return; 
-                    
-            var canWrite = FileSystemPermissions.CanWriteDirectory(directoryToTest);
+                return;
+            
+            var directoryInfo = new DirectoryInfo(directoryToTest);
+
+            var canWrite = directoryInfo.CanWriteDirectory();
             
             if (!canWrite)
             {
