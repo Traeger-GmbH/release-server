@@ -19,7 +19,7 @@ namespace ReleaseServer.WebApi
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e.Message);
                 Environment.Exit(1);
             }
         }
