@@ -22,19 +22,13 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Could be done smarter!
             ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
 
-            var configuration = new Mock<IConfiguration>();
-            configuration
-                .SetupGet(x => x[It.Is<string>(s => s == "ArtifactRootDirectory")])
-                .Returns(Path.Combine(ProjectDirectory, "TestData"));
-            
-            //BackupRootDirectory not needed
-            configuration
-                .SetupGet(x => x[It.Is<string>(s => s == "BackupRootDirectory")])
-                .Returns(Path.Combine(ProjectDirectory, "TestBackupDir"));
+            var artifactRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData"));
+            var backupRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestBackupDir"));
 
             FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
                     Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
-                    configuration.Object
+                    artifactRootDirectory,
+                    backupRootDirectory
                 );
             FsReleaseArtifactService = new FsReleaseArtifactService(
                     FsReleaseArtifactRepository,
