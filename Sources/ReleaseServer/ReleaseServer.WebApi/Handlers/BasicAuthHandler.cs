@@ -86,10 +86,8 @@ namespace ReleaseServer.WebApi.Auth
                     Username = Configuration["Credentials:Username"],
                     Password = Configuration["Credentials:Password"]});
             
-            var validPwBase64 = Convert.FromBase64String(validCredentials.Password);
-            
             if (CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username)) && 
-                CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), validPwBase64))
+                CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), Encoding.UTF8.GetBytes(validCredentials.Password)))
                 return validCredentials.Username;
             
             return null;
