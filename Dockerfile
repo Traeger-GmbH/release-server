@@ -15,4 +15,4 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS runtime
 WORKDIR /app
 COPY --from=builder /app/output ./
 
-ENTRYPOINT [ "dotnet", "ReleaseServer/ReleaseServer.WebApi.dll", "--urls", "https://0.0.0.0:5001"]
+ENTRYPOINT [ "dotnet", "ReleaseServer/ReleaseServer.WebApi.dll", "--urls", "http://0.0.0.0:5001"]

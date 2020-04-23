@@ -87,8 +87,6 @@ namespace ReleaseServer.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthentication();
