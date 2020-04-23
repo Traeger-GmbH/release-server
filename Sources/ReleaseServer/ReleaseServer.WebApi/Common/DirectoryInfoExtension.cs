@@ -44,8 +44,14 @@ namespace ReleaseServer.WebApi.Common
             Directory.Move(directory.FullName, destination.FullName);
         }
         
+        public static void EnsureWritable(this DirectoryInfo directory) {            
+            if (!directory.IsWritable())
+            {
+                throw new UnauthorizedAccessException($"Unable to write to the directory {directory.FullName}. Please check your permissions!");
+            }
+        }
         
-        public static bool CanWriteDirectory(this DirectoryInfo directory)
+        public static bool IsWritable(this DirectoryInfo directory)
         {
             bool writable = false;
             

@@ -17,10 +17,13 @@ namespace ReleaseServer.WebApi.Repositories
         private readonly DirectoryInfo ArtifactRootDir, BackupRootDir;
         private ILogger Logger;
 
-        public FsReleaseArtifactRepository(ILogger<FsReleaseArtifactRepository> logger, IConfiguration configuration)
+        public FsReleaseArtifactRepository(
+            ILogger<FsReleaseArtifactRepository> logger,
+            DirectoryInfo artifactDirectory,
+            DirectoryInfo backupDirectory)
         {
-            ArtifactRootDir = new DirectoryInfo(configuration["ArtifactRootDirectory"]);
-            BackupRootDir = new DirectoryInfo(configuration["BackupRootDirectory"]);
+            ArtifactRootDir = artifactDirectory;
+            BackupRootDir = backupDirectory;
             Logger = logger;
         }
 

@@ -13,17 +13,25 @@ namespace ReleaseServer.WebApi.Common
         public static IServiceCollection AddFsReleaseArtifactService(this IServiceCollection services, IConfiguration configuration)
         {
             //Check file permissions
-            var artifactRootDir = configuration["ArtifactRootDirectory"];
-            var backupRootDir = configuration["BackupRootDirectory"];
-            
-            CheckPermissions(artifactRootDir);
-            CheckPermissions(backupRootDir);
+            var artifactRootDir = new DirectoryInfo(configuration["ArtifactRootDirectory"]);
+            var backupRootDir = new DirectoryInfo(configuration["BackupRootDirectory"]);
+
+            if (!artifactRootDir.Exists) {
+                artifactRootDir.Create();
+            }
+            if (!backupRootDir.Exists) {
+                backupRootDir.Create();
+            }
+
+            artifactRootDir.EnsureWritable();
+            backupRootDir.EnsureWritable();
             
             services.AddSingleton<IReleaseArtifactService>(serviceProvider =>
             {
                 var releaseArtifactRepository = new FsReleaseArtifactRepository(
                     serviceProvider.GetRequiredService<ILogger<FsReleaseArtifactRepository>>(),
-                    serviceProvider.GetRequiredService<IConfiguration>()
+                    artifactRootDir,
+                    backupRootDir
                 );
                 return new FsReleaseArtifactService(
                     releaseArtifactRepository,
@@ -31,21 +39,6 @@ namespace ReleaseServer.WebApi.Common
                 );
             });
             return services;
-        }
-        
-        private static void CheckPermissions(string directoryToTest)
-        {
-            if (directoryToTest == null)
-                return;
-            
-            var directoryInfo = new DirectoryInfo(directoryToTest);
-
-            var canWrite = directoryInfo.CanWriteDirectory();
-            
-            if (!canWrite)
-            {
-                throw new UnauthorizedAccessException($"Unable to write to the directory {directoryToTest}. Please check your permissions!");
-            }
         }
     }
 }
