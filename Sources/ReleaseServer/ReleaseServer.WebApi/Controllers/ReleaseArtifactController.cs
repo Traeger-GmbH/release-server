@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Authorization;
@@ -60,10 +61,67 @@ namespace ReleaseServer.WebApi.Controllers
                 return BadRequest(validationResult.ValidationError);
             
             await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
-            
+
             return Ok("Upload of the artifact successful!");
         }
         
+        private static int CompareByVersion(ProductInformation x, ProductInformation y) {
+            return x.Version.CompareTo(y.Version);
+        }
+
+        /// <summary>
+        /// Retrieves a list of all available releases of a product that can be filtered, ordered and paginated.
+        /// </summary>
+        /// <param name="product">The name/identifier of the product to get.</param>
+        /// <param name="architectures">A comma separated list of architectures to filter for. If this parameter is not set no filter will be applied.</param>
+        /// <param name="operatingSystems">A comma separated list of operating systems to filter for. If this parameter is not set no filter will be applied.</param>
+        /// <param name="sortOrder">Defines how the results will be ordered by their version numbers.</param>
+        /// <param name="limit">Paging parameter: Maximum number of elements that will be returned.</param>
+        /// <param name="offset">Paging parameter: Offset of the first element to be returned.</param>
+        /// <response code="200">A product with the specified product name exists.</response>
+        /// <response code="404">The specified product does not exist.</response>
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ProductInformationListResponseModel), 200)]
+        [SeparatedQueryString]
+        [HttpGet("products/{product}")]
+        public async Task<ActionResult<ProductInformationList>> GetProduct(
+            [Required] string product,
+            [FromQuery] List<string> architectures,
+            [FromQuery] List<string> operatingSystems,
+            [FromQuery] SortOrder sortOrder = SortOrder.Descending,
+            [FromQuery] int limit = 50,
+            [FromQuery] int offset = 0
+            )
+        {
+            var productInfos = (await ReleaseArtifactService.GetProductInfos(product));
+
+            if (productInfos.IsNullOrEmpty())
+                return NotFound("The specified product was not found!");
+
+            productInfos = productInfos
+                .Where((release) => {
+                    var match = true;
+                    if (architectures.Count > 0) {
+                        match &= architectures.Contains(release.Architecture);
+                    }
+                    if (operatingSystems.Count > 0) {
+                        match &= operatingSystems.Contains(release.Os);
+                    }
+                    return match;
+                })
+                .ToList();
+
+            if (productInfos.IsNullOrEmpty())
+                return NotFound($"There is no release of \"${product}\" that matches the specified filter criteria.");
+
+            productInfos.Sort(CompareByVersion);
+            if (sortOrder == SortOrder.Descending) {
+                productInfos.Reverse();
+            }
+
+            return new ProductInformationList(productInfos, limit, offset);
+        }
+
         /// <summary>
         /// Retrieves a list of all available versions of the specified product.
         /// </summary>
