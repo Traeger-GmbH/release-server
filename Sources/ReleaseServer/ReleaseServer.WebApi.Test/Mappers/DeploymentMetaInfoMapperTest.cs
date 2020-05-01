@@ -19,6 +19,7 @@ namespace ReleaseServer.WebApi.Test
             {
                 ChangelogFileName = "changelog.txt",
                 ArtifactFileName = "artifact.zip",
+                ReleaseDate = new DateTime(2020, 02, 01)
             };
 
             var parsedMeta = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(Path.Combine(projectDirectory, "TestData","testDeployment.json"));
