@@ -60,7 +60,7 @@ namespace ReleaseServer.WebApi.Services
             return await Task.Run(() => FsReleaseArtifactRepository.GetPlatforms(productName, version));
         }
 
-        public async Task<string> GetReleaseInfo(string productName, string os, string architecture, string version)
+        public async Task<ReleaseInformationModel> GetReleaseInfo(string productName, string os, string architecture, string version)
         {
             return await Task.Run(() =>
                 FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));

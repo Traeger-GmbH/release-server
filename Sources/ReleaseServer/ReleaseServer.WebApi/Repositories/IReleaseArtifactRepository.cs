@@ -8,7 +8,7 @@ namespace ReleaseServer.WebApi.Repositories
     {
         void StoreArtifact(ReleaseArtifactModel artifact);
         List<ProductInformationModel> GetInfosByProductName(string productName);
-        string GetReleaseInfo(string product, string os, string architecture, string version);
+        ReleaseInformationModel GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
         bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
         bool DeleteProductIfExists(string productName);

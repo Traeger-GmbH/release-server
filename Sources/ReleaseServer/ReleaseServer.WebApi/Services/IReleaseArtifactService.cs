@@ -10,7 +10,7 @@ namespace ReleaseServer.WebApi.Services
         Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
         Task<List<ProductInformationModel>> GetProductInfos(string productName);
         Task<List<string>> GetPlatforms(string productName, string version);
-        Task<string> GetReleaseInfo(string productName, string os, string architecture, string version);
+        Task<ReleaseInformationModel> GetReleaseInfo(string productName, string os, string architecture, string version);
         Task<List<string>> GetVersions(string productName, string os, string architecture);
         Task<string> GetLatestVersion(string productName, string os, string architecture);
         Task<ArtifactDownloadModel> GetSpecificArtifact(string productName, string os, string architecture, string version);

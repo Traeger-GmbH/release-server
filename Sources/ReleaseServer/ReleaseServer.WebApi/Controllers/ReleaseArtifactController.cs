@@ -97,7 +97,7 @@ namespace ReleaseServer.WebApi.Controllers
         }
         
         /// <summary>
-        /// Retrieves the changelog of a specific product.
+        /// Retrieves the Release information of a specific product.
         /// </summary>
         /// <param name="product"></param>
         /// <param name="os"></param>
@@ -106,16 +106,16 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specific product exists.</response>
         /// <response code="404">The product with the specified product name does not exist. Therefore the changelog does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ChangelogResponseModel), 200)]
+        [ProducesResponseType(typeof(ReleaseInformationModel), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public async Task<ActionResult<ChangelogResponseModel>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ActionResult<ReleaseInformationModel>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
 
             if (releaseInfo == null)
-                return NotFound("The changelog does not exist (the specified product was not found)!");
+                return NotFound("The Release information does not exist (the specified product was not found)!");
 
-            return releaseInfo.toChangelogResponse();
+            return releaseInfo;
         }
         
         /// <summary>

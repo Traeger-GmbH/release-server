@@ -1,4 +1,5 @@
 {
     "ChangelogFileName": "changelog.txt",
-    "ArtifactFileName": "artifact.zip"
+    "ArtifactFileName": "artifact.zip",
+    "ReleaseDate": "2020-02-10"
 }

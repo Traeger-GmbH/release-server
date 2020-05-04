@@ -172,15 +172,24 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetReleaseInfo()
         {
             //Setup 
-            string expectedReleaseInfo;
+            ReleaseInformationModel expectedReleaseInfo;
             
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                expectedReleaseInfo = "Release 1.0.0\r\n- This is an example\r\n- This is another example";
+                expectedReleaseInfo = new ReleaseInformationModel
+                {
+                    Changelog = "Release 1.0.0\r\n- This is an example\r\n- This is another example",
+                    ReleaseDate = new DateTime(2020, 02, 10)
+                };
             }
             else
             {
-                expectedReleaseInfo = "Release 1.0.0\n- This is an example\n- This is another example";
+                expectedReleaseInfo = new ReleaseInformationModel
+                {
+                    Changelog = "Release 1.0.0\n- This is an example\n- This is another example",
+                    ReleaseDate = new DateTime(2020, 02, 10)
+                };
+
             }
             
             //Act

@@ -94,7 +94,7 @@ namespace ReleaseServer.WebApi.Repositories
             return productInformation.ToList();
         }
 
-        public string GetReleaseInfo(string product, string os, string architecture, string version)
+        public ReleaseInformationModel GetReleaseInfo(string product, string os, string architecture, string version)
         {
             try
             {
@@ -107,8 +107,11 @@ namespace ReleaseServer.WebApi.Repositories
 
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
-                    var changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName));
-                    return changelog;
+                    return new ReleaseInformationModel
+                    {
+                        Changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName)), 
+                        ReleaseDate = deploymentMetaInfo.ReleaseDate
+                    };
                 }
 
                 //The artifact directory (thus the specified artifact) does not exist.
