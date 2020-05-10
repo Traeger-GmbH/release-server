@@ -178,7 +178,7 @@ namespace ReleaseServer.WebApi.Services
         {
             using (var zipMapper = new ZipArchiveMapper())
             {
-                DeploymentMetaInfo deploymentMetaInfo;
+                DeploymentMetaInfoModel deploymentMetaInfoModel;
 
                 Logger.LogDebug("convert the uploaded payload to a ZIP archive");
                 var payloadZipArchive = zipMapper.FormFileToZipArchive(payload);
@@ -201,11 +201,11 @@ namespace ReleaseServer.WebApi.Services
                     await deploymentInfoStream.CopyToAsync(memoryStream);
                     var deploymentInfoByteArray = memoryStream.ToArray();
 
-                    deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
+                    deploymentMetaInfoModel = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
                 }
 
                 //Check if the deployment.json file is valid
-                if (!deploymentMetaInfo.IsValid())
+                if (!deploymentMetaInfoModel.IsValid())
                 {
                     var validationError = "the deployment meta information (deployment.json) is invalid!";
                     Logger.LogError(validationError);
@@ -213,17 +213,17 @@ namespace ReleaseServer.WebApi.Services
                 }
 
                 //Check if the uploaded payload contains the rest of the expected parts
-                if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
+                if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ArtifactFileName) == null)
                 {
-                    var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
+                    var validationError = "the expected artifact" + " \"" + deploymentMetaInfoModel.ArtifactFileName +
                                           "\"" + " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
-                if (payloadZipArchive.GetEntry(deploymentMetaInfo.ChangelogFileName) == null)
+                if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ChangelogFileName) == null)
                 {
-                    var validationError = "the expected changelog file" + " \"" +  deploymentMetaInfo.ChangelogFileName +
+                    var validationError = "the expected changelog file" + " \"" +  deploymentMetaInfoModel.ChangelogFileName +
                                           "\"" +  " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};

@@ -7,14 +7,14 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class DeploymentMetaInfoMapper
     {
-        public static DeploymentMetaInfo ParseDeploymentMetaInfo(string fileName)
+        public static DeploymentMetaInfoModel ParseDeploymentMetaInfo(string fileName)
         {
-            return JsonConvert.DeserializeObject<DeploymentMetaInfo>(File.ReadAllText(fileName));
+            return JsonConvert.DeserializeObject<DeploymentMetaInfoModel>(File.ReadAllText(fileName));
         }
         
-        public static DeploymentMetaInfo ParseDeploymentMetaInfo(byte[] byteContent)
+        public static DeploymentMetaInfoModel ParseDeploymentMetaInfo(byte[] byteContent)
         {
-            return JsonConvert.DeserializeObject<DeploymentMetaInfo>(Encoding.UTF8.GetString(byteContent));
+            return JsonConvert.DeserializeObject<DeploymentMetaInfoModel>(Encoding.UTF8.GetString(byteContent));
         }
     }
 }

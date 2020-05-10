@@ -5,10 +5,10 @@ namespace ReleaseServer.WebApi.Extensions
 {
     public static class DeploymentMetaInfoExtension
     {
-        public static bool IsValid(this DeploymentMetaInfo deploymentMetaInfo)
+        public static bool IsValid(this DeploymentMetaInfoModel deploymentMetaInfoModel)
         {
-            if (deploymentMetaInfo.ReleaseDate == new DateTime() || deploymentMetaInfo.ArtifactFileName == null ||
-                deploymentMetaInfo.ChangelogFileName == null)
+            if (deploymentMetaInfoModel.ReleaseDate == new DateTime() || deploymentMetaInfoModel.ArtifactFileName == null ||
+                deploymentMetaInfoModel.ChangelogFileName == null)
             {
                 return false;
             }

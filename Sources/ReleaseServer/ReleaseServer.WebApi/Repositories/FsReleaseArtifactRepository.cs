@@ -271,7 +271,7 @@ namespace ReleaseServer.WebApi.Repositories
             return Path.Combine(ArtifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
-        private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
+        private DeploymentMetaInfoModel GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
         {
             var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
 

@@ -11,12 +11,12 @@ namespace ReleaseServer.WebApi.Test
     public class DeploymentMetaMapperTest
     {
         private readonly string ProjectDirectory;
-        private readonly DeploymentMetaInfo ExpectedMeta;
+        private readonly DeploymentMetaInfoModel ExpectedMeta;
 
         public DeploymentMetaMapperTest()
         {
             ProjectDirectory = TestUtils.GetProjectDirectory();
-            ExpectedMeta =  new DeploymentMetaInfo
+            ExpectedMeta =  new DeploymentMetaInfoModel
             {
                 ChangelogFileName = "changelog.txt",
                 ArtifactFileName = "artifact.zip",
