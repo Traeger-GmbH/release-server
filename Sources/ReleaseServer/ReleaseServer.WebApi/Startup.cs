@@ -9,12 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using NLog.Fluent;
 using ReleaseServer.WebApi.Auth;
-using ReleaseServer.WebApi.Common;
+using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.SwaggerDocu;
 using Swashbuckle.AspNetCore.Filters;
 

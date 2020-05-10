@@ -1,11 +1,9 @@
-using System;
 using System.IO;
-using System.Text;
-using ReleaseServer.WebApi.Common;
+using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
-namespace ReleaseServer.WebApi.Test.Common
+namespace ReleaseServer.WebApi.Test.Extensions
 {
     public class DirectoryInfoExtensionTest
     {
@@ -13,7 +11,7 @@ namespace ReleaseServer.WebApi.Test.Common
 
         public DirectoryInfoExtensionTest()
         {
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            ProjectDirectory = TestUtils.GetProjectDirectory();
         }
 
         [Fact]

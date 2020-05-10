@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using ReleaseServer.WebApi.Common;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Config;
+using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 

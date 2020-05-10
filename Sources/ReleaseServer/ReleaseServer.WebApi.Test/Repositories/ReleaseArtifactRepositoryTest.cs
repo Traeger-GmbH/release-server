@@ -5,9 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Moq;
 using NSubstitute;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -24,7 +22,7 @@ namespace ReleaseServer.WebApi.Test
         public ReleaseArtifactRepositoryTest()
         {
             //Could be done smarter
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            ProjectDirectory = TestUtils.GetProjectDirectory();
 
             var artifactRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData"));
             var backupRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestBackupDir"));

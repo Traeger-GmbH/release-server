@@ -38,7 +38,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="version"></param>
         /// <param name="artifact"></param>
         /// <response code="200">Upload of the artifact was successful.</response>
-        /// <response code="400">No or wrong body provided.</response>
+        /// <response code="400">No or invalid body provided (must be a Zip file).</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
@@ -48,8 +48,14 @@ namespace ReleaseServer.WebApi.Controllers
             [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
             
-            if (artifact == null)
-                return BadRequest();
+            if (artifact == null || artifact.ContentType != "application/zip")
+                return BadRequest("No or invalid body provided (must be a Zip file)");
+            
+            //Validate the payload of the uploaded Zip file
+            var validationResult = await ReleaseArtifactService.ValidateUploadPayload(artifact);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.ValidationError);
             
             await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
             

@@ -3,28 +3,44 @@ using System.IO;
 using FluentAssertions;
 using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test
 {
     public class DeploymentMetaMapperTest
     {
+        private readonly string ProjectDirectory;
+        private readonly DeploymentMetaInfo ExpectedMeta;
 
-        [Fact]
-        public void ConvertJsonToDeploymentMetaInfo()
+        public DeploymentMetaMapperTest()
         {
-            var projectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-
-            var expectedMeta = new DeploymentMetaInfo
+            ProjectDirectory = TestUtils.GetProjectDirectory();
+            ExpectedMeta =  new DeploymentMetaInfo
             {
                 ChangelogFileName = "changelog.txt",
                 ArtifactFileName = "artifact.zip",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
+        }
+        
 
-            var parsedMeta = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(Path.Combine(projectDirectory, "TestData","testDeployment.json"));
+        [Fact]
+        public void ConvertJsonToDeploymentMetaInfo_String()
+        {
+            var parsedMeta = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(Path.Combine(ProjectDirectory, "TestData","testDeployment.json"));
 
-            parsedMeta.Should().BeEquivalentTo(expectedMeta);
+            parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
+        }
+        
+        [Fact]
+        public void ConvertJsonToDeploymentMetaInfo_ByteArray()
+        {
+            var testMetaInfoByteArray = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "testDeployment.json"));
+            
+            var parsedMeta = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(testMetaInfoByteArray);
+
+            parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
         }
     }
 }

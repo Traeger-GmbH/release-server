@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using ReleaseServer.WebApi.Config;
+using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -168,6 +171,66 @@ namespace ReleaseServer.WebApi.Services
                 {
                     DirectoryLock.Release();
                 }
+            }
+        }
+
+        public async Task<ValidationResultModel> ValidateUploadPayload(IFormFile payload)
+        {
+            using (var zipMapper = new ZipArchiveMapper())
+            {
+                DeploymentMetaInfo deploymentMetaInfo;
+
+                Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+                var payloadZipArchive = zipMapper.FormFileToZipArchive(payload);
+                
+                //Try to get the deployment.json entry from the zip archive and check, if it exists
+                var deploymentInfoEntry = payloadZipArchive.GetEntry("deployment.json");
+
+                if (deploymentInfoEntry == null)
+                {
+                    var validationError = "the deployment.json does not exist in the uploaded payload!";
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
+                }
+
+                //Open the deployment.json and extract the DeploymentMetaInfo of it
+                var deploymentInfoStream = deploymentInfoEntry.Open();
+                
+                using (var memoryStream = new MemoryStream())
+                {
+                    await deploymentInfoStream.CopyToAsync(memoryStream);
+                    var deploymentInfoByteArray = memoryStream.ToArray();
+
+                    deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
+                }
+
+                //Check if the deployment.json file is valid
+                if (!deploymentMetaInfo.IsValid())
+                {
+                    var validationError = "the deployment meta information (deployment.json) is invalid!";
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
+                }
+
+                //Check if the uploaded payload contains the rest of the expected parts
+                if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
+                {
+                    var validationError = "the expected file: " + deploymentMetaInfo.ArtifactFileName +
+                                          " does not exist in the uploaded payload!";
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
+                }
+
+                if (payloadZipArchive.GetEntry(deploymentMetaInfo.ChangelogFileName) == null)
+                {
+                    var validationError = "the expected file: " +  deploymentMetaInfo.ChangelogFileName +
+                                          " does not exist in the uploaded payload!";
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
+                }
+
+                //The uploaded payload is valid
+                return new ValidationResultModel {IsValid = true};
             }
         }
     }

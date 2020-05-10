@@ -19,5 +19,6 @@ namespace ReleaseServer.WebApi.Services
         Task<bool> DeleteProductIfExists(string productName);
         Task<BackupInformationModel> RunBackup();
         Task RestoreBackup(IFormFile payload);
+        Task<ValidationResultModel> ValidateUploadPayload(IFormFile payload);
     }
 }

@@ -1,12 +1,11 @@
-using System;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using ReleaseServer.WebApi.Services;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
-using Microsoft.Extensions.Configuration;
-using Moq;
+using ReleaseServer.WebApi.Test.Utils;
 
 namespace ReleaseServer.WebApi.Test.TestData
 {
@@ -20,7 +19,7 @@ namespace ReleaseServer.WebApi.Test.TestData
         {
             //Setup
             //Could be done smarter!
-            ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            ProjectDirectory = TestUtils.GetProjectDirectory();
 
             var artifactRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData"));
             var backupRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestBackupDir"));
@@ -56,6 +55,114 @@ namespace ReleaseServer.WebApi.Test.TestData
 
             //Assert
             Assert.Null(testVersion);
+        }
+
+        [Fact]
+        public async void TestValidateUploadPayload_Valid()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_zip.zip");
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.True(validationResult.IsValid);
+            Assert.Null(validationResult.ValidationError);
+        }
+
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_NoArtifactFile()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_without_artifact.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_without_artifact.zip");
+
+            var expectedValidationError = "the expected file: testprogram.exe does not exist in the uploaded payload!";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+        }
+        
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_NoChangelog()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_without_changelog.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_without_changelog.zip");
+
+            var expectedValidationError = "the expected file: changelog.txt does not exist in the uploaded payload!";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+        }
+        
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_InvalidMeta()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_invalid_meta.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_invalid_meta.zip");
+
+            var expectedValidationError = "the deployment meta information (deployment.json) is invalid!";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+        }
+        
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_NoMeta()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_without_meta.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_without_meta.zip");
+
+            var expectedValidationError = "the deployment.json does not exist in the uploaded payload!";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
     }
 }
