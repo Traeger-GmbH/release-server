@@ -90,7 +90,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_without_artifact.zip");
 
-            var expectedValidationError = "the expected file: testprogram.exe does not exist in the uploaded payload!";
+            var expectedValidationError = "the expected artifact \"testprogram.exe\" does not exist in the uploaded payload!";
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
@@ -112,7 +112,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_without_changelog.zip");
 
-            var expectedValidationError = "the expected file: changelog.txt does not exist in the uploaded payload!";
+            var expectedValidationError = "the expected changelog file \"changelog.txt\" does not exist in the uploaded payload!";
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);

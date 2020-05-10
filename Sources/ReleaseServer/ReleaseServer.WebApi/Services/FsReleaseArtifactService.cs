@@ -215,16 +215,16 @@ namespace ReleaseServer.WebApi.Services
                 //Check if the uploaded payload contains the rest of the expected parts
                 if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
                 {
-                    var validationError = "the expected file: " + deploymentMetaInfo.ArtifactFileName +
-                                          " does not exist in the uploaded payload!";
+                    var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
+                                          "\"" + " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
                 if (payloadZipArchive.GetEntry(deploymentMetaInfo.ChangelogFileName) == null)
                 {
-                    var validationError = "the expected file: " +  deploymentMetaInfo.ChangelogFileName +
-                                          " does not exist in the uploaded payload!";
+                    var validationError = "the expected changelog file" + " \"" +  deploymentMetaInfo.ChangelogFileName +
+                                          "\"" +  " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
