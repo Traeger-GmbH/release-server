@@ -8,7 +8,7 @@ namespace ReleaseServer.WebApi.Extensions
         public static bool IsValid(this DeploymentMetaInfoModel deploymentMetaInfoModel)
         {
             if (deploymentMetaInfoModel.ReleaseDate == new DateTime() || deploymentMetaInfoModel.ArtifactFileName == null ||
-                deploymentMetaInfoModel.ChangelogFileName == null)
+                deploymentMetaInfoModel.ReleaseNotesFileName == null)
             {
                 return false;
             }

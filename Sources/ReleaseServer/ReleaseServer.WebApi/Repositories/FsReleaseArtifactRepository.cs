@@ -108,7 +108,7 @@ namespace ReleaseServer.WebApi.Repositories
 
                     return new ReleaseInformationModel
                     {
-                        Changelog = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ChangelogFileName)), 
+                        ReleaseNotes = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName)), 
                         ReleaseDate = deploymentMetaInfo.ReleaseDate
                     };
                 }

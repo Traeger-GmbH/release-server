@@ -13,7 +13,7 @@ namespace ReleaseServer.WebApi.Test.Extensions
             var testDeploymentMetaInfo = new DeploymentMetaInfoModel
             {
                 ArtifactFileName = "testArtifact.zip",
-                ChangelogFileName = "changelog.txt",
+                ReleaseNotesFileName = "releaseNotes.txt",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
 
@@ -24,7 +24,7 @@ namespace ReleaseServer.WebApi.Test.Extensions
         public void ValidateDeploymentMeta_Invalid()
         {
             
-            //Without Changelog
+            //Without release notes
             var testDeploymentMetaInfo1 = new DeploymentMetaInfoModel
             {
                 ArtifactFileName = "testArtifact.zip",
@@ -35,13 +35,13 @@ namespace ReleaseServer.WebApi.Test.Extensions
             var testDeploymentMetaInfo2 = new DeploymentMetaInfoModel
             {
                 ArtifactFileName = "testArtifact.zip",
-                ChangelogFileName = "changelog.txt",
+                ReleaseNotesFileName = "releaseNotes.txt",
             };
             
             //Without ArtifactFileName
             var testDeploymentMetaInfo3 = new DeploymentMetaInfoModel
             {
-                ChangelogFileName = "changelog.txt",
+                ReleaseNotesFileName = "releaseNotes.txt",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
             

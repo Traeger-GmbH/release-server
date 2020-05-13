@@ -4,7 +4,7 @@ namespace ReleaseServer.WebApi.Config
 {
     public class DeploymentMetaInfoModel
     {
-        public string ChangelogFileName { get; set; }
+        public string ReleaseNotesFileName { get; set; }
         
         public string ArtifactFileName { get; set; }
         

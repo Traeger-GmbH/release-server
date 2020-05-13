@@ -100,19 +100,19 @@ namespace ReleaseServer.WebApi.Test.TestData
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoChangelog()
+        public async void TestValidateUploadPayload_Invalid_NoReleaseNotes()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_without_changelog.zip")); 
+                "test_payload_without_release_notes.zip")); 
             
             var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
                 baseStreamOffset: 0,
                 length: testUploadPayload.Length,
                 name: "test data",
-                fileName: "test_payload_without_changelog.zip");
+                fileName: "test_payload_without_release_notes.zip");
 
-            var expectedValidationError = "the expected changelog file \"changelog.txt\" does not exist in the uploaded payload!";
+            var expectedValidationError = "the expected release notes file \"releaseNotes.txt\" does not exist in the uploaded payload!";
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);

@@ -18,7 +18,7 @@ namespace ReleaseServer.WebApi.Test
             ProjectDirectory = TestUtils.GetProjectDirectory();
             ExpectedMeta =  new DeploymentMetaInfoModel
             {
-                ChangelogFileName = "changelog.txt",
+                ReleaseNotesFileName = "releaseNotes.txt",
                 ArtifactFileName = "artifact.zip",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };

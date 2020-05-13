@@ -221,9 +221,9 @@ namespace ReleaseServer.WebApi.Services
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
-                if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ChangelogFileName) == null)
+                if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ReleaseNotesFileName) == null)
                 {
-                    var validationError = "the expected changelog file" + " \"" +  deploymentMetaInfoModel.ChangelogFileName +
+                    var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfoModel.ReleaseNotesFileName +
                                           "\"" +  " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};

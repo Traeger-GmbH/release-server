@@ -67,7 +67,7 @@ namespace ReleaseServer.WebApi.Test
 
             //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "changelog.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes.txt")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram.exe")));
             Assert.True(File.Exists(Path.Combine(testPath, "deployment.json")));
             
@@ -78,7 +78,7 @@ namespace ReleaseServer.WebApi.Test
 
             //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "changelog_update.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes_update.txt")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
             Assert.True(File.Exists(Path.Combine(testPath, "deployment_update.json")));
 
@@ -176,7 +176,7 @@ namespace ReleaseServer.WebApi.Test
             {
                 expectedReleaseInfo = new ReleaseInformationModel
                 {
-                    Changelog = "Release 1.0.0\r\n- This is an example\r\n- This is another example",
+                    ReleaseNotes = "Release 1.0.0\r\n- This is an example\r\n- This is another example",
                     ReleaseDate = new DateTime(2020, 02, 10)
                 };
             }
@@ -184,7 +184,7 @@ namespace ReleaseServer.WebApi.Test
             {
                 expectedReleaseInfo = new ReleaseInformationModel
                 {
-                    Changelog = "Release 1.0.0\n- This is an example\n- This is another example",
+                    ReleaseNotes = "Release 1.0.0\n- This is an example\n- This is another example",
                     ReleaseDate = new DateTime(2020, 02, 10)
                 };
 

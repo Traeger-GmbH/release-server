@@ -10,7 +10,7 @@ namespace ReleaseServer.WebApi.SwaggerDocu
         {
             return new ReleaseInformationModel
             {
-                Changelog = "Release 1.0.0 - This is an example.",
+                ReleaseNotes = "Release 1.0.0 - This is an example.",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
         }

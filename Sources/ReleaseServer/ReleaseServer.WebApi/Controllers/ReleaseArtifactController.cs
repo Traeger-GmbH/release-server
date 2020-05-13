@@ -110,7 +110,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="architecture"></param>
         /// <param name="version"></param>
         /// <response code="200">The specific product exists.</response>
-        /// <response code="404">The product with the specified product name does not exist. Therefore the changelog does not exist.</response>
+        /// <response code="404">The product with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ReleaseInformationModel), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
