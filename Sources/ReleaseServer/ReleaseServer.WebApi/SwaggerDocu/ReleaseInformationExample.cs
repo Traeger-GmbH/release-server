@@ -13,7 +13,10 @@ namespace ReleaseServer.WebApi.SwaggerDocu
             return new ReleaseInformationModel
             {
                 //TODO: Fill the object with examples!
-                ReleaseNotes = new ReleaseNotesModel(),
+                ReleaseNotes = new ReleaseNotesModel
+                {
+                    
+                }, 
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
         }

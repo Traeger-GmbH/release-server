@@ -112,7 +112,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specific product exists.</response>
         /// <response code="404">The product with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ReleaseInformationModel), 200)]
+        [ProducesResponseType(typeof(ReleaseInformationResponseModel), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
         public async Task<ActionResult<ReleaseInformationResponseModel>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
