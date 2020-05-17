@@ -112,7 +112,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_without_release_notes.zip");
 
-            var expectedValidationError = "the expected release notes file \"releaseNotes.txt\" does not exist in the uploaded payload!";
+            var expectedValidationError = "the expected release notes file \"releaseNotes.json\" does not exist in the uploaded payload!";
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);

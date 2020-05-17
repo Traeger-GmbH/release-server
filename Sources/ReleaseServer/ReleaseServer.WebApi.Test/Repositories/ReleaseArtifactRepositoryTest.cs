@@ -78,7 +78,7 @@ namespace ReleaseServer.WebApi.Test
 
             //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes_update.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes_update.json")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
             Assert.True(File.Exists(Path.Combine(testPath, "deployment_update.json")));
 
@@ -87,25 +87,56 @@ namespace ReleaseServer.WebApi.Test
         }
 
         
-        //TODO: fix the unit test
-//        [Fact]
-        /*
+        [Fact]
         public void TestGetInfosByProductName()
         {
             //Setup
+            var testProductPath = Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.1");
             
             //Cleanup test dir from old tests (if they failed before)
-            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "testproduct"));
+
+            Directory.CreateDirectory(testProductPath);
             
-            var testDirInfo = Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
+            var test = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData", "productx", "debian", "amd64", "1.1"));
+
+            foreach (var file in test.GetFiles())
+            {
+                file.CopyTo(Path.Combine(testProductPath, file.Name));
+            }
 
             var expectedProductInfo = new ProductInformationModel
             {
                 ProductIdentifier = "testproduct",
                 Os = "debian",
                 HwArchitecture = "amd64",
-                Version = "1.0".ToProductVersion(),
-                ReleaseNotes = new Dictionary<CultureInfo, List<ReleaseNotes>>()
+                Version = "1.1".ToProductVersion(),
+                ReleaseNotes = new ReleaseNotesModel
+                {
+                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    {
+                        {
+                            new CultureInfo("de"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added de 1"}
+                                }
+                            }
+                        },
+                        {
+                            new CultureInfo("en"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added en 1"}
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
             //Act
@@ -117,7 +148,6 @@ namespace ReleaseServer.WebApi.Test
             //Cleanup
             Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "testproduct"), true);
         }
-        */
         
         [Fact]
         public void TestGetPlatforms()
