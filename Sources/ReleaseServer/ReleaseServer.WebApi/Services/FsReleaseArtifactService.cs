@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using ReleaseServer.WebApi.Common;
 using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Mappers;
@@ -195,16 +195,20 @@ namespace ReleaseServer.WebApi.Services
 
                 //Open the deployment.json and extract the DeploymentMetaInfo of it
                 var deploymentInfoStream = deploymentInfoEntry.Open();
-                
-                using (var memoryStream = new MemoryStream())
+                var deploymentInfoByteArray = await deploymentInfoStream.ToByteArrayAsync();
+
+                //Check if the deployment.json is a valid json file
+                if(!deploymentInfoByteArray.IsAValidJson(out var errorMsg))
                 {
-                    await deploymentInfoStream.CopyToAsync(memoryStream);
-                    var deploymentInfoByteArray = memoryStream.ToArray();
-
-                    deploymentMetaInfoModel = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
+                    var validationError = "the deployment meta information (deployment.json) is an invalid json file! "
+                        + "Error: " + errorMsg;
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
-
-                //Check if the deployment.json file is valid
+                    
+                
+                //Check if the deployment.json file has a valid content
+                deploymentMetaInfoModel = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
                 if (!deploymentMetaInfoModel.IsValid())
                 {
                     var validationError = "the deployment meta information (deployment.json) is invalid!";
