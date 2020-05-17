@@ -179,6 +179,7 @@ namespace ReleaseServer.WebApi.Services
             using (var zipMapper = new ZipArchiveMapper())
             {
                 DeploymentMetaInfoModel deploymentMetaInfoModel;
+                string errorMsg;
 
                 Logger.LogDebug("convert the uploaded payload to a ZIP archive");
                 var payloadZipArchive = zipMapper.FormFileToZipArchive(payload);
@@ -193,19 +194,18 @@ namespace ReleaseServer.WebApi.Services
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
-                //Open the deployment.json and extract the DeploymentMetaInfo of it
+                //Open the deployment.json
                 var deploymentInfoStream = deploymentInfoEntry.Open();
                 var deploymentInfoByteArray = await deploymentInfoStream.ToByteArrayAsync();
 
                 //Check if the deployment.json is a valid json file
-                if(!deploymentInfoByteArray.IsAValidJson(out var errorMsg))
+                if(!deploymentInfoByteArray.IsAValidJson(out errorMsg))
                 {
                     var validationError = "the deployment meta information (deployment.json) is an invalid json file! "
                         + "Error: " + errorMsg;
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
-                    
                 
                 //Check if the deployment.json file has a valid content
                 deploymentMetaInfoModel = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
@@ -216,7 +216,7 @@ namespace ReleaseServer.WebApi.Services
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
-                //Check if the uploaded payload contains the rest of the expected parts
+                //Check if the uploaded payload contains the artifact file
                 if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ArtifactFileName) == null)
                 {
                     var validationError = "the expected artifact" + " \"" + deploymentMetaInfoModel.ArtifactFileName +
@@ -225,14 +225,30 @@ namespace ReleaseServer.WebApi.Services
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
 
-                if (payloadZipArchive.GetEntry(deploymentMetaInfoModel.ReleaseNotesFileName) == null)
+                //Check if the uploaded payload contains the release notes file
+                var releaseNotesEntry = payloadZipArchive.GetEntry(deploymentMetaInfoModel.ReleaseNotesFileName);
+                
+                if (releaseNotesEntry == null)
                 {
                     var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfoModel.ReleaseNotesFileName +
                                           "\"" +  " does not exist in the uploaded payload!";
                     Logger.LogError(validationError);
                     return new ValidationResultModel {IsValid = false, ValidationError = validationError};
                 }
+                
+                //Open the release notes and
+                var releaseNotesStream = releaseNotesEntry.Open();
+                var releaseNotesByteArray = await releaseNotesStream.ToByteArrayAsync();
 
+                //Check if the release notes file is a valid json file
+                if(!releaseNotesByteArray.IsAValidJson(out errorMsg))
+                {
+                    var validationError = "the release notes file" + " \"" +  deploymentMetaInfoModel.ReleaseNotesFileName +
+                                          "\" is an invalid json file! " + "Error: " + errorMsg;;
+                    Logger.LogError(validationError);
+                    return new ValidationResultModel {IsValid = false, ValidationError = validationError};
+                }
+                
                 //The uploaded payload is valid
                 return new ValidationResultModel {IsValid = true};
             }
