@@ -122,19 +122,43 @@ namespace ReleaseServer.WebApi.Test.TestData
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_InvalidMeta()
+        public async void TestValidateUploadPayload_Invalid_InvalidMeta_Json_Format()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_invalid_meta.zip")); 
+                "test_payload_invalid_meta_format.zip")); 
             
             var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
                 baseStreamOffset: 0,
                 length: testUploadPayload.Length,
                 name: "test data",
-                fileName: "test_payload_invalid_meta.zip");
+                fileName: "test_payload_invalid_meta_format.zip");
+
+            var expectedValidationError = "the deployment meta information (deployment.json) is an invalid json file! " +
+                "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+        }
+        
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_InvalidMeta_Structure()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_invalid_meta_structure.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_invalid_meta_structure.zip");
 
             var expectedValidationError = "the deployment meta information (deployment.json) is invalid!";
+
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
