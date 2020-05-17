@@ -82,12 +82,13 @@ namespace ReleaseServer.WebApi.Repositories
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select new ProductInformationModel()
+                select new ProductInformationModel
                 {
                     ProductIdentifier = productDir.Name,
                     Os = osDir.Name,
                     HwArchitecture = hwArchDir.Name,
-                    Version = versionDir.Name.ToProductVersion()
+                    Version = versionDir.Name.ToProductVersion(),
+                    ReleaseNotes = GetReleaseInfo(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name).ReleaseNotes
                 };
 
             return productInformation.ToList();
@@ -106,9 +107,11 @@ namespace ReleaseServer.WebApi.Repositories
 
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
+                    var releaseNotesFileName = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
+
                     return new ReleaseInformationModel
                     {
-                        ReleaseNotes = File.ReadAllText(Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName)), 
+                        ReleaseNotes = ReleaseNotesMapper.ParseReleaseNotes(releaseNotesFileName), 
                         ReleaseDate = deploymentMetaInfo.ReleaseDate
                     };
                 }

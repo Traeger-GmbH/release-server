@@ -9,5 +9,7 @@ namespace ReleaseServer.WebApi.Models
         public string Os { get; set; }
         
         public string HwArchitecture { get; set; }
+        
+        public ReleaseNotesModel ReleaseNotes { get; set; }
     }
 }

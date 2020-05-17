@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Mappers
@@ -12,7 +13,8 @@ namespace ReleaseServer.WebApi.Mappers
                 Identifier = productInfo.ProductIdentifier,
                 Os = productInfo.Os,
                 Version = productInfo.Version.ToString(),
-                Architecture = productInfo.HwArchitecture
+                Architecture = productInfo.HwArchitecture,
+                ReleaseNotes = productInfo.ReleaseNotes.GetReleaseNotesResponse()
             };
         }
 

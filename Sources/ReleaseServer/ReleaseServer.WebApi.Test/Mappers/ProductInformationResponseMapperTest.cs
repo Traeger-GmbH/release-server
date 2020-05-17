@@ -38,7 +38,8 @@ namespace ReleaseServer.WebApi.Test
                 Identifier = "product1",
                 Os = "ubuntu",
                 Architecture = "arm64",
-                Version = "1.0"
+                Version = "1.0",
+                ReleaseNotes = new Dictionary<string, List<ChangeSet>>()
             };
             
             var expectedProductResult2 = new ProductInformationResponseModel
@@ -46,7 +47,8 @@ namespace ReleaseServer.WebApi.Test
                 Identifier = "product1",
                 Os = "ubuntu",
                 Architecture = "amd64",
-                Version = "1.1-beta"
+                Version = "1.1-beta",
+                ReleaseNotes = new Dictionary<string, List<ChangeSet>>()
             };
 
             //Act
@@ -78,7 +80,8 @@ namespace ReleaseServer.WebApi.Test
                         Identifier = "product1",
                         Os = "ubuntu",
                         Architecture = "arm64",
-                        Version = "1.0"
+                        Version = "1.0",
+                        ReleaseNotes = new Dictionary<string, List<ChangeSet>>()
                     },
 
                     new ProductInformationResponseModel
@@ -86,7 +89,8 @@ namespace ReleaseServer.WebApi.Test
                         Identifier = "product1",
                         Os = "ubuntu",
                         Architecture = "amd64",
-                        Version = "1.1-beta"
+                        Version = "1.1-beta",
+                        ReleaseNotes = new Dictionary<string, List<ChangeSet>>()
                     }
                 }
             };

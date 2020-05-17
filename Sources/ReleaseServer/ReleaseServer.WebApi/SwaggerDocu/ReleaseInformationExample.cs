@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using ReleaseServer.WebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -10,7 +12,8 @@ namespace ReleaseServer.WebApi.SwaggerDocu
         {
             return new ReleaseInformationModel
             {
-                ReleaseNotes = "Release 1.0.0 - This is an example.",
+                //TODO: Fill the object with examples!
+                ReleaseNotes = new ReleaseNotesModel(),
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
         }
