@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -199,7 +200,7 @@ namespace ReleaseServer.WebApi.Services
                 var deploymentInfoByteArray = await deploymentInfoStream.ToByteArrayAsync();
 
                 //Check if the deployment.json is a valid json file
-                if(!deploymentInfoByteArray.IsAValidJson(out errorMsg))
+                if(!deploymentInfoByteArray.IsAValidJson<DeploymentMetaInfoModel>(out errorMsg))
                 {
                     var validationError = "the deployment meta information (deployment.json) is an invalid json file! "
                         + "Error: " + errorMsg;
@@ -241,7 +242,7 @@ namespace ReleaseServer.WebApi.Services
                 var releaseNotesByteArray = await releaseNotesStream.ToByteArrayAsync();
 
                 //Check if the release notes file is a valid json file
-                if(!releaseNotesByteArray.IsAValidJson(out errorMsg))
+                if(!releaseNotesByteArray.IsAValidJson<Dictionary<CultureInfo, List<ChangeSet>>>(out errorMsg))
                 {
                     var validationError = "the release notes file" + " \"" +  deploymentMetaInfoModel.ReleaseNotesFileName +
                                           "\" is an invalid json file! " + "Error: " + errorMsg;;

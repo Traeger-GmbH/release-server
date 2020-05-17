@@ -211,5 +211,30 @@ namespace ReleaseServer.WebApi.Test.TestData
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
+        
+        [Fact]
+        public async void TestValidateUploadPayload_Invalid_ReleaseNotes_Structure()
+        {
+            //Prepare
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "test_payload_invalid_release_notes_structure.zip")); 
+            
+            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+                baseStreamOffset: 0,
+                length: testUploadPayload.Length,
+                name: "test data",
+                fileName: "test_payload_invalid_release_notes_structure.zip");
+
+            var expectedValidationError = "the release notes file \"releaseNotes.json\" is an invalid json file! " +
+                                          "Error: Could not convert string 'invalid' to dictionary key type " +
+                                          "'System.Globalization.CultureInfo'. Create a TypeConverter to convert from the" +
+                                          " string to the key type object. Path 'invalid', line 2, position 13.";
+            
+            //Act
+            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+
+            Assert.False(validationResult.IsValid);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+        }
     }
 }
