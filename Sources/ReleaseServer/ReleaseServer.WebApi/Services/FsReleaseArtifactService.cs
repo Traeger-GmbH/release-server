@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -6,8 +10,7 @@ using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using ReleaseServer.WebApi.Common;
-using ReleaseServer.WebApi.Extensions;
+using Newtonsoft.Json;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -31,26 +34,25 @@ namespace ReleaseServer.WebApi.Services
         public async Task StoreArtifact(string product, string os, string architecture, string version,
             IFormFile payload)
         {
-            using (var zipMapper = new ZipArchiveMapper())
+            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            using var fileStream = payload.OpenReadStream();
+            using var zipPayload = new ZipArchive(payload.OpenReadStream());
+            
+            var artifact =
+                ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
+
+            await DirectoryLock.WaitAsync();
+
+            //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+            try
             {
-                Logger.LogDebug("convert the uploaded payload to a ZIP archive");
-                var zipPayload = zipMapper.FormFileToZipArchive(payload);
-
-                var artifact =
-                    ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
-
-                await DirectoryLock.WaitAsync();
-
-                //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
-                try
-                {
-                    await Task.Run(() => FsReleaseArtifactRepository.StoreArtifact(artifact));
-                }
-                finally
-                {
-                    DirectoryLock.Release();
-                }
+                await Task.Run(() => FsReleaseArtifactRepository.StoreArtifact(artifact));
             }
+            finally
+            {
+                DirectoryLock.Release();
+            }
+            
         }
 
         public async Task<List<ProductInformation>> GetProductInfos(string productName)
@@ -155,103 +157,124 @@ namespace ReleaseServer.WebApi.Services
 
         public async Task RestoreBackup(IFormFile payload)
         {
-            using (var zipMapper = new ZipArchiveMapper())
+            
+            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            using var fileStream = payload.OpenReadStream();
+            using var zipPayload = new ZipArchive(payload.OpenReadStream());
+            
+            await DirectoryLock.WaitAsync();
+
+            //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
+            try
             {
-                Logger.LogDebug("convert the uploaded backup payload to a ZIP archive");
-                var zipPayload = zipMapper.FormFileToZipArchive(payload);
-
-                await DirectoryLock.WaitAsync();
-
-                //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
-                try
-                {
-                    await Task.Run(() => FsReleaseArtifactRepository.RestoreBackup(zipPayload));
-                }
-                finally
-                {
-                    DirectoryLock.Release();
-                }
+                await Task.Run(() => FsReleaseArtifactRepository.RestoreBackup(zipPayload));
             }
+            finally
+            {
+                DirectoryLock.Release();
+            }
+        
         }
 
         public async Task<ValidationResult> ValidateUploadPayload(IFormFile payload)
         {
-            using (var zipMapper = new ZipArchiveMapper())
+            DeploymentMetaInfo deploymentMetaInfo;
+            string errorMsg;
+            
+            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            using var fileStream = payload.OpenReadStream();
+            using var payloadZipArchive = new ZipArchive(payload.OpenReadStream());
+            
+            //Try to get the deployment.json entry from the zip archive and check, if it exists
+            var deploymentInfoEntry = payloadZipArchive.GetEntry("deployment.json");
+
+            if (deploymentInfoEntry == null)
             {
-                DeploymentMetaInfo deploymentMetaInfo;
-                string errorMsg;
+                var validationError = "the deployment.json does not exist in the uploaded payload!";
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }
 
-                Logger.LogDebug("convert the uploaded payload to a ZIP archive");
-                var payloadZipArchive = zipMapper.FormFileToZipArchive(payload);
-                
-                //Try to get the deployment.json entry from the zip archive and check, if it exists
-                var deploymentInfoEntry = payloadZipArchive.GetEntry("deployment.json");
-
-                if (deploymentInfoEntry == null)
+            //Open the deployment.json and extract the DeploymentMetaInfo of it
+            using (StreamReader deploymentInfoFile = new StreamReader(deploymentInfoEntry.Open(), System.Text.Encoding.UTF8))
+            {
+                try
                 {
-                    var validationError = "the deployment.json does not exist in the uploaded payload!";
-                    Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
+                    JsonSerializer serializer = new JsonSerializer();
+                    deploymentMetaInfo = await Task.Run(() =>
+                        (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo)));
                 }
-
-                //Open the deployment.json
-                var deploymentInfoStream = deploymentInfoEntry.Open();
-                var deploymentInfoByteArray = await deploymentInfoStream.ToByteArrayAsync();
-
-                //Check if the deployment.json is a valid json file
-                if(!deploymentInfoByteArray.IsAValidJson<DeploymentMetaInfo>(out errorMsg))
+                catch (Exception e)
                 {
-                    var validationError = "the deployment meta information (deployment.json) is an invalid json file! "
-                        + "Error: " + errorMsg;
+                    var validationError = "the deployment meta information (deployment.json) is invalid! "
+                                          + "Error: " + e.Message;
                     Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
+                    return new ValidationResult { IsValid = false, ValidationError = validationError };
                 }
-                
-                //Check if the deployment.json file has a valid content
-                deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
-                if (!deploymentMetaInfo.IsValid())
-                {
-                    var validationError = "the deployment meta information (deployment.json) is invalid!";
-                    Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
-                }
+            }
 
-                //Check if the uploaded payload contains the artifact file
-                if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
-                {
-                    var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
-                                          "\"" + " does not exist in the uploaded payload!";
-                    Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
-                }
+            //Check if the uploaded payload contains the the artifact file
+            if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
+            {
+                var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
+                                      "\"" + " does not exist in the uploaded payload!";
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }
 
-                //Check if the uploaded payload contains the release notes file
-                var releaseNotesEntry = payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName);
-                
-                if (releaseNotesEntry == null)
+            if (payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName) == null)
+            {
+                var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
+                                      "\"" +  " does not exist in the uploaded payload!";
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }
+            
+            //Check if the uploaded payload contains the release notes file
+            var releaseNotesEntry = payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName);
+            
+            if (releaseNotesEntry == null)
+            {
+                var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
+                                      "\"" +  " does not exist in the uploaded payload!";
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }
+            
+            //Try to Deserialize the release notes and check if it is valid
+            using (StreamReader releaseNotesFile = new StreamReader(releaseNotesEntry.Open(), System.Text.Encoding.UTF8))
+            {
+                try
                 {
-                    var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
-                                          "\"" +  " does not exist in the uploaded payload!";
-                    Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
+                    JsonSerializer serializer = new JsonSerializer();
+                    await Task.Run(() => (Dictionary<CultureInfo, List<ChangeSet>>) serializer.Deserialize(releaseNotesFile, 
+                            typeof(Dictionary<CultureInfo, List<ChangeSet>>)));
                 }
-                
-                //Open the release notes and
-                var releaseNotesStream = releaseNotesEntry.Open();
-                var releaseNotesByteArray = await releaseNotesStream.ToByteArrayAsync();
-
-                //Check if the release notes file is a valid json file
-                if(!releaseNotesByteArray.IsAValidJson<Dictionary<CultureInfo, List<ChangeSet>>>(out errorMsg))
+                catch (Exception e)
                 {
                     var validationError = "the release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
-                                          "\" is an invalid json file! " + "Error: " + errorMsg;;
-                    Logger.LogError(validationError);
-                    return new ValidationResult {IsValid = false, ValidationError = validationError};
+                                          "\" is an invalid json file! " + "Error: " + e.Message;;
+                    return new ValidationResult { IsValid = false, ValidationError = validationError };
                 }
-                
-                //The uploaded payload is valid
-                return new ValidationResult {IsValid = true};
             }
+                
+            
+            /*
+            //Open the release notes and
+            var releaseNotesStream = releaseNotesEntry.Open();
+            var releaseNotesByteArray = await releaseNotesStream.ToByteArrayAsync();
+
+            //Check if the release notes file is a valid json file
+            if(!releaseNotesByteArray.IsAValidJson<Dictionary<CultureInfo, List<ChangeSet>>>(out errorMsg))
+            {
+                var validationError = "the release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
+                                      "\" is an invalid json file! " + "Error: " + errorMsg;;
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }*/
+
+            //The uploaded payload is valid
+            return new ValidationResult {IsValid = true};
         }
     }
 }

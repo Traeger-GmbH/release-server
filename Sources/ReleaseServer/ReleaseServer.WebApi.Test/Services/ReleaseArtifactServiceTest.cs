@@ -121,7 +121,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
-        [Fact]
+        /*[Fact]
         public async void TestValidateUploadPayload_Invalid_MetaJsonFormat()
         {
             //Prepare
@@ -165,7 +165,7 @@ namespace ReleaseServer.WebApi.Test.TestData
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
-        }
+        }*/
         
         [Fact]
         public async void TestValidateUploadPayload_Invalid_NoMeta()
