@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using ReleaseServer.WebApi.Mappers;
@@ -48,21 +48,6 @@ namespace ReleaseServer.WebApi.Test
         }
 
         [Fact]
-        public void ConvertVersionStringToProductVersionResponse()
-        {
-            var testVersionString = "1.0";
-
-            var expectedProductVersionResponse = new ProductVersionResponse
-            {
-                Version = "1.0"
-            };
-
-            var testResponse = testVersionString.ToProductVersionResponse();
-            
-            testResponse.Should().BeEquivalentTo(expectedProductVersionResponse);
-        }
-        
-        [Fact]
         public void ConvertVersionStringListToProductVersionListResponse()
         {
             var testVersionStringList = new List<string> {"1.1", "1.0"};
@@ -77,4 +62,4 @@ namespace ReleaseServer.WebApi.Test
             testResponse.Should().BeEquivalentTo(expectedProductVersionResponse);
         }
     }
-}
+}*/

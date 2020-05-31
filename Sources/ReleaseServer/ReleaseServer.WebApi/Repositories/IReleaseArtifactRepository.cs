@@ -12,7 +12,7 @@ namespace ReleaseServer.WebApi.Repositories
         ArtifactDownload GetSpecificArtifact(string productName, string os, string architecture, string version);
         bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
         bool DeleteProductIfExists(string productName);
-        List<string> GetVersions(string productName, string os, string architecture);
+        List<ProductVersion> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
         BackupInformation RunBackup();
         void RestoreBackup(ZipArchive backupPayload);

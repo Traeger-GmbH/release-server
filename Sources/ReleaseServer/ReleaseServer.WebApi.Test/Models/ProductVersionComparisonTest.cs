@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using Xunit;
 
-namespace ReleaseServer.WebApi.Test
+namespace ReleaseServer.WebApi.Test.Models
 {
     public class ProductVersionComparisonTest
     {
@@ -15,65 +13,16 @@ namespace ReleaseServer.WebApi.Test
         {
             versionList = new List<ProductVersion>
             {
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "alpha1"
-                },
-                
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "rc1"
-                },
-
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "beta"
-                },
-                
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "alpha2"
-                },
-
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "aaa"
-                },
-
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "open"
-                },
-
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "rc"
-                },
-
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = "zzz"
-                }, 
-                
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.0"),
-                    VersionSuffix = ""
-                }, 
-                
-                new ProductVersion
-                {
-                    VersionNumber = new Version("1.1"),
-                    VersionSuffix = ""
-                },
+                new ProductVersion("1.0-alpha1"),
+                new ProductVersion("1.0-rc1"),
+                new ProductVersion("1.0-beta"),
+                new ProductVersion("1.0-alpha2"),
+                new ProductVersion("1.0-aaa"),
+                new ProductVersion("1.0-open"),
+                new ProductVersion("1.0-rc"),
+                new ProductVersion("1.0-zzz"), 
+                new ProductVersion("1.0"),
+                new ProductVersion("1.1")
             };
         }
 
@@ -94,10 +43,10 @@ namespace ReleaseServer.WebApi.Test
             Assert.Equal(1, versionList[9].CompareTo(versionList[1]));
             
             //1.0 = 1.0
-            Assert.Equal(0, versionList[8].CompareTo("1.0".ToProductVersion()));
+            Assert.Equal(0, versionList[8].CompareTo(new ProductVersion("1.0")));
             
             //1.0-alpha1 = 1.0-alpha-1
-            Assert.Equal(0, versionList[0].CompareTo("1.0-alpha1".ToProductVersion()));
+            Assert.Equal(0, versionList[0].CompareTo(new ProductVersion("1.0-alpha1")));
         }
 
         [Fact]
@@ -125,7 +74,7 @@ namespace ReleaseServer.WebApi.Test
         [Fact]
         public void TestEqual()
         {
-            var testVersion = "1.0".ToProductVersion();
+            var testVersion = new ProductVersion("1.0");
             
             //1.0 is equal 1.0
             Assert.True(versionList[8].Equals(testVersion));
@@ -135,24 +84,6 @@ namespace ReleaseServer.WebApi.Test
             
             //1.0 is not equal to 1.1
             Assert.False(versionList[9].Equals(testVersion));
-        }
-
-        [Fact]
-        public void TestOperators()
-        {
-            var testVersion = "1.0".ToProductVersion();
-            
-            //1.0 is equal 1.0
-            Assert.True(versionList[8]==(testVersion));
-            Assert.False(versionList[8]!=(testVersion));
-            
-            //1.0 is not equal to 1.0-alpha1
-            Assert.True(versionList[0]!=(testVersion));
-            Assert.False(versionList[0]==(testVersion));
-            
-            //1.0 is not equal to 1.1
-            Assert.True(versionList[9]!=(testVersion));
-            Assert.False(versionList[9]==(testVersion));
         }
     }
 }

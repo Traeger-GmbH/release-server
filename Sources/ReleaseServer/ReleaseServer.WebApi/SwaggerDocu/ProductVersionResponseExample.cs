@@ -7,10 +7,8 @@ namespace ReleaseServer.WebApi.SwaggerDocu
     {
         public ProductVersionResponse GetExamples()
         {
-            return new ProductVersionResponse
-            {
-                Version = "1.5"
-            };
+            return new ProductVersionResponse(new ProductVersion("1.1"));
         }
+        
     }
 }

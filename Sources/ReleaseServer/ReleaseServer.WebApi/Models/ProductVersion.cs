@@ -7,6 +7,22 @@ namespace ReleaseServer.WebApi.Models
         public Version VersionNumber { get; set; }
 
         public string VersionSuffix { get; set; }
+
+        public ProductVersion(string version)
+        {
+            var versionElements = version.Split("-", 2);
+            
+            if (versionElements.Length == 1)
+            {
+                VersionNumber = new Version(versionElements[0]);
+                VersionSuffix = "";
+            }
+            else
+            {
+                VersionNumber = new Version(versionElements[0]);
+                VersionSuffix = versionElements[1];
+            }
+        }
         
         public int CompareTo(ProductVersion other)
         {
@@ -40,7 +56,7 @@ namespace ReleaseServer.WebApi.Models
         {
             if (VersionSuffix == "")
             {
-                return VersionNumber.ToString();
+                return new string(VersionNumber.ToString());
             }
             
             return VersionNumber + "-" + VersionSuffix;
@@ -57,14 +73,16 @@ namespace ReleaseServer.WebApi.Models
             return VersionNumber.Equals(other.VersionNumber) && VersionSuffix.Equals(other.VersionSuffix);
         }
         
-        public static bool operator ==(ProductVersion v1, ProductVersion v2)
+        protected bool Equals(ProductVersion other)
         {
-            return v1.VersionNumber == v2.VersionNumber && v1.VersionSuffix == v2.VersionSuffix;
+            return Equals(VersionNumber, other.VersionNumber) && VersionSuffix == other.VersionSuffix;
         }
 
-        public static bool operator !=(ProductVersion v1, ProductVersion v2)
+        public override int GetHashCode()
         {
-            return !(v1 == v2);
+            return HashCode.Combine(VersionNumber, VersionSuffix);
         }
+        
+        
     }
 }

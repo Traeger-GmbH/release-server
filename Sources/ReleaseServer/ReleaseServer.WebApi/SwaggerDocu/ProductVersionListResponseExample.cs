@@ -4,18 +4,15 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ProductVersionListResponseExample : IExamplesProvider<ProductVersionListResponse>
+    public class ProductVersionListExample : IExamplesProvider<ProductVersionList>
     {
-        public ProductVersionListResponse GetExamples()
+        public ProductVersionList GetExamples()
         {
-            return new ProductVersionListResponse
+            return new ProductVersionList(new List<ProductVersion>(new[]
             {
-                Versions = new List<string>()
-                {
-                    "1.1",
-                    "1.0"
-                }
-            };
+                new ProductVersion("1.1"),
+                new ProductVersion("1.0")
+            }));
         }
     }
 }

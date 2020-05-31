@@ -71,12 +71,12 @@ namespace ReleaseServer.WebApi.Services
                 FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
         }
 
-        public async Task<List<string>> GetVersions(string productName, string os, string architecture)
+        public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
         {
             return await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
         }
 
-        public async Task<string> GetLatestVersion(string productName, string os, string architecture)
+        public async Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture)
         {
             var versions = await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
 
@@ -101,7 +101,7 @@ namespace ReleaseServer.WebApi.Services
                 return null;
 
             return await Task.Run(() =>
-                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion));
+                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
@@ -247,8 +247,8 @@ namespace ReleaseServer.WebApi.Services
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    await Task.Run(() => (Dictionary<CultureInfo, List<ChangeSet>>) serializer.Deserialize(releaseNotesFile, 
-                            typeof(Dictionary<CultureInfo, List<ChangeSet>>)));
+                    await Task.Run(() => (ReleaseNotes) serializer.Deserialize(releaseNotesFile, 
+                            typeof(ReleaseNotes)));
                 }
                 catch (Exception e)
                 {

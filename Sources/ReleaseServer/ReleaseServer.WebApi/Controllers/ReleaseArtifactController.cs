@@ -135,16 +135,16 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing versions for the specified platform and product.</response>
         /// <response code="404">There exists no version for the specified platform / product.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductVersionListResponse), 200)]
+        [ProducesResponseType(typeof(ProductVersionList), 200)]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public async Task<ActionResult<ProductVersionListResponse>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ActionResult<ProductVersionList>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
             var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
             
             if (productVersions.IsNullOrEmpty()) 
                 return NotFound("No versions for the specified platform / product name found!");
 
-            return productVersions.ToProductVersionListResponse();
+            return new ProductVersionList(productVersions);
         }
         
         /// <summary>
@@ -236,10 +236,10 @@ namespace ReleaseServer.WebApi.Controllers
         {
             var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
             
-            if (latestVersion.IsNullOrEmpty())
-                return NotFound("The specified product was not found!");
-
-            return latestVersion.ToProductVersionResponse();
+           if (latestVersion == null)
+               return NotFound("The specified product was not found!");
+            
+            return new ProductVersionResponse(latestVersion);
         }
         
         /// <summary>
