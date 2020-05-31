@@ -72,7 +72,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestProductInformationResponseMapping()
         {
             //Setup
-            var expectedProductResult1 = new ProductInformationResponseModel
+            var expectedProductResult1 = new ProductInformationResponse
             {
                 Identifier = "product1",
                 Os = "ubuntu",
@@ -96,7 +96,7 @@ namespace ReleaseServer.WebApi.Test
                 }
             };
             
-            var expectedProductResult2 = new ProductInformationResponseModel
+            var expectedProductResult2 = new ProductInformationResponse
             {
                 Identifier = "product1",
                 Os = "ubuntu",
@@ -142,9 +142,9 @@ namespace ReleaseServer.WebApi.Test
 
             var expectedProductInforListRepsonse = new ProductInformationListResponse
             {
-                ProductInformation = new List<ProductInformationResponseModel>
+                ProductInformation = new List<ProductInformationResponse>
                 {
-                    new ProductInformationResponseModel
+                    new ProductInformationResponse
                     {
                         Identifier = "product1",
                         Os = "ubuntu",
@@ -168,7 +168,7 @@ namespace ReleaseServer.WebApi.Test
                         }
                     },
 
-                    new ProductInformationResponseModel
+                    new ProductInformationResponse
                     {
                         Identifier = "product1",
                         Os = "ubuntu",

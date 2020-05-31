@@ -8,9 +8,9 @@ public class ProductInformationListResponseExample : IExamplesProvider<ProductIn
     {
         return new ProductInformationListResponse
         {
-            ProductInformation = new List<ProductInformationResponseModel>
+            ProductInformation = new List<ProductInformationResponse>
             {
-                new ProductInformationResponseModel
+                new ProductInformationResponse
                 {
                     Identifier = "softwareX",
                     Version = "1.0",
@@ -52,7 +52,7 @@ public class ProductInformationListResponseExample : IExamplesProvider<ProductIn
                         }
                     }
                 },
-                new ProductInformationResponseModel
+                new ProductInformationResponse
                 {
                     Identifier = "softwareX",
                     Version = "1.1-beta",

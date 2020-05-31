@@ -6,9 +6,9 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class ProductInformationResponseMapper
     {
-        public static ProductInformationResponseModel ToProductInfoResponse(this ProductInformation productInfo)
+        public static ProductInformationResponse ToProductInfoResponse(this ProductInformation productInfo)
         {
-            return new ProductInformationResponseModel
+            return new ProductInformationResponse
             {
                 Identifier = productInfo.ProductIdentifier,
                 Os = productInfo.Os,
@@ -20,7 +20,7 @@ namespace ReleaseServer.WebApi.Mappers
 
         public static ProductInformationListResponse ToProductInfoListResponse(this List<ProductInformation> productInfoList)
         {
-            var retVal = new List<ProductInformationResponseModel>();
+            var retVal = new List<ProductInformationResponse>();
 
             foreach (var productInfo in productInfoList)
             {
