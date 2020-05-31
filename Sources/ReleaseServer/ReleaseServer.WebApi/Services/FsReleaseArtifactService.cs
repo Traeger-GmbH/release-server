@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -6,8 +8,7 @@ using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using ReleaseServer.WebApi.Common;
-using ReleaseServer.WebApi.Extensions;
+using Newtonsoft.Json;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Repositories;
@@ -192,10 +193,22 @@ namespace ReleaseServer.WebApi.Services
             }
 
             //Open the deployment.json and extract the DeploymentMetaInfo of it
-            var deploymentInfoStream = deploymentInfoEntry.Open();
-            var deploymentInfoByteArray = await deploymentInfoStream.ToByteArrayAsync();
-
-            deploymentMetaInfo = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentInfoByteArray);
+            using (StreamReader deploymentInfoFile = new StreamReader(deploymentInfoEntry.Open(), System.Text.Encoding.UTF8))
+            {
+                try
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    deploymentMetaInfo = await Task.Run(() =>
+                        (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo)));
+                }
+                catch (Exception e)
+                {
+                    var validationError = "the deployment meta information (deployment.json) is invalid! "
+                                          + "Error: " + e.Message;
+                    Logger.LogError(validationError);
+                    return new ValidationResult { IsValid = false, ValidationError = validationError };
+                }
+            }
 
             //Check if the uploaded payload contains the rest of the expected parts
             if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
@@ -216,7 +229,6 @@ namespace ReleaseServer.WebApi.Services
 
             //The uploaded payload is valid
             return new ValidationResult {IsValid = true};
-        
         }
     }
 }
