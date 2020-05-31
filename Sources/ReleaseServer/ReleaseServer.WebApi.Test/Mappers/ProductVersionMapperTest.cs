@@ -52,7 +52,7 @@ namespace ReleaseServer.WebApi.Test
         {
             var testVersionString = "1.0";
 
-            var expectedProductVersionResponse = new ProductVersionResponseModel
+            var expectedProductVersionResponse = new ProductVersionResponse
             {
                 Version = "1.0"
             };

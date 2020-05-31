@@ -5,7 +5,7 @@ namespace ReleaseServer.WebApi.Models
 {
     public class ReleaseArtifactModel
     {
-        public ProductInformationModel ProductInformation { get; set; }
+        public ProductInformation ProductInformation { get; set; }
         
         public ZipArchive Payload { get; set; }
     }

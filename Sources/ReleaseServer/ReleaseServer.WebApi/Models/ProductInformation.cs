@@ -1,6 +1,6 @@
 namespace ReleaseServer.WebApi.Models
 {
-    public class ProductInformationModel
+    public class ProductInformation
     {
         public string ProductIdentifier { get; set; }
         

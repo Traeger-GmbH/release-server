@@ -2,7 +2,7 @@ using System;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ReleaseInformationModel
+    public class ReleaseInformation
     {
         
         //Will be extended depending on the further requirements

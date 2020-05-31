@@ -1,14 +1,14 @@
 using System;
-using ReleaseServer.WebApi.Config;
+using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Extensions
 {
     public static class DeploymentMetaInfoExtension
     {
-        public static bool IsValid(this DeploymentMetaInfoModel deploymentMetaInfoModel)
+        public static bool IsValid(this DeploymentMetaInfo deploymentMetaInfo)
         {
-            if (deploymentMetaInfoModel.ReleaseDate == new DateTime() || deploymentMetaInfoModel.ArtifactFileName == null ||
-                deploymentMetaInfoModel.ChangelogFileName == null)
+            if (deploymentMetaInfo.ReleaseDate == new DateTime() || deploymentMetaInfo.ArtifactFileName == null ||
+                deploymentMetaInfo.ChangelogFileName == null)
             {
                 return false;
             }

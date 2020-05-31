@@ -13,7 +13,7 @@ namespace ReleaseServer.WebApi.Test
     {
         private readonly string validTestPath1, validTestPath2, validTestPath3;
         private readonly string invalidTestPath;
-        private readonly ProductInformationModel expectedProductInfo;
+        private readonly ProductInformation expectedProductInfo;
         
         public ProductInformationMapperTest()
         {
@@ -24,7 +24,7 @@ namespace ReleaseServer.WebApi.Test
            
             invalidTestPath = Path.Combine("./", "debian", "amd64", "1.0");
             
-            expectedProductInfo = new ProductInformationModel
+            expectedProductInfo = new ProductInformation
             {
                 ProductIdentifier = "productx",
                 Os = "debian",

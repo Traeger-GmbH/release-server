@@ -4,7 +4,7 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public class ProductInformationMapper
     {
-        public static ProductInformationModel PathToProductInfo(string rootPath, string path)
+        public static ProductInformation PathToProductInfo(string rootPath, string path)
         {
          
             //Remove the rootPath
@@ -16,7 +16,7 @@ namespace ReleaseServer.WebApi.Mappers
             //If the directory has a depth of 4 (actual our standard artifact)
             if (infos.Length == 4)
             {
-                return new ProductInformationModel
+                return new ProductInformation
                 {
                     ProductIdentifier = infos[0],
                     Os = infos[1],

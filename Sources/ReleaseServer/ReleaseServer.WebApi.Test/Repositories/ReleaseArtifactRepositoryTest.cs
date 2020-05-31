@@ -96,7 +96,7 @@ namespace ReleaseServer.WebApi.Test
             
             Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
 
-            var expectedProductInfo = new ProductInformationModel
+            var expectedProductInfo = new ProductInformation
             {
                 ProductIdentifier = "testproduct",
                 Os = "debian",
@@ -170,11 +170,11 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetReleaseInfo()
         {
             //Setup 
-            ReleaseInformationModel expectedReleaseInfo;
+            ReleaseInformation expectedReleaseInfo;
             
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                expectedReleaseInfo = new ReleaseInformationModel
+                expectedReleaseInfo = new ReleaseInformation
                 {
                     Changelog = "Release 1.0.0\r\n- This is an example\r\n- This is another example",
                     ReleaseDate = new DateTime(2020, 02, 10)
@@ -182,7 +182,7 @@ namespace ReleaseServer.WebApi.Test
             }
             else
             {
-                expectedReleaseInfo = new ReleaseInformationModel
+                expectedReleaseInfo = new ReleaseInformation
                 {
                     Changelog = "Release 1.0.0\n- This is an example\n- This is another example",
                     ReleaseDate = new DateTime(2020, 02, 10)
@@ -212,7 +212,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetSpecificArtifact()
         {
             //Setup
-            var expectedArtifact = new ArtifactDownloadModel
+            var expectedArtifact = new ArtifactDownload
             {
                 FileName = Path.GetFileName(Path.Combine(ProjectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip")),

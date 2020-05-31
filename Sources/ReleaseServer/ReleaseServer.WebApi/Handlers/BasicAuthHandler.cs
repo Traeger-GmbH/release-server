@@ -33,7 +33,7 @@ namespace ReleaseServer.WebApi.Auth
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.Fail("Authorization Header is missing");
 
-            CredentialsModel sentCredentials; 
+            Credentials sentCredentials; 
 
             try
             {
@@ -63,7 +63,7 @@ namespace ReleaseServer.WebApi.Auth
             return AuthenticateResult.Fail("Invalid credentials!");
         }
 
-        private static CredentialsModel ExtractCredentialsFromHeader(AuthenticationHeaderValue authHeader)
+        private static Credentials ExtractCredentialsFromHeader(AuthenticationHeaderValue authHeader)
         {
             //Extract base 64 encoded credentials from the header
             var authPayload = Convert.FromBase64String(authHeader.Parameter);
@@ -71,18 +71,18 @@ namespace ReleaseServer.WebApi.Auth
             var readableAuthPayload = Encoding.UTF8.GetString(authPayload);
             var credentials = readableAuthPayload.Split(":", StringSplitOptions.None);
             
-            return new CredentialsModel
+            return new Credentials
             {
                 Username = credentials[0],
                 Password = credentials[1]
             };
         }
 
-        private async Task<string> CheckCredentials(CredentialsModel credentials)
+        private async Task<string> CheckCredentials(Credentials credentials)
         {
             //Didn't have to be async, but later if there are DB operations needed.
             var validCredentials = await Task.Run(() =>
-                new CredentialsModel{
+                new Credentials{
                     Username = Configuration["Credentials:Username"],
                     Password = Configuration["Credentials:Password"]});
             

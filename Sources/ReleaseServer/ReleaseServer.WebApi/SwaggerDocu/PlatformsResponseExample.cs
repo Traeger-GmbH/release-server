@@ -4,11 +4,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class PlatformsResponseExample : IExamplesProvider<PlatformsResponseModel>
+    public class PlatformsResponseExample : IExamplesProvider<PlatformsResponse>
     {
-        public PlatformsResponseModel GetExamples()
+        public PlatformsResponse GetExamples()
         {
-            return new PlatformsResponseModel
+            return new PlatformsResponse
             {
                 Platforms =  new List<string>()
                 {

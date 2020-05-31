@@ -1,6 +1,6 @@
 namespace ReleaseServer.WebApi.Models
 {
-    public class CredentialsModel
+    public class Credentials
     {
         public string Username { get; set; }
         
