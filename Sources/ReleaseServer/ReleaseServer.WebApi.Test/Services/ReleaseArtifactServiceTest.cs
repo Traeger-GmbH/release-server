@@ -2,6 +2,7 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Services;
 using ReleaseServer.WebApi.Repositories;
 using Xunit;
@@ -43,8 +44,8 @@ namespace ReleaseServer.WebApi.Test.TestData
             var testVersions2 = await FsReleaseArtifactService.GetLatestVersion("productx", "ubuntu", "amd64");
 
             //Assert
-            Assert.Equal("1.2-beta", testVersions1);
-            Assert.Equal("1.1", testVersions2);
+            Assert.Equal(new ProductVersion("1.2-beta"), testVersions1);
+            Assert.Equal(new ProductVersion("1.1"), testVersions2);
         }
         
         [Fact]

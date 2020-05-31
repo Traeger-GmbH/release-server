@@ -4,18 +4,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class PlatformsResponseExample : IExamplesProvider<PlatformsResponse>
+    public class PlatformsResponseExample : IExamplesProvider<PlatformsList>
     {
-        public PlatformsResponse GetExamples()
+        public PlatformsList GetExamples()
         {
-            return new PlatformsResponse
-            {
-                Platforms =  new List<string>()
-                {
-                    "debian-amd64",
-                    "debian-arm64"
-                }
-            };
+            return new PlatformsList(new List<string>(new[]{"debian-amd64", "debian-arm64"}));
         }
     }
 }

@@ -40,7 +40,7 @@ namespace ReleaseServer.WebApi
                 .AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
-                    //options.SerializerSettings.Converters.Add(new DeploymentMetaInfoConverter());
+                   options.SerializerSettings.Converters.Add(new ProductVersionConverter());
                 });
             
             services.AddSwaggerGen(c =>

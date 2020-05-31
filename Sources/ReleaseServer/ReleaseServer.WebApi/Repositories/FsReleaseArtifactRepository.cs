@@ -31,9 +31,9 @@ namespace ReleaseServer.WebApi.Repositories
         {
 
             var artifactPath = GenerateArtifactPath(
-                artifact.ProductInformation.ProductIdentifier,
+                artifact.ProductInformation.Identifier,
                 artifact.ProductInformation.Os,
-                artifact.ProductInformation.HwArchitecture,
+                artifact.ProductInformation.Architecture,
                 artifact.ProductInformation.Version.ToString());
 
             var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
@@ -85,10 +85,10 @@ namespace ReleaseServer.WebApi.Repositories
                 from versionDir in hwArchDir.EnumerateDirectories()
                 select new ProductInformation
                 {
-                    ProductIdentifier = productDir.Name,
+                    Identifier = productDir.Name,
                     Os = osDir.Name,
-                    HwArchitecture = hwArchDir.Name,
-                    Version = versionDir.Name.ToProductVersion(),
+                    Architecture = hwArchDir.Name,
+                    Version = new ProductVersion(versionDir.Name),
                     ReleaseNotes = GetReleaseInfo(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name).ReleaseNotes
                 };
 
@@ -188,7 +188,7 @@ namespace ReleaseServer.WebApi.Repositories
             return true;
         }
 
-        public List<string> GetVersions(string productName, string os, string architecture)
+        public List<ProductVersion> GetVersions(string productName, string os, string architecture)
         {
             var versions =
                 from productDir in ArtifactRootDir.EnumerateDirectories()
@@ -198,7 +198,7 @@ namespace ReleaseServer.WebApi.Repositories
                 from hwArchDir in osDir.EnumerateDirectories()
                 where hwArchDir.Name == architecture
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select versionDir.Name;
+                select new ProductVersion(versionDir.Name);
 
             return versions.OrderByDescending(v => v).ToList();
         }
@@ -284,7 +284,9 @@ namespace ReleaseServer.WebApi.Repositories
             if (deploymentMetaName == null)
                 throw new Exception("meta information of the specified product does not exist!");
 
-            return DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(deploymentMetaName.FullName);
+            var jsonDeserializer = new JsonSerializable<DeploymentMetaInfo>();
+
+            return jsonDeserializer.FromJsonFile(deploymentMetaName.FullName);
         }
     }
 }

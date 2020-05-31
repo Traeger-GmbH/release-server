@@ -6,7 +6,7 @@ using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
-namespace ReleaseServer.WebApi.Test
+namespace ReleaseServer.WebApi.Test.Mappers
 {
     public class ReleaseArtifactMapperTest
     {
@@ -29,10 +29,10 @@ namespace ReleaseServer.WebApi.Test
             {
                 ProductInformation = new ProductInformation
                 {
-                    ProductIdentifier = "product",
-                    Version = "1.1".ToProductVersion(),
+                    Identifier = "product",
+                    Version = new ProductVersion("1.1"),
                     Os = "ubuntu",
-                    HwArchitecture = "amd64"
+                    Architecture = "amd64"
                 },
                 Payload = testZip
             };

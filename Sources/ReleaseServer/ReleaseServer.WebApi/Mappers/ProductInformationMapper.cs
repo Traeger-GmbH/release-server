@@ -18,10 +18,10 @@ namespace ReleaseServer.WebApi.Mappers
             {
                 return new ProductInformation
                 {
-                    ProductIdentifier = infos[0],
+                    Identifier = infos[0],
                     Os = infos[1],
-                    HwArchitecture = infos[2],
-                    Version = infos[3].ToProductVersion()
+                    Architecture = infos[2],
+                    Version = new ProductVersion(infos[3])
                 };
             }
 

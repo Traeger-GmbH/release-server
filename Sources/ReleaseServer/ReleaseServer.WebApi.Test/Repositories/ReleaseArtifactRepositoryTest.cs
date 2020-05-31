@@ -107,10 +107,10 @@ namespace ReleaseServer.WebApi.Test
 
             var expectedProductInfo = new ProductInformation
             {
-                ProductIdentifier = "testproduct",
+                Identifier = "testproduct",
                 Os = "debian",
-                HwArchitecture = "amd64",
-                Version = "1.1".ToProductVersion(),
+                Architecture = "amd64",
+                Version = new ProductVersion("1.1"),
                 ReleaseNotes = new ReleaseNotes
                 {
                     Changes = new Dictionary<CultureInfo, List<ChangeSet>>
@@ -177,18 +177,15 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetVersions()
         {
             //Setup 
-            List<string> expectedVersions1 = new List<string>()
-                {"1.2-beta", "1.1"};
+            var expectedVersions1 = new List<ProductVersion>
+                {new ProductVersion("1.2-beta"), new ProductVersion("1.1")};
 
-            List<string> expectedVersions2 = new List<string>()
-            {
-                "1.1", "1.0"
-            };
+            var expectedVersions2 = new List<ProductVersion>
+                { new ProductVersion("1.1"), new ProductVersion("1.0")};
             
-            List<string> expectedVersions3 = new List<string>()
-            {
-                "1.0"
-            };
+            var expectedVersions3 = new List<ProductVersion>
+                {new ProductVersion("1.0")};
+
             
             //Act
             var testVersions1 = FsReleaseArtifactRepository.GetVersions("productx", "debian", "amd64");

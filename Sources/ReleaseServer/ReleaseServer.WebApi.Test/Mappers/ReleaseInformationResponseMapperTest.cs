@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections.Generic;
 using System.Globalization;
 using FluentAssertions;
@@ -69,4 +69,4 @@ namespace ReleaseServer.WebApi.Test
             testResponse.Should().BeEquivalentTo(expectedReleaseInformationResponse);
         }
     }
-}
+}*/

@@ -6,11 +6,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ReleaseInformationResponseExample : IExamplesProvider<ReleaseInformationResponse>
+    public class ReleaseInformationResponseExample : IExamplesProvider<ReleaseInformation>
     {
-        public ReleaseInformationResponse GetExamples()
+        public ReleaseInformation GetExamples()
         {
-            return new ReleaseInformationResponse
+            return new ReleaseInformation()
             {
                 ReleaseNotes = new ReleaseNotes
                 { Changes = new Dictionary<CultureInfo, List<ChangeSet>>

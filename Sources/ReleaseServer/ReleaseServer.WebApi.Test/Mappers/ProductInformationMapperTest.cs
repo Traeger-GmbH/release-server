@@ -1,13 +1,10 @@
-using System;
 using System.IO;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Moq;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using Xunit;
 
-namespace ReleaseServer.WebApi.Test
+namespace ReleaseServer.WebApi.Test.Mappers
 {
     public class ProductInformationMapperTest
     {
@@ -26,10 +23,10 @@ namespace ReleaseServer.WebApi.Test
             
             expectedProductInfo = new ProductInformation
             {
-                ProductIdentifier = "productx",
+                Identifier = "productx",
                 Os = "debian",
-                HwArchitecture = "amd64",
-                Version = "1.0".ToProductVersion(),
+                Architecture = "amd64",
+                Version = new ProductVersion("1.0")
             };
         }
         

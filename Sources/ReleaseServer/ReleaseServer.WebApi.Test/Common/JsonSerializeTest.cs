@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -13,6 +14,7 @@ namespace ReleaseServer.WebApi.Test.Common
     {
         private readonly string ProjectDirectory;
         private readonly ReleaseNotes ExpectedReleaseNotes;
+        private readonly DeploymentMetaInfo ExpectedMeta;
 
         public JsonSerializeTest()
         {
@@ -57,6 +59,12 @@ namespace ReleaseServer.WebApi.Test.Common
                     }
                 }
             };
+            ExpectedMeta =  new DeploymentMetaInfo
+            {
+                ReleaseNotesFileName = "releaseNotes.json",
+                ArtifactFileName = "artifact.zip",
+                ReleaseDate = new DateTime(2020, 02, 01)
+            };
         }
         
         
@@ -68,6 +76,16 @@ namespace ReleaseServer.WebApi.Test.Common
             var parsedReleaseNotes = serializer.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testReleaseNotes.json"));
 
             parsedReleaseNotes.Should().BeEquivalentTo(ExpectedReleaseNotes);
+        }
+
+        [Fact]
+        public void DeserializeDeploymentMetaInfo()
+        {
+            var deserializer = new JsonSerializable<DeploymentMetaInfo>();
+
+            var parsedMeta = deserializer.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testDeployment.json"));
+            
+            parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
         }
     }
 }
