@@ -1,24 +1,26 @@
 {
-  "de": [
-    {
-      "platforms": [
-        "windows/any",
-        "linux/rpi"
-      ],
-      "added": [
-        "added de 1"
-      ]
-    }
-  ],
-  "en": [
-    {
-      "platforms": [
-        "windows/any",
-        "linux/rpi"
-      ],
-      "added": [
-        "added en 1"
-      ]
-    }
-  ]
+  "changes": {
+    "de": [
+      {
+        "platforms": [
+          "windows/any",
+          "linux/rpi"
+        ],
+        "added": [
+          "added de 1"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "platforms": [
+          "windows/any",
+          "linux/rpi"
+        ],
+        "added": [
+          "added en 1"
+        ]
+      }
+    ]
+  }
 }

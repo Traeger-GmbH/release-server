@@ -2,19 +2,19 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using FluentAssertions;
-using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Common;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
-namespace ReleaseServer.WebApi.Test
+namespace ReleaseServer.WebApi.Test.Common
 {
-    public class ReleaseNotesMapperTest
+    public class JsonSerializeTest
     {
         private readonly string ProjectDirectory;
         private readonly ReleaseNotes ExpectedReleaseNotes;
 
-        public ReleaseNotesMapperTest()
+        public JsonSerializeTest()
         {
             ProjectDirectory = TestUtils.GetProjectDirectory();
             ExpectedReleaseNotes = new ReleaseNotes
@@ -61,11 +61,12 @@ namespace ReleaseServer.WebApi.Test
         
         
         [Fact]
-        public void ConvertJsonToReleaseNotes()
+        public void DeserializeReleaseNotes()
         {
-            var parsedReleaseNotes = ReleaseNotesMapper.ParseReleaseNotes(Path.Combine(ProjectDirectory,
-                "TestData", "testReleaseNotes.json"));
-            
+            var serializer = new JsonSerializable<ReleaseNotes>();
+
+            var parsedReleaseNotes = serializer.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testReleaseNotes.json"));
+
             parsedReleaseNotes.Should().BeEquivalentTo(ExpectedReleaseNotes);
         }
     }

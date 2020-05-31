@@ -1,64 +1,66 @@
 {
-  "de": [
-    {
-      "platforms": [
-        "windows/any",
-        "linux/rpi"
-      ],
-      "added": [
-        "added de 1",
-        "added de 2"
-      ],
-      "fixed": [
-        "fix de 1",
-        "fix de 2"
-      ],
-      "breaking": [
-        "breaking de 1",
-        "breaking de 2"
-      ],
-      "deprecated": [
-        "deprecated de 1",
-        "deprecated de 2"
-      ]
-    }
-  ],
-  "en": [
-    {
-      "platforms": [
-        "windows/any",
-        "linux/rpi"
-      ],
-      "added": [
-        "added en 1",
-        "added en 2"
-      ],
-      "fixed": [
-        "fix en 1",
-        "fix en 2"
-      ],
-      "breaking": [
-        "breaking en 1",
-        "breaking en 2"
-      ],
-      "deprecated": [
-        "deprecated en 1",
-        "deprecated en 2"
-      ]
-    },
-    {
-      "added": [
-        "added en 3"
-      ],
-      "fixed": [
-        "fix en 3"
-      ],
-      "breaking": [
-        "breaking en 3"
-      ],
-      "deprecated": [
-        "deprecated en 3"
-      ]
-    }
-  ]
+  "changes": {
+    "de": [
+      {
+        "platforms": [
+          "windows/any",
+          "linux/rpi"
+        ],
+        "added": [
+          "added de 1",
+          "added de 2"
+        ],
+        "fixed": [
+          "fix de 1",
+          "fix de 2"
+        ],
+        "breaking": [
+          "breaking de 1",
+          "breaking de 2"
+        ],
+        "deprecated": [
+          "deprecated de 1",
+          "deprecated de 2"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "platforms": [
+          "windows/any",
+          "linux/rpi"
+        ],
+        "added": [
+          "added en 1",
+          "added en 2"
+        ],
+        "fixed": [
+          "fix en 1",
+          "fix en 2"
+        ],
+        "breaking": [
+          "breaking en 1",
+          "breaking en 2"
+        ],
+        "deprecated": [
+          "deprecated en 1",
+          "deprecated en 2"
+        ]
+      },
+      {
+        "added": [
+          "added en 3"
+        ],
+        "fixed": [
+          "fix en 3"
+        ],
+        "breaking": [
+          "breaking en 3"
+        ],
+        "deprecated": [
+          "deprecated en 3"
+        ]
+      }
+    ]
+  }
 }
