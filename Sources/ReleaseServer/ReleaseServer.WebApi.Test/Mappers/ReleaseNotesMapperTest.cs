@@ -12,12 +12,12 @@ namespace ReleaseServer.WebApi.Test
     public class ReleaseNotesMapperTest
     {
         private readonly string ProjectDirectory;
-        private readonly ReleaseNotesModel ExpectedReleaseNotes;
+        private readonly ReleaseNotes ExpectedReleaseNotes;
 
         public ReleaseNotesMapperTest()
         {
             ProjectDirectory = TestUtils.GetProjectDirectory();
-            ExpectedReleaseNotes = new ReleaseNotesModel
+            ExpectedReleaseNotes = new ReleaseNotes
             {
                 ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
                 {

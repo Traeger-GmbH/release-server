@@ -1,8 +1,8 @@
 using System;
 
-namespace ReleaseServer.WebApi.Config
+namespace ReleaseServer.WebApi.Models
 {
-    public class DeploymentMetaInfoModel
+    public class DeploymentMetaInfo
     {
         public string ReleaseNotesFileName { get; set; }
         

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ReleaseInformationResponseModel
+    public class ReleaseInformationResponse
     {
         public Dictionary<string, List<ChangeSet>> ReleaseNotes { get; set;}
 

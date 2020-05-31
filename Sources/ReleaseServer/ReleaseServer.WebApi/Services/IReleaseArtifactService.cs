@@ -8,17 +8,17 @@ namespace ReleaseServer.WebApi.Services
     public interface IReleaseArtifactService
     {
         Task StoreArtifact(string product, string os, string architecture, string version, IFormFile payload);
-        Task<List<ProductInformationModel>> GetProductInfos(string productName);
+        Task<List<ProductInformation>> GetProductInfos(string productName);
         Task<List<string>> GetPlatforms(string productName, string version);
-        Task<ReleaseInformationModel> GetReleaseInfo(string productName, string os, string architecture, string version);
+        Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version);
         Task<List<string>> GetVersions(string productName, string os, string architecture);
         Task<string> GetLatestVersion(string productName, string os, string architecture);
-        Task<ArtifactDownloadModel> GetSpecificArtifact(string productName, string os, string architecture, string version);
-        Task<ArtifactDownloadModel> GetLatestArtifact(string productName, string os, string architecture);
+        Task<ArtifactDownload> GetSpecificArtifact(string productName, string os, string architecture, string version);
+        Task<ArtifactDownload> GetLatestArtifact(string productName, string os, string architecture);
         Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
         Task<bool> DeleteProductIfExists(string productName);
-        Task<BackupInformationModel> RunBackup();
+        Task<BackupInformation> RunBackup();
         Task RestoreBackup(IFormFile payload);
-        Task<ValidationResultModel> ValidateUploadPayload(IFormFile payload);
+        Task<ValidationResult> ValidateUploadPayload(IFormFile payload);
     }
 }

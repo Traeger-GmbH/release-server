@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Extensions
 {
     public static class ReleaseNotesModelExtension
     {
-        public static Dictionary<string, List<ChangeSet>> GetReleaseNotesResponse(this ReleaseNotesModel releaseNotes)
+        public static Dictionary<string, List<ChangeSet>> GetReleaseNotesResponse(this ReleaseNotes releaseNotes)
         {
             if (releaseNotes == null)
                 return new Dictionary<string, List<ChangeSet>>();

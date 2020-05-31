@@ -26,17 +26,17 @@ namespace ReleaseServer.WebApi.Mappers
             };
         }
 
-        public static ProductVersionResponseModel ToProductVersionResponse(this string version)
+        public static ProductVersionResponse ToProductVersionResponse(this string version)
         {
-            return new ProductVersionResponseModel
+            return new ProductVersionResponse
             {
                 Version = version
             };
         }
         
-        public static ProductVersionListResponseModel ToProductVersionListResponse(this List<string> versionList)
+        public static ProductVersionListResponse ToProductVersionListResponse(this List<string> versionList)
         {
-            return new ProductVersionListResponseModel
+            return new ProductVersionListResponse
             {
                 Versions = versionList
             };

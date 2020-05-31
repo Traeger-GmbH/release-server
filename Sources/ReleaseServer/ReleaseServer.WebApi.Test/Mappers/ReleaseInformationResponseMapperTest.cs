@@ -14,9 +14,9 @@ namespace ReleaseServer.WebApi.Test
         public void TestToReleaseInformationResponse()
         {
             //Setup
-            var testReleaseInformationModel = new ReleaseInformationModel
+            var testReleaseInformationModel = new ReleaseInformation
             {
-                ReleaseNotes = new ReleaseNotesModel
+                ReleaseNotes = new ReleaseNotes
                 {
                     ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
@@ -38,7 +38,7 @@ namespace ReleaseServer.WebApi.Test
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
 
-            var expectedReleaseInformationResponse = new ReleaseInformationResponseModel
+            var expectedReleaseInformationResponse = new ReleaseInformationResponse
             {
                 ReleaseNotes = new Dictionary<string, List<ChangeSet>>
                 {

@@ -4,11 +4,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ProductVersionListResponseExample : IExamplesProvider<ProductVersionListResponseModel>
+    public class ProductVersionListResponseExample : IExamplesProvider<ProductVersionListResponse>
     {
-        public ProductVersionListResponseModel GetExamples()
+        public ProductVersionListResponse GetExamples()
         {
-            return new ProductVersionListResponseModel
+            return new ProductVersionListResponse
             {
                 Versions = new List<string>()
                 {

@@ -1,6 +1,6 @@
 namespace ReleaseServer.WebApi.Models
 {
-    public class ValidationResultModel
+    public class ValidationResult
     {
         public bool IsValid { get; set;}
 

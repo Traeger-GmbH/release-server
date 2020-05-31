@@ -1,6 +1,6 @@
 namespace ReleaseServer.WebApi.Models
 {
-    public class ProductInformationModel
+    public class ProductInformation
     {
         public string ProductIdentifier { get; set; }
         
@@ -10,6 +10,6 @@ namespace ReleaseServer.WebApi.Models
         
         public string HwArchitecture { get; set; }
         
-        public ReleaseNotesModel ReleaseNotes { get; set; }
+        public ReleaseNotes ReleaseNotes { get; set; }
     }
 }

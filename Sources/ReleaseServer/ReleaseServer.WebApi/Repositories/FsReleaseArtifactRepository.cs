@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
@@ -74,7 +73,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public List<ProductInformationModel> GetInfosByProductName(string productName)
+        public List<ProductInformation> GetInfosByProductName(string productName)
         {
             var productInformation =
                 from productDir in ArtifactRootDir.EnumerateDirectories()
@@ -82,7 +81,7 @@ namespace ReleaseServer.WebApi.Repositories
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select new ProductInformationModel
+                select new ProductInformation
                 {
                     ProductIdentifier = productDir.Name,
                     Os = osDir.Name,
@@ -94,7 +93,7 @@ namespace ReleaseServer.WebApi.Repositories
             return productInformation.ToList();
         }
 
-        public ReleaseInformationModel GetReleaseInfo(string product, string os, string architecture, string version)
+        public ReleaseInformation GetReleaseInfo(string product, string os, string architecture, string version)
         {
             try
             {
@@ -109,7 +108,7 @@ namespace ReleaseServer.WebApi.Repositories
 
                     var releaseNotesFileName = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
 
-                    return new ReleaseInformationModel
+                    return new ReleaseInformation
                     {
                         ReleaseNotes = ReleaseNotesMapper.ParseReleaseNotes(releaseNotesFileName), 
                         ReleaseDate = deploymentMetaInfo.ReleaseDate
@@ -127,7 +126,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
         }
 
-        public ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture,
+        public ArtifactDownload GetSpecificArtifact(string productName, string os, string architecture,
             string version)
         {
             try
@@ -142,7 +141,7 @@ namespace ReleaseServer.WebApi.Repositories
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
 
-                    return new ArtifactDownloadModel
+                    return new ArtifactDownload
                     {
                         Payload = File.ReadAllBytes(Path.Combine(path, deploymentMetaInfo.ArtifactFileName)),
                         FileName = deploymentMetaInfo.ArtifactFileName,
@@ -214,7 +213,7 @@ namespace ReleaseServer.WebApi.Repositories
             return platforms.OrderBy(p => p).ToList();
         }
 
-        public BackupInformationModel RunBackup()
+        public BackupInformation RunBackup()
         {
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
 
@@ -234,7 +233,7 @@ namespace ReleaseServer.WebApi.Repositories
             //Create the backup -> zip the whole ArtifactRoot folder
             ZipFile.CreateFromDirectory(ArtifactRootDir.ToString(), backupArchiveFileName);
 
-            return new BackupInformationModel
+            return new BackupInformation
             {
                 FullPath = backupArchiveFileName,
                 FileName = backupFileName
@@ -274,7 +273,7 @@ namespace ReleaseServer.WebApi.Repositories
             return Path.Combine(ArtifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
-        private DeploymentMetaInfoModel GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
+        private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
         {
             var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
 

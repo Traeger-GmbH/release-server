@@ -12,7 +12,7 @@ namespace ReleaseServer.WebApi.Mappers
         {
             return new ReleaseArtifactModel
             {
-                ProductInformation = new ProductInformationModel
+                ProductInformation = new ProductInformation
                 {
                     ProductIdentifier = product,
                     Os = os,

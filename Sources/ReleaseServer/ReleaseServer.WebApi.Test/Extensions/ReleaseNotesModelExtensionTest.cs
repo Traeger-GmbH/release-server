@@ -13,7 +13,7 @@ namespace ReleaseServer.WebApi.Test.Extensions
         public void TestGetReleaseNotesResponse()
         {
             //Setup
-            var testReleaseNotesModel = new ReleaseNotesModel
+            var testReleaseNotesModel = new ReleaseNotes
             {
                 ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
                 {

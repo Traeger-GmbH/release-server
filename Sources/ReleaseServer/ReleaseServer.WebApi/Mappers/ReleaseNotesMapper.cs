@@ -8,11 +8,11 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class ReleaseNotesMapper
     {
-        public static ReleaseNotesModel ParseReleaseNotes(string fileName)
+        public static ReleaseNotes ParseReleaseNotes(string fileName)
         {
             var parsedReleaseNotes = JsonConvert.DeserializeObject<Dictionary<CultureInfo, List<ChangeSet>>>(File.ReadAllText(fileName));
 
-            return new ReleaseNotesModel
+            return new ReleaseNotes
             {
                 ReleaseNotesSet = parsedReleaseNotes
             };

@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class ProductInformationResponseMapper
     {
-        public static ProductInformationResponseModel ToProductInfoResponse(this ProductInformationModel productInfo)
+        public static ProductInformationResponseModel ToProductInfoResponse(this ProductInformation productInfo)
         {
             return new ProductInformationResponseModel
             {
@@ -18,7 +18,7 @@ namespace ReleaseServer.WebApi.Mappers
             };
         }
 
-        public static ProductInformationListResponseModel ToProductInfoListResponse(this List<ProductInformationModel> productInfoList)
+        public static ProductInformationListResponse ToProductInfoListResponse(this List<ProductInformation> productInfoList)
         {
             var retVal = new List<ProductInformationResponseModel>();
 
@@ -27,7 +27,7 @@ namespace ReleaseServer.WebApi.Mappers
                 retVal.Add(productInfo.ToProductInfoResponse());
             }
             
-            return new ProductInformationListResponseModel
+            return new ProductInformationListResponse
             {
                 ProductInformation = retVal
             };

@@ -5,9 +5,9 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class ReleaseInformationResponseMapper
     {
-        public static ReleaseInformationResponseModel ToReleaseInformationResponse(this ReleaseInformationModel releaseInfo)
+        public static ReleaseInformationResponse ToReleaseInformationResponse(this ReleaseInformation releaseInfo)
         {
-            return new ReleaseInformationResponseModel
+            return new ReleaseInformationResponse
             {
                 ReleaseNotes = releaseInfo.ReleaseNotes.GetReleaseNotesResponse(),
                 ReleaseDate = releaseInfo.ReleaseDate

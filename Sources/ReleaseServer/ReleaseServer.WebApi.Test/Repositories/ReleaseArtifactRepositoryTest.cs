@@ -105,13 +105,13 @@ namespace ReleaseServer.WebApi.Test
                 file.CopyTo(Path.Combine(testProductPath, file.Name));
             }
 
-            var expectedProductInfo = new ProductInformationModel
+            var expectedProductInfo = new ProductInformation
             {
                 ProductIdentifier = "testproduct",
                 Os = "debian",
                 HwArchitecture = "amd64",
                 Version = "1.1".ToProductVersion(),
-                ReleaseNotes = new ReleaseNotesModel
+                ReleaseNotes = new ReleaseNotes
                 {
                     ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
@@ -205,13 +205,13 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetReleaseInfo()
         {
             //Setup 
-            ReleaseInformationModel expectedReleaseInfo;
+            ReleaseInformation expectedReleaseInfo;
             
-            expectedReleaseInfo = new ReleaseInformationModel
+            expectedReleaseInfo = new ReleaseInformation
             {
                 ReleaseDate = new DateTime(2020, 02, 10),
                 
-                ReleaseNotes = new ReleaseNotesModel
+                ReleaseNotes = new ReleaseNotes
                 {
                     
                     ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
@@ -274,7 +274,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetSpecificArtifact()
         {
             //Setup
-            var expectedArtifact = new ArtifactDownloadModel
+            var expectedArtifact = new ArtifactDownload
             {
                 FileName = Path.GetFileName(Path.Combine(ProjectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip")),

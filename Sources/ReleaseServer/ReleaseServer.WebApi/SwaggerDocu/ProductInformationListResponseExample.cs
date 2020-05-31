@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using ReleaseServer.WebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-public class ProductInformationListResponseExample : IExamplesProvider<ProductInformationListResponseModel>
+public class ProductInformationListResponseExample : IExamplesProvider<ProductInformationListResponse>
 {
-    public ProductInformationListResponseModel GetExamples()
+    public ProductInformationListResponse GetExamples()
     {
-        return new ProductInformationListResponseModel
+        return new ProductInformationListResponse
         {
             ProductInformation = new List<ProductInformationResponseModel>
             {

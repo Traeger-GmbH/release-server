@@ -69,9 +69,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductInformationListResponseModel), 200)]
+        [ProducesResponseType(typeof(ProductInformationListResponse), 200)]
         [HttpGet("versions/{product}")]
-        public async Task<ActionResult<ProductInformationListResponseModel>> GetProductInfos([Required] string product)
+        public async Task<ActionResult<ProductInformationListResponse>> GetProductInfos([Required] string product)
         {
             var productInfos = await ReleaseArtifactService.GetProductInfos(product);
 
@@ -89,9 +89,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing Platforms for the specified product name.</response>
         /// <response code="404">The product does not exist or there exists no platform for the specified product.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(PlatformsResponseModel), 200)]
+        [ProducesResponseType(typeof(PlatformsResponse), 200)]
         [HttpGet("platforms/{product}/{version}")]
-        public async Task<ActionResult<PlatformsResponseModel>> GetPlatforms([Required] string product, [Required]string version)
+        public async Task<ActionResult<PlatformsResponse>> GetPlatforms([Required] string product, [Required]string version)
         {
             var platformsList = await ReleaseArtifactService.GetPlatforms(product, version);
 
@@ -112,9 +112,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">The specific product exists.</response>
         /// <response code="404">The product with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ReleaseInformationResponseModel), 200)]
+        [ProducesResponseType(typeof(ReleaseInformationResponse), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public async Task<ActionResult<ReleaseInformationResponseModel>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ActionResult<ReleaseInformationResponse>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
 
@@ -133,9 +133,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing versions for the specified platform and product.</response>
         /// <response code="404">There exists no version for the specified platform / product.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductVersionListResponseModel), 200)]
+        [ProducesResponseType(typeof(ProductVersionListResponse), 200)]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public async Task<ActionResult<ProductVersionListResponseModel>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ActionResult<ProductVersionListResponse>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
             var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
             
@@ -229,8 +229,8 @@ namespace ReleaseServer.WebApi.Controllers
         /// or the product with the specified product name does not exist</response>
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
-        [ProducesResponseType(typeof(ProductVersionResponseModel), 200)]
-        public async Task<ActionResult<ProductVersionResponseModel>> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
+        [ProducesResponseType(typeof(ProductVersionResponse), 200)]
+        public async Task<ActionResult<ProductVersionResponse>> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
             var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
             

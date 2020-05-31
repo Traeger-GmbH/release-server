@@ -7,14 +7,14 @@ namespace ReleaseServer.WebApi.Repositories
     public interface IReleaseArtifactRepository     
     {
         void StoreArtifact(ReleaseArtifactModel artifact);
-        List<ProductInformationModel> GetInfosByProductName(string productName);
-        ReleaseInformationModel GetReleaseInfo(string product, string os, string architecture, string version);
-        ArtifactDownloadModel GetSpecificArtifact(string productName, string os, string architecture, string version);
+        List<ProductInformation> GetInfosByProductName(string productName);
+        ReleaseInformation GetReleaseInfo(string product, string os, string architecture, string version);
+        ArtifactDownload GetSpecificArtifact(string productName, string os, string architecture, string version);
         bool DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);
         bool DeleteProductIfExists(string productName);
         List<string> GetVersions(string productName, string os, string architecture);
         List<string> GetPlatforms(string productName, string version);
-        BackupInformationModel RunBackup();
+        BackupInformation RunBackup();
         void RestoreBackup(ZipArchive backupPayload);
     }
 }

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ReleaseNotesModel
+    public class ReleaseNotes
     {
         public Dictionary<CultureInfo, List<ChangeSet>> ReleaseNotesSet { get; set;}
     }

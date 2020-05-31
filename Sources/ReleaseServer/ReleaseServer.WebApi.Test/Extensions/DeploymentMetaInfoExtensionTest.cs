@@ -1,6 +1,6 @@
 using System;
-using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Extensions;
+using ReleaseServer.WebApi.Models;
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Extensions
@@ -10,7 +10,7 @@ namespace ReleaseServer.WebApi.Test.Extensions
         [Fact]
         public void ValidateDeploymentMeta_Valid()
         {
-            var testDeploymentMetaInfo = new DeploymentMetaInfoModel
+            var testDeploymentMetaInfo = new DeploymentMetaInfo
             {
                 ArtifactFileName = "testArtifact.zip",
                 ReleaseNotesFileName = "releaseNotes.txt",
@@ -25,28 +25,28 @@ namespace ReleaseServer.WebApi.Test.Extensions
         {
             
             //Without release notes
-            var testDeploymentMetaInfo1 = new DeploymentMetaInfoModel
+            var testDeploymentMetaInfo1 = new DeploymentMetaInfo
             {
                 ArtifactFileName = "testArtifact.zip",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
             
             //Without ReleaseDate
-            var testDeploymentMetaInfo2 = new DeploymentMetaInfoModel
+            var testDeploymentMetaInfo2 = new DeploymentMetaInfo
             {
                 ArtifactFileName = "testArtifact.zip",
                 ReleaseNotesFileName = "releaseNotes.txt",
             };
             
             //Without ArtifactFileName
-            var testDeploymentMetaInfo3 = new DeploymentMetaInfoModel
+            var testDeploymentMetaInfo3 = new DeploymentMetaInfo
             {
                 ReleaseNotesFileName = "releaseNotes.txt",
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
             
             //Empty
-            var testDeploymentMetaInfo4 = new DeploymentMetaInfoModel();
+            var testDeploymentMetaInfo4 = new DeploymentMetaInfo();
             
             Assert.False(testDeploymentMetaInfo1.IsValid());
             Assert.False(testDeploymentMetaInfo2.IsValid());

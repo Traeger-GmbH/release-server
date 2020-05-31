@@ -27,7 +27,7 @@ namespace ReleaseServer.WebApi.Test
             
             var expectedArtifact = new ReleaseArtifactModel
             {
-                ProductInformation = new ProductInformationModel
+                ProductInformation = new ProductInformation
                 {
                     ProductIdentifier = "product",
                     Version = "1.1".ToProductVersion(),

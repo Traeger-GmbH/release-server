@@ -14,7 +14,7 @@ namespace ReleaseServer.WebApi.Test
 
             var testPlatformsList = new List<string> {"debian-arm64", "debian-amd64", "ubuntu-amd64"};
 
-            var expectedPlatformsResponse = new PlatformsResponseModel
+            var expectedPlatformsResponse = new PlatformsResponse
             {
                 Platforms = new List<string> {"debian-arm64", "debian-amd64", "ubuntu-amd64"}
             };

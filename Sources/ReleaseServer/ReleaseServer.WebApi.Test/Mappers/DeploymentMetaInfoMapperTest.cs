@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using FluentAssertions;
-using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Mappers;
+using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
@@ -11,12 +11,12 @@ namespace ReleaseServer.WebApi.Test
     public class DeploymentMetaMapperTest
     {
         private readonly string ProjectDirectory;
-        private readonly DeploymentMetaInfoModel ExpectedMeta;
+        private readonly DeploymentMetaInfo ExpectedMeta;
 
         public DeploymentMetaMapperTest()
         {
             ProjectDirectory = TestUtils.GetProjectDirectory();
-            ExpectedMeta =  new DeploymentMetaInfoModel
+            ExpectedMeta =  new DeploymentMetaInfo
             {
                 ReleaseNotesFileName = "releaseNotes.json",
                 ArtifactFileName = "artifact.zip",
