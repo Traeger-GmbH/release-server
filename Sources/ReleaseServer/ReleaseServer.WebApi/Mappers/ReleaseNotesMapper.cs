@@ -14,7 +14,7 @@ namespace ReleaseServer.WebApi.Mappers
 
             return new ReleaseNotes
             {
-                ReleaseNotesSet = parsedReleaseNotes
+                Changes = parsedReleaseNotes
             };
         }
     }

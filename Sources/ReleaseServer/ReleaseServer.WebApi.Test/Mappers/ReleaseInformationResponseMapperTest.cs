@@ -18,7 +18,7 @@ namespace ReleaseServer.WebApi.Test
             {
                 ReleaseNotes = new ReleaseNotes
                 {
-                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {
                             new CultureInfo("de"), new List<ChangeSet>
@@ -40,18 +40,21 @@ namespace ReleaseServer.WebApi.Test
 
             var expectedReleaseInformationResponse = new ReleaseInformationResponse
             {
-                ReleaseNotes = new Dictionary<string, List<ChangeSet>>
+                ReleaseNotes = new ReleaseNotes
                 {
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
-                        "de", new List<ChangeSet>
                         {
-                            new ChangeSet
+                            new CultureInfo("de"), new List<ChangeSet>
                             {
-                                Platforms = new List<string> {"windows/any", "linux/rpi"},
-                                Added = new List<string> {"added de 1", "added de 2"},
-                                Fixed = new List<string> {"fix de 1", "fix de 2"},
-                                Breaking = new List<string> {"breaking de 1", "breaking de 2"},
-                                Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string> {"windows/any", "linux/rpi"},
+                                    Added = new List<string> {"added de 1", "added de 2"},
+                                    Fixed = new List<string> {"fix de 1", "fix de 2"},
+                                    Breaking = new List<string> {"breaking de 1", "breaking de 2"},
+                                    Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                }
                             }
                         }
                     }

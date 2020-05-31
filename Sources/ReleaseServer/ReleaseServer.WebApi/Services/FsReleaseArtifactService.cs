@@ -257,22 +257,7 @@ namespace ReleaseServer.WebApi.Services
                     return new ValidationResult { IsValid = false, ValidationError = validationError };
                 }
             }
-                
             
-            /*
-            //Open the release notes and
-            var releaseNotesStream = releaseNotesEntry.Open();
-            var releaseNotesByteArray = await releaseNotesStream.ToByteArrayAsync();
-
-            //Check if the release notes file is a valid json file
-            if(!releaseNotesByteArray.IsAValidJson<Dictionary<CultureInfo, List<ChangeSet>>>(out errorMsg))
-            {
-                var validationError = "the release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
-                                      "\" is an invalid json file! " + "Error: " + errorMsg;;
-                Logger.LogError(validationError);
-                return new ValidationResult {IsValid = false, ValidationError = validationError};
-            }*/
-
             //The uploaded payload is valid
             return new ValidationResult {IsValid = true};
         }

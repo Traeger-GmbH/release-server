@@ -19,7 +19,7 @@ namespace ReleaseServer.WebApi.Test
             ProjectDirectory = TestUtils.GetProjectDirectory();
             ExpectedReleaseNotes = new ReleaseNotes
             {
-                ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                 {
                     {
                         new CultureInfo("de"), new List<ChangeSet>

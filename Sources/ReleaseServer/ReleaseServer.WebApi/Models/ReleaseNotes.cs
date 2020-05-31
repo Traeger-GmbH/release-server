@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Models
 {
     public class ReleaseNotes
     {
-        public Dictionary<CultureInfo, List<ChangeSet>> ReleaseNotesSet { get; set;}
+        public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set;}
     }
     
     public class ChangeSet

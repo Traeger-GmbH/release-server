@@ -114,14 +114,14 @@ namespace ReleaseServer.WebApi.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ReleaseInformationResponse), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public async Task<ActionResult<ReleaseInformationResponse>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ActionResult<ReleaseInformation>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
 
             if (releaseInfo == null)
                 return NotFound("The Release information does not exist (the specified product was not found)!");
 
-            return releaseInfo.ToReleaseInformationResponse();
+            return releaseInfo;
         }
         
         /// <summary>

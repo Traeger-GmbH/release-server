@@ -17,6 +17,6 @@ namespace ReleaseServer.WebApi.Models
         
         public string Architecture { get; set; }
         
-        public Dictionary<string, List<ChangeSet>> ReleaseNotes { get; set; }
+        public ReleaseNotes ReleaseNotes { get; set; }
     }
 }

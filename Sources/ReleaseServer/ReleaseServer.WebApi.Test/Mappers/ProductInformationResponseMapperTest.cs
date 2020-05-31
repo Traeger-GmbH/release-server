@@ -21,7 +21,7 @@ namespace ReleaseServer.WebApi.Test
                 Version = "1.0".ToProductVersion(),
                 ReleaseNotes = new ReleaseNotes
                 {
-                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {
                             new CultureInfo("de"), new List<ChangeSet>
@@ -48,7 +48,7 @@ namespace ReleaseServer.WebApi.Test
                 Version = "1.1-beta".ToProductVersion(),
                 ReleaseNotes = new ReleaseNotes
                 {
-                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {
                             new CultureInfo("de"), new List<ChangeSet>
@@ -78,18 +78,20 @@ namespace ReleaseServer.WebApi.Test
                 Os = "ubuntu",
                 Architecture = "arm64",
                 Version = "1.0",
-                ReleaseNotes = new Dictionary<string, List<ChangeSet>>
-                {
+                ReleaseNotes = new ReleaseNotes
+                { Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
-                        "de", new List<ChangeSet>
                         {
-                            new ChangeSet
+                            new CultureInfo("de"), new List<ChangeSet>
                             {
-                                Platforms = new List<string> {"windows/any", "linux/rpi"},
-                                Added = new List<string> {"added de 1", "added de 2"},
-                                Fixed = new List<string> {"fix de 1", "fix de 2"},
-                                Breaking = new List<string> {"breaking de 1", "breaking de 2"},
-                                Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string> {"windows/any", "linux/rpi"},
+                                    Added = new List<string> {"added de 1", "added de 2"},
+                                    Fixed = new List<string> {"fix de 1", "fix de 2"},
+                                    Breaking = new List<string> {"breaking de 1", "breaking de 2"},
+                                    Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                }
                             }
                         }
                     }
@@ -102,18 +104,20 @@ namespace ReleaseServer.WebApi.Test
                 Os = "ubuntu",
                 Architecture = "amd64",
                 Version = "1.1-beta",
-                ReleaseNotes = new Dictionary<string, List<ChangeSet>>
-                {
+                ReleaseNotes = new ReleaseNotes
+                { Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
-                        "de", new List<ChangeSet>
                         {
-                            new ChangeSet
+                            new CultureInfo("de"), new List<ChangeSet>
                             {
-                                Platforms = new List<string> {"windows/any"},
-                                Added = new List<string> {"added de 1", "added de 2"},
-                                Fixed = new List<string> {"fix de 1", "fix de 2"},
-                                Breaking = new List<string> {"breaking de 1", "breaking de 2"},
-                                Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string> {"windows/any"},
+                                    Added = new List<string> {"added de 1", "added de 2"},
+                                    Fixed = new List<string> {"fix de 1", "fix de 2"},
+                                    Breaking = new List<string> {"breaking de 1", "breaking de 2"},
+                                    Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                }
                             }
                         }
                     }
@@ -140,7 +144,7 @@ namespace ReleaseServer.WebApi.Test
             };
 
 
-            var expectedProductInforListRepsonse = new ProductInformationListResponse
+            var expectedProductInfoListResponse = new ProductInformationListResponse
             {
                 ProductInformation = new List<ProductInformationResponse>
                 {
@@ -150,18 +154,20 @@ namespace ReleaseServer.WebApi.Test
                         Os = "ubuntu",
                         Architecture = "arm64",
                         Version = "1.0",
-                        ReleaseNotes = new Dictionary<string, List<ChangeSet>>
-                        {
+                        ReleaseNotes = new ReleaseNotes
+                        { Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                             {
-                                "de", new List<ChangeSet>
                                 {
-                                    new ChangeSet
+                                    new CultureInfo("de"), new List<ChangeSet>
                                     {
-                                        Platforms = new List<string> {"windows/any", "linux/rpi"},
-                                        Added = new List<string> {"added de 1", "added de 2"},
-                                        Fixed = new List<string> {"fix de 1", "fix de 2"},
-                                        Breaking = new List<string> {"breaking de 1", "breaking de 2"},
-                                        Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                        new ChangeSet
+                                        {
+                                            Platforms = new List<string> {"windows/any", "linux/rpi"},
+                                            Added = new List<string> {"added de 1", "added de 2"},
+                                            Fixed = new List<string> {"fix de 1", "fix de 2"},
+                                            Breaking = new List<string> {"breaking de 1", "breaking de 2"},
+                                            Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                        }
                                     }
                                 }
                             }
@@ -174,18 +180,20 @@ namespace ReleaseServer.WebApi.Test
                         Os = "ubuntu",
                         Architecture = "amd64",
                         Version = "1.1-beta",
-                        ReleaseNotes = new Dictionary<string, List<ChangeSet>>
-                        {
+                        ReleaseNotes = new ReleaseNotes
+                        { Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                             {
-                                "de", new List<ChangeSet>
                                 {
-                                    new ChangeSet
+                                    new CultureInfo("de"), new List<ChangeSet>
                                     {
-                                        Platforms = new List<string> {"windows/any"},
-                                        Added = new List<string> {"added de 1", "added de 2"},
-                                        Fixed = new List<string> {"fix de 1", "fix de 2"},
-                                        Breaking = new List<string> {"breaking de 1", "breaking de 2"},
-                                        Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                        new ChangeSet
+                                        {
+                                            Platforms = new List<string> {"windows/any"},
+                                            Added = new List<string> {"added de 1", "added de 2"},
+                                            Fixed = new List<string> {"fix de 1", "fix de 2"},
+                                            Breaking = new List<string> {"breaking de 1", "breaking de 2"},
+                                            Deprecated = new List<string> {"deprecated de 1", "deprecated de 2"}
+                                        }
                                     }
                                 }
                             }
@@ -198,7 +206,7 @@ namespace ReleaseServer.WebApi.Test
             var testResponse = testProductInfoList.ToProductInfoListResponse();
             
             //Assert
-            testResponse.Should().BeEquivalentTo(expectedProductInforListRepsonse);
+            testResponse.Should().BeEquivalentTo(expectedProductInfoListResponse);
         }
     }
 }

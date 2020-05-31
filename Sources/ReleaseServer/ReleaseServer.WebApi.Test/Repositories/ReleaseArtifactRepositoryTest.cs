@@ -113,7 +113,7 @@ namespace ReleaseServer.WebApi.Test
                 Version = "1.1".ToProductVersion(),
                 ReleaseNotes = new ReleaseNotes
                 {
-                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {
                             new CultureInfo("de"), new List<ChangeSet>
@@ -214,7 +214,7 @@ namespace ReleaseServer.WebApi.Test
                 ReleaseNotes = new ReleaseNotes
                 {
                     
-                    ReleaseNotesSet = new Dictionary<CultureInfo, List<ChangeSet>>
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {new CultureInfo("de"), new List<ChangeSet>
                             {

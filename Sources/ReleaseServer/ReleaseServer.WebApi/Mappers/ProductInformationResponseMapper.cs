@@ -14,7 +14,7 @@ namespace ReleaseServer.WebApi.Mappers
                 Os = productInfo.Os,
                 Version = productInfo.Version.ToString(),
                 Architecture = productInfo.HwArchitecture,
-                ReleaseNotes = productInfo.ReleaseNotes.GetReleaseNotesResponse()
+                ReleaseNotes = productInfo.ReleaseNotes
             };
         }
 

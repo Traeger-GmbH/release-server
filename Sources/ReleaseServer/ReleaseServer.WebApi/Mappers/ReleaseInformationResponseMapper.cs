@@ -9,7 +9,7 @@ namespace ReleaseServer.WebApi.Mappers
         {
             return new ReleaseInformationResponse
             {
-                ReleaseNotes = releaseInfo.ReleaseNotes.GetReleaseNotesResponse(),
+                ReleaseNotes = releaseInfo.ReleaseNotes,
                 ReleaseDate = releaseInfo.ReleaseDate
             };
         }
