@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ReleaseServer.WebApi.Models;
@@ -5,11 +6,11 @@ using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Models
 {
-    public class ProductVersionComparisonTest
+    public class ProductVersionTest
     {
         private readonly List<ProductVersion> versionList;
 
-        public ProductVersionComparisonTest()
+        public ProductVersionTest()
         {
             versionList = new List<ProductVersion>
             {
@@ -26,6 +27,24 @@ namespace ReleaseServer.WebApi.Test.Models
             };
         }
 
+        [Fact]
+        public void ProductVersionCreation_Success()
+        {
+            var testVersion1 = new ProductVersion("1.0");
+
+            Assert.Equal(new Version("1.0"), testVersion1.VersionNumber);
+            Assert.Equal("", testVersion1.VersionSuffix);
+            
+            var testVersion2 = new ProductVersion("1.1-rc2");
+            Assert.Equal(new Version("1.1"), testVersion2.VersionNumber);
+            Assert.Equal("rc2", testVersion2.VersionSuffix);
+        }
+        
+        [Fact]
+        public void ProductVersionCreation_Error()
+        {
+            Assert.Throws<ArgumentException>(() => new ProductVersion("invalid"));
+        }
 
         [Fact]
         public void CompareProductVersions()
@@ -84,6 +103,22 @@ namespace ReleaseServer.WebApi.Test.Models
             
             //1.0 is not equal to 1.1
             Assert.False(versionList[9].Equals(testVersion));
+        }
+        
+        [Fact]
+        public void TestToString()
+        {
+            //Prepare
+            var testVersion1 = new ProductVersion("1.0");
+            var testVersion2 = new ProductVersion("1.0-alpha1");
+            
+            //Act
+            var testVersion1String = testVersion1.ToString();
+            var testVersion2String = testVersion2.ToString();
+            
+            //Assert
+            Assert.Equal("1.0", testVersion1String);
+            Assert.Equal("1.0-alpha1", testVersion2String);
         }
     }
 }

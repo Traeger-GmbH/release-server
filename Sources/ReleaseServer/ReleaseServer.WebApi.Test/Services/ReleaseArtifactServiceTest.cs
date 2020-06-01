@@ -122,7 +122,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
-        /*[Fact]
+        [Fact]
         public async void TestValidateUploadPayload_Invalid_MetaJsonFormat()
         {
             //Prepare
@@ -135,7 +135,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_invalid_meta_format.zip");
 
-            var expectedValidationError = "the deployment meta information (deployment.json) is an invalid json file! " +
+            var expectedValidationError = "the deployment meta information (deployment.json) is invalid! " +
                 "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
             
             //Act
@@ -158,7 +158,8 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_invalid_meta_structure.zip");
 
-            var expectedValidationError = "the deployment meta information (deployment.json) is invalid!";
+            var expectedValidationError = "the deployment meta information (deployment.json) is invalid! Error: " + 
+                                          "Required property 'ReleaseNotesFileName' not found in JSON. Path '', line 3, position 1.";
 
             
             //Act
@@ -166,7 +167,7 @@ namespace ReleaseServer.WebApi.Test.TestData
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
-        }*/
+        }
         
         [Fact]
         public async void TestValidateUploadPayload_Invalid_NoMeta()
@@ -226,17 +227,14 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_invalid_release_notes_structure.zip");
 
-            var expectedValidationError = "the release notes file \"releaseNotes.json\" is an invalid json file! " +
-                                          "Error: Could not convert string 'invalid' to dictionary key type " +
-                                          "'System.Globalization.CultureInfo'. Create a TypeConverter to convert from the" +
-                                          " string to the key type object. Path 'invalid', line 2, position 13.";
-            
+            var expectedValidationError = "the release notes file \"releaseNotes.json\" is an invalid json file!" +
+                                          " Error: Required property 'Changes' not found in JSON. Path '', line 3, position 1.";
+
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            //TODO: Fix different Exception messages (local <-> Travis-CI)
-            //Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
     }
 }

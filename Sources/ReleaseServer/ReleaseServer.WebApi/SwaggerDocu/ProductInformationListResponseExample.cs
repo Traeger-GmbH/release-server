@@ -1,4 +1,3 @@
-/*
 using System.Collections.Generic;
 using System.Globalization;
 using ReleaseServer.WebApi.Models;
@@ -8,7 +7,7 @@ public class ProductInformationListExample : IExamplesProvider<ProductInformatio
 {
     public ProductInformationList GetExamples()
     {
-        var example = new ProductInformationList(new List<ProductInformation>(new ProductInformation[] {
+        var example = new ProductInformationList(new List<ProductInformation>(new[] {
                     new ProductInformation
                     {
                         Identifier = "softwareX",
@@ -62,7 +61,7 @@ public class ProductInformationListExample : IExamplesProvider<ProductInformatio
                         Version = new ProductVersion("1.1-beta"),
                         Os = "debian",
                         Architecture = "amd64",
-                        ReleaseNotes =
+                        ReleaseNotes = new ReleaseNotes
                         {
                             Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                             {
@@ -109,4 +108,3 @@ public class ProductInformationListExample : IExamplesProvider<ProductInformatio
     
     
 }
-*/

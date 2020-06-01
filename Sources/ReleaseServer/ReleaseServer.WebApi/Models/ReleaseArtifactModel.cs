@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using Microsoft.AspNetCore.Http;
 
 namespace ReleaseServer.WebApi.Models
 {
