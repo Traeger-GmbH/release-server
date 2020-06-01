@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -63,13 +64,13 @@ namespace ReleaseServer.WebApi.Test.TestData
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload.zip")); 
+                "valid", "test_payload_valid.zip")); 
             
             var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
                 baseStreamOffset: 0,
                 length: testUploadPayload.Length,
                 name: "test data",
-                fileName: "test_zip.zip");
+                fileName: "test_zip_valid.zip");
             
             //Act
             var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
@@ -82,12 +83,17 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_NoArtifactFile()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_without_artifact.zip")); 
-            
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
+            });
+
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_without_artifact.zip");
 
@@ -104,12 +110,17 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_NoReleaseNotes()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_without_release_notes.zip")); 
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
+            });
             
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_without_release_notes.zip");
 
@@ -126,12 +137,19 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_MetaJsonFormat()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_invalid_meta_format.zip")); 
-            
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "invalid_meta_format", "deployment.json"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                
+            });
+
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_invalid_meta_format.zip");
 
@@ -149,12 +167,19 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_Meta_Structure()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_invalid_meta_structure.zip")); 
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "invalid_meta_structure", "deployment.json"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                
+            });
             
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_invalid_meta_structure.zip");
 
@@ -173,12 +198,17 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_NoMeta()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_without_meta.zip")); 
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json")
+            });
             
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_without_meta.zip");
 
@@ -195,12 +225,19 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_ReleaseNotes_JsonFormat()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_invalid_release_notes_format.zip")); 
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_format", "releaseNotes.json"),
+                
+            });
             
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_invalid_release_notes_format.zip");
 
@@ -218,12 +255,19 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestValidateUploadPayload_Invalid_ReleaseNotes_Structure()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
-                "test_payload_invalid_release_notes_structure.zip")); 
+            var filePaths = new List<string>(new[]
+            {
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
+                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_structure", "releaseNotes.json"),
+                
+            });
             
-            var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
+            var testZipFile = TestUtils.CreateTestZipFile(filePaths);
+            
+            var testFormFile = new FormFile(new MemoryStream(testZipFile),
                 baseStreamOffset: 0,
-                length: testUploadPayload.Length,
+                length: testZipFile.Length,
                 name: "test data",
                 fileName: "test_payload_invalid_release_notes_structure.zip");
 

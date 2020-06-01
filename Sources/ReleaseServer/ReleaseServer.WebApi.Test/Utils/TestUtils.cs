@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace ReleaseServer.WebApi.Test.Utils
@@ -44,6 +47,24 @@ namespace ReleaseServer.WebApi.Test.Utils
         public static string GetProjectDirectory()
         {
             return Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        }
+        
+        public static byte[] CreateTestZipFile(List<string> filePathList)
+        {
+            using var memoryStream = new MemoryStream();
+            using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var filePath in filePathList)
+                {
+                    var fileName = Path.GetFileName(filePath);
+                    var fileBytes = File.ReadAllBytes(Path.Combine(filePath, filePath));
+                    
+                    var zipArchiveEntry = zipArchive.CreateEntry(fileName, CompressionLevel.Optimal);
+                    using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(fileBytes, 0, fileBytes.Length);
+                }
+            }
+
+            return memoryStream.ToArray();
         }
     }
 }
