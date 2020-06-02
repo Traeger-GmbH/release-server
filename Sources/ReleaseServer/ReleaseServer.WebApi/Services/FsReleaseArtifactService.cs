@@ -176,10 +176,9 @@ namespace ReleaseServer.WebApi.Services
         
         }
 
-        public async Task<ValidationResult> ValidateUploadPayload(IFormFile payload)
+        public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
             DeploymentMetaInfo deploymentMetaInfo;
-            string errorMsg;
             
             Logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
@@ -201,8 +200,7 @@ namespace ReleaseServer.WebApi.Services
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    deploymentMetaInfo = await Task.Run(() =>
-                        (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo)));
+                    deploymentMetaInfo = (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo));
                 }
                 catch (Exception e)
                 {
@@ -247,8 +245,7 @@ namespace ReleaseServer.WebApi.Services
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    await Task.Run(() => (ReleaseNotes) serializer.Deserialize(releaseNotesFile, 
-                            typeof(ReleaseNotes)));
+                    serializer.Deserialize(releaseNotesFile, typeof(ReleaseNotes));
                 }
                 catch (Exception e)
                 {

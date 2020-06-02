@@ -54,7 +54,7 @@ namespace ReleaseServer.WebApi.Controllers
                 return BadRequest("No or invalid body provided (must be a Zip file)");
             
             //Validate the payload of the uploaded Zip file
-            var validationResult = await ReleaseArtifactService.ValidateUploadPayload(artifact);
+            var validationResult = ReleaseArtifactService.ValidateUploadPayload(artifact);
 
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ValidationError);

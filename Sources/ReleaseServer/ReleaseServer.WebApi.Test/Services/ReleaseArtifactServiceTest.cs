@@ -60,7 +60,7 @@ namespace ReleaseServer.WebApi.Test.TestData
         }
 
         [Fact]
-        public async void TestValidateUploadPayload_Valid()
+        public void TestValidateUploadPayload_Valid()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -73,14 +73,14 @@ namespace ReleaseServer.WebApi.Test.TestData
                 fileName: "test_zip_valid.zip");
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.True(validationResult.IsValid);
             Assert.Null(validationResult.ValidationError);
         }
 
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoArtifactFile()
+        public void TestValidateUploadPayload_Invalid_NoArtifactFile()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -100,14 +100,14 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected artifact \"testprogram.exe\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoReleaseNotes()
+        public void TestValidateUploadPayload_Invalid_NoReleaseNotes()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -127,14 +127,14 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected release notes file \"releaseNotes.json\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_MetaJsonFormat()
+        public void TestValidateUploadPayload_Invalid_MetaJsonFormat()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -157,14 +157,14 @@ namespace ReleaseServer.WebApi.Test.TestData
                 "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_Meta_Structure()
+        public void TestValidateUploadPayload_Invalid_Meta_Structure()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -188,14 +188,14 @@ namespace ReleaseServer.WebApi.Test.TestData
 
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoMeta()
+        public void TestValidateUploadPayload_Invalid_NoMeta()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -215,14 +215,14 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the deployment.json does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_ReleaseNotes_JsonFormat()
+        public void TestValidateUploadPayload_Invalid_ReleaseNotes_JsonFormat()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -245,14 +245,14 @@ namespace ReleaseServer.WebApi.Test.TestData
                                           "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_ReleaseNotes_Structure()
+        public void TestValidateUploadPayload_Invalid_ReleaseNotes_Structure()
         {
             //Prepare
             var filePaths = new List<string>(new[]
@@ -275,7 +275,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                                           " Error: Required property 'Changes' not found in JSON. Path '', line 3, position 1.";
 
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
