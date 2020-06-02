@@ -2,7 +2,7 @@ using System.IO.Compression;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ReleaseArtifactModel
+    public class ReleaseArtifact
     {
         public ProductInformation ProductInformation { get; set; }
         

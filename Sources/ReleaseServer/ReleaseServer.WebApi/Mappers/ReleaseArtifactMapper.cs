@@ -7,10 +7,10 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class ReleaseArtifactMapper
     {
-        public static ReleaseArtifactModel ConvertToReleaseArtifact(string product, string os, string architecture,
+        public static ReleaseArtifact ConvertToReleaseArtifact(string product, string os, string architecture,
             string version, ZipArchive payload)
         {
-            return new ReleaseArtifactModel
+            return new ReleaseArtifact
             {
                 ProductInformation = new ProductInformation
                 {

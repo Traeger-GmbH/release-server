@@ -27,7 +27,7 @@ namespace ReleaseServer.WebApi.Repositories
             Logger = logger;
         }
 
-        public void StoreArtifact(ReleaseArtifactModel artifact)
+        public void StoreArtifact(ReleaseArtifact artifact)
         {
 
             var artifactPath = GenerateArtifactPath(
