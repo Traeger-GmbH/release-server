@@ -58,7 +58,7 @@ namespace ReleaseServer.WebApi.Test.TestData
         }
 
         [Fact]
-        public async void TestValidateUploadPayload_Valid()
+        public void TestValidateUploadPayload_Valid()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -71,14 +71,14 @@ namespace ReleaseServer.WebApi.Test.TestData
                 fileName: "test_zip.zip");
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.True(validationResult.IsValid);
             Assert.Null(validationResult.ValidationError);
         }
 
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoArtifactFile()
+        public void TestValidateUploadPayload_Invalid_NoArtifactFile()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -93,14 +93,14 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected artifact \"testprogram.exe\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoChangelog()
+        public void TestValidateUploadPayload_Invalid_NoChangelog()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -115,14 +115,14 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected changelog file \"changelog.txt\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
-        /*[Fact]
-        public async void TestValidateUploadPayload_Invalid_InvalidMeta_Json_Format()
+        [Fact]
+        public void TestValidateUploadPayload_Invalid_InvalidMeta_Json_Format()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -134,18 +134,19 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_invalid_meta_format.zip");
 
-            var expectedValidationError = "the deployment meta information (deployment.json) is an invalid json file! " +
-                "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
+            var expectedValidationError = "the deployment meta information (deployment.json) is invalid! " +
+                                          "Error: Unexpected character encountered while parsing value:" +
+                                          " i. Path '', line 0, position 0.";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
         }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_InvalidMeta_Structure()
+        public void TestValidateUploadPayload_Invalid_InvalidMeta_Structure()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -157,18 +158,19 @@ namespace ReleaseServer.WebApi.Test.TestData
                 name: "test data",
                 fileName: "test_payload_invalid_meta_structure.zip");
 
-            var expectedValidationError = "the deployment meta information (deployment.json) is invalid!";
-
+            var expectedValidationError = "the deployment meta information (deployment.json) is invalid!" +
+                                          " Error: Required property 'ChangelogFileName' not found in JSON." +
+                                          " Path '', line 3, position 1.";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
-        }*/
+        }
         
         [Fact]
-        public async void TestValidateUploadPayload_Invalid_NoMeta()
+        public void TestValidateUploadPayload_Invalid_NoMeta()
         {
             //Prepare
             var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
@@ -183,7 +185,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the deployment.json does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = await FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);

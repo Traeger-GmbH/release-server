@@ -40,8 +40,6 @@ namespace ReleaseServer.WebApi.Test
             
             var parsedMeta = DeploymentMetaInfoMapper.ParseDeploymentMetaInfo(testMetaInfoByteArray);
 
-            string test = null;
-
             parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
         }
     }

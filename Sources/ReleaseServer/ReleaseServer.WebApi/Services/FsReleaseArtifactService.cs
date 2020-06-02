@@ -174,7 +174,7 @@ namespace ReleaseServer.WebApi.Services
         
         }
 
-        public async Task<ValidationResult> ValidateUploadPayload(IFormFile payload)
+        public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
             DeploymentMetaInfo deploymentMetaInfo;
             
@@ -198,8 +198,7 @@ namespace ReleaseServer.WebApi.Services
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    deploymentMetaInfo = await Task.Run(() =>
-                        (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo)));
+                    deploymentMetaInfo = (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo));
                 }
                 catch (Exception e)
                 {
