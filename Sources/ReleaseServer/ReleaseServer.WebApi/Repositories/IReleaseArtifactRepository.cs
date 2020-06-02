@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Repositories
 {
     public interface IReleaseArtifactRepository     
     {
-        void StoreArtifact(ReleaseArtifactModel artifact);
+        void StoreArtifact(ReleaseArtifact artifact);
         List<ProductInformation> GetInfosByProductName(string productName);
         ReleaseInformation GetReleaseInfo(string product, string os, string architecture, string version);
         ArtifactDownload GetSpecificArtifact(string productName, string os, string architecture, string version);

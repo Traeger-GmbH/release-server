@@ -25,7 +25,7 @@ namespace ReleaseServer.WebApi.Test
             using var stream = new MemoryStream(testFile);
             var testZip = new ZipArchive(stream);
             
-            var expectedArtifact = new ReleaseArtifactModel
+            var expectedArtifact = new ReleaseArtifact
             {
                 ProductInformation = new ProductInformation
                 {

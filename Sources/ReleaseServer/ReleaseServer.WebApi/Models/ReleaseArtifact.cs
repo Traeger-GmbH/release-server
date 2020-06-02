@@ -1,9 +1,8 @@
 using System.IO.Compression;
-using Microsoft.AspNetCore.Http;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ReleaseArtifactModel
+    public class ReleaseArtifact
     {
         public ProductInformation ProductInformation { get; set; }
         
