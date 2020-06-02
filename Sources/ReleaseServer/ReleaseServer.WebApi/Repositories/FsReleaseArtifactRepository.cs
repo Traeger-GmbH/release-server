@@ -110,11 +110,9 @@ namespace ReleaseServer.WebApi.Repositories
 
                     var releaseNotesFileName = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
                     
-                    var jsonSerializer = new JsonSerializable<ReleaseNotes>();
-
                     return new ReleaseInformation
                     {
-                        ReleaseNotes = jsonSerializer.FromJsonFile(releaseNotesFileName), 
+                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName), 
                         ReleaseDate = deploymentMetaInfo.ReleaseDate
                     };
                 }
@@ -284,9 +282,8 @@ namespace ReleaseServer.WebApi.Repositories
             if (deploymentMetaName == null)
                 throw new Exception("meta information of the specified product does not exist!");
 
-            var jsonDeserializer = new JsonSerializable<DeploymentMetaInfo>();
-
-            return jsonDeserializer.FromJsonFile(deploymentMetaName.FullName);
+            return
+                DeploymentMetaInfo.FromJsonFile(deploymentMetaName.FullName);
         }
     }
 }

@@ -71,21 +71,43 @@ namespace ReleaseServer.WebApi.Test.Common
         [Fact]
         public void DeserializeReleaseNotes()
         {
-            var serializer = new JsonSerializable<ReleaseNotes>();
-
-            var parsedReleaseNotes = serializer.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testReleaseNotes.json"));
+            var parsedReleaseNotes = ReleaseNotes.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testReleaseNotes.json"));
 
             parsedReleaseNotes.Should().BeEquivalentTo(ExpectedReleaseNotes);
         }
 
         [Fact]
-        public void DeserializeDeploymentMetaInfo()
+        public void DeserializeDeploymentMetaInfo_Success()
         {
-            var deserializer = new JsonSerializable<DeploymentMetaInfo>();
-
-            var parsedMeta = deserializer.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testDeployment.json"));
+            var parsedMeta = DeploymentMetaInfo.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testDeployment.json"));
             
             parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
+        }
+        
+        [Fact]
+        public void DeserializeDeploymentMetaInfo_Error_No_ReleaseDate()
+        {
+            var pathToInvalidMeta = Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "invalid_meta_format", "no_release_date_deployment.json");
+            
+            var exception = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() => 
+                DeploymentMetaInfo.FromJsonFile(pathToInvalidMeta));
+
+            Assert.Equal("Required property 'ReleaseDate' not found in JSON. Path '', line 4, position 1.",
+                exception.Message);
+        }
+        
+        [Fact]
+        public void DeserializeDeploymentMetaInfo_Error_Empty_ReleaseDate()
+        {
+            var pathToMetaWithEmptyDate = Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+                "invalid_meta_format", "empty_release_date_deployment.json");
+            
+            var exception = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() => 
+                DeploymentMetaInfo.FromJsonFile(pathToMetaWithEmptyDate));
+            
+            Assert.Equal("Error converting value {null} to type 'System.DateTime'. Path 'ReleaseDate', line 4, position 19.",
+                exception.Message);
         }
     }
 }

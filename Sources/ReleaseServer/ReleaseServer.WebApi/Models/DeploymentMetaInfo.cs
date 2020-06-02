@@ -1,9 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using ReleaseServer.WebApi.Common;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class DeploymentMetaInfo
+    public class DeploymentMetaInfo : JsonSerializable<DeploymentMetaInfo>
     {
         [JsonRequired]
         public string ReleaseNotesFileName { get; set; }
