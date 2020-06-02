@@ -1,9 +1,9 @@
 namespace ReleaseServer.WebApi.Models
 {
-    public class BackupInformationModel
+    public class ArtifactDownload
     {
-        public string FullPath { get; set; }
-        
         public string FileName { get; set; }
+        
+        public byte[] Payload { get; set; }
     }
 }

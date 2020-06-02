@@ -1,9 +1,9 @@
-using System;
 using System.IO;
 using System.IO.Compression;
 using FluentAssertions;
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
+using ReleaseServer.WebApi.Test.Utils;
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test
@@ -14,7 +14,7 @@ namespace ReleaseServer.WebApi.Test
 
         public ReleaseArtifactMapperTest()
         {
-            var projectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            var projectDirectory = TestUtils.GetProjectDirectory();
             testFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
         }
         
@@ -25,9 +25,9 @@ namespace ReleaseServer.WebApi.Test
             using var stream = new MemoryStream(testFile);
             var testZip = new ZipArchive(stream);
             
-            var expectedArtifact = new ReleaseArtifactModel
+            var expectedArtifact = new ReleaseArtifact
             {
-                ProductInformation = new ProductInformationModel
+                ProductInformation = new ProductInformation
                 {
                     ProductIdentifier = "product",
                     Version = "1.1".ToProductVersion(),

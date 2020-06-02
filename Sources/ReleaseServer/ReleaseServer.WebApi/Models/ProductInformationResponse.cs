@@ -2,12 +2,12 @@ using System.Collections.Generic;
 
 namespace ReleaseServer.WebApi.Models
 {
-    public class ProductInformationListResponseModel
+    public class ProductInformationListResponse
     {
-        public List<ProductInformationResponseModel> ProductInformation { get; set; }
+        public List<ProductInformationResponse> ProductInformation { get; set; }
     }
     
-    public class ProductInformationResponseModel
+    public class ProductInformationResponse
     {
         public string Identifier { get; set; }
         

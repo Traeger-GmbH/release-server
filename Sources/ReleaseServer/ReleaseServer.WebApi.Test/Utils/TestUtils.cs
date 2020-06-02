@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 
@@ -39,6 +40,10 @@ namespace ReleaseServer.WebApi.Test.Utils
 
             return Path.Combine(destinationPath.ToString(), "testFile");
         }
-        
+
+        public static string GetProjectDirectory()
+        {
+            return Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        }
     }
 }

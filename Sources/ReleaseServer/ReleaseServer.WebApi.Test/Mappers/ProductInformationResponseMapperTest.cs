@@ -8,11 +8,11 @@ namespace ReleaseServer.WebApi.Test
 {
     public class ProductInformationResponseMapperTest
     {
-        private readonly ProductInformationModel testProductInfo1, testProductInfo2;
+        private readonly ProductInformation testProductInfo1, testProductInfo2;
 
         public ProductInformationResponseMapperTest()
         {
-            testProductInfo1 = new ProductInformationModel
+            testProductInfo1 = new ProductInformation
             {
                 ProductIdentifier = "product1",
                 Os = "ubuntu",
@@ -20,7 +20,7 @@ namespace ReleaseServer.WebApi.Test
                 Version = "1.0".ToProductVersion()
             };
 
-            testProductInfo2 = new ProductInformationModel
+            testProductInfo2 = new ProductInformation
             {
                 ProductIdentifier = "product1",
                 Os = "ubuntu",
@@ -33,7 +33,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestProductInformationResponseMapping()
         {
             //Setup
-            var expectedProductResult1 = new ProductInformationResponseModel
+            var expectedProductResult1 = new ProductInformationResponse
             {
                 Identifier = "product1",
                 Os = "ubuntu",
@@ -41,7 +41,7 @@ namespace ReleaseServer.WebApi.Test
                 Version = "1.0"
             };
             
-            var expectedProductResult2 = new ProductInformationResponseModel
+            var expectedProductResult2 = new ProductInformationResponse
             {
                 Identifier = "product1",
                 Os = "ubuntu",
@@ -62,18 +62,18 @@ namespace ReleaseServer.WebApi.Test
         public void TestProductInformationListResponseMapping()
         {
             //Setup
-            var testProductInfoList = new List<ProductInformationModel>
+            var testProductInfoList = new List<ProductInformation>
             {
                 testProductInfo1,
                 testProductInfo2
             };
 
 
-            var expectedProductInforListRepsonse = new ProductInformationListResponseModel
+            var expectedProductInforListRepsonse = new ProductInformationListResponse
             {
-                ProductInformation = new List<ProductInformationResponseModel>
+                ProductInformation = new List<ProductInformationResponse>
                 {
-                    new ProductInformationResponseModel
+                    new ProductInformationResponse
                     {
                         Identifier = "product1",
                         Os = "ubuntu",
@@ -81,7 +81,7 @@ namespace ReleaseServer.WebApi.Test
                         Version = "1.0"
                     },
 
-                    new ProductInformationResponseModel
+                    new ProductInformationResponse
                     {
                         Identifier = "product1",
                         Os = "ubuntu",

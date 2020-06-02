@@ -5,9 +5,9 @@ namespace ReleaseServer.WebApi.Mappers
 {
     public static class PlatformsMapper
     {
-        public static PlatformsResponseModel ToPlatformsResponse(this List<string> platforms)
+        public static PlatformsResponse ToPlatformsResponse(this List<string> platforms)
         {
-            return new PlatformsResponseModel
+            return new PlatformsResponse
             {
                 Platforms = platforms
             };

@@ -26,9 +26,9 @@ namespace ReleaseServer.WebApi.Mappers
             };
         }
 
-        public static ProductVersionResponseModel ToProductVersionResponse(this string version)
+        public static ProductVersionResponse ToProductVersionResponse(this string version)
         {
-            return new ProductVersionResponseModel
+            return new ProductVersionResponse
             {
                 Version = version
             };

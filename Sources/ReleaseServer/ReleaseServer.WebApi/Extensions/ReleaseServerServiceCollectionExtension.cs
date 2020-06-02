@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Repositories;
 using ReleaseServer.WebApi.Services;
 
-namespace ReleaseServer.WebApi.Common
+namespace ReleaseServer.WebApi.Extensions
 {
     public static class ReleaseServerServiceCollectionExtension
     {
