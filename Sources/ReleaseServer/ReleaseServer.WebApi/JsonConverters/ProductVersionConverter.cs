@@ -1,6 +1,5 @@
 using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using ReleaseServer.WebApi.Models;
 
 
@@ -16,7 +15,7 @@ namespace ReleaseServer.WebApi.JsonConverters
         public override ProductVersion ReadJson(JsonReader reader, Type objectType, ProductVersion existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            return existingValue;
+            throw new NotImplementedException("this functionality is not implemented yet");
         }
     }
 }
