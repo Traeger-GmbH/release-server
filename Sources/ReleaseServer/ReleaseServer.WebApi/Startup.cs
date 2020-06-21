@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ReleaseServer.WebApi.Auth;
+using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.JsonConverters;
 using ReleaseServer.WebApi.SwaggerDocu;
@@ -40,7 +41,10 @@ namespace ReleaseServer.WebApi
                 .AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
-                   options.SerializerSettings.Converters.Add(new ProductVersionConverter());
+                    foreach (var jsonConverter in JsonConfiguration.Settings.Converters)
+                    { 
+                        options.SerializerSettings.Converters.Add(jsonConverter);
+                    }
                 });
             
             services.AddSwaggerGen(c =>
