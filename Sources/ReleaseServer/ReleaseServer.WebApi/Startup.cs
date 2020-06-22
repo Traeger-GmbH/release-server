@@ -41,10 +41,7 @@ namespace ReleaseServer.WebApi
                 .AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
-                    foreach (var jsonConverter in JsonConfiguration.Settings.Converters)
-                    { 
-                        options.SerializerSettings.Converters.Add(jsonConverter);
-                    }
+                    JsonConfiguration.Configure(options);
                 });
             
             services.AddSwaggerGen(c =>
