@@ -6,7 +6,7 @@ namespace ReleaseServer.WebApi.Models
     {
         
         //Will be extended depending on the further requirements
-        public string Changelog { get; set;}
+        public ReleaseNotes ReleaseNotes { get; set;}
 
         public DateTime ReleaseDate { get; set;}
     }

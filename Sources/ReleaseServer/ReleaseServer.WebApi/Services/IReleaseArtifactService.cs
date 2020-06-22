@@ -11,8 +11,8 @@ namespace ReleaseServer.WebApi.Services
         Task<List<ProductInformation>> GetProductInfos(string productName);
         Task<List<string>> GetPlatforms(string productName, string version);
         Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version);
-        Task<List<string>> GetVersions(string productName, string os, string architecture);
-        Task<string> GetLatestVersion(string productName, string os, string architecture);
+        Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture);
+        Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture);
         Task<ArtifactDownload> GetSpecificArtifact(string productName, string os, string architecture, string version);
         Task<ArtifactDownload> GetLatestArtifact(string productName, string os, string architecture);
         Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture, string version);

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
@@ -69,16 +71,16 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductInformationListResponse), 200)]
+        [ProducesResponseType(typeof(ProductInformationList), 200)]
         [HttpGet("versions/{product}")]
-        public async Task<ActionResult<ProductInformationListResponse>> GetProductInfos([Required] string product)
+        public async Task<ActionResult<ProductInformationList>> GetProductInfos([Required] string product)
         {
             var productInfos = await ReleaseArtifactService.GetProductInfos(product);
 
             if (productInfos.IsNullOrEmpty()) 
                 return NotFound("The specified product was not found!");
             
-            return productInfos.ToProductInfoListResponse();
+            return new ProductInformationList(productInfos);
         }
 
         /// <summary>
@@ -89,9 +91,9 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing Platforms for the specified product name.</response>
         /// <response code="404">The product does not exist or there exists no platform for the specified product.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(PlatformsResponse), 200)]
+        [ProducesResponseType(typeof(PlatformsList), 200)]
         [HttpGet("platforms/{product}/{version}")]
-        public async Task<ActionResult<PlatformsResponse>> GetPlatforms([Required] string product, [Required]string version)
+        public async Task<ActionResult<PlatformsList>> GetPlatforms([Required] string product, [Required]string version)
         {
             var platformsList = await ReleaseArtifactService.GetPlatforms(product, version);
 
@@ -99,7 +101,7 @@ namespace ReleaseServer.WebApi.Controllers
                 return NotFound("The specified product was not found or there exists no platform for the specified product!");
             
             
-            return platformsList.ToPlatformsResponse();
+            return new PlatformsList(platformsList);
         }
         
         /// <summary>
@@ -110,7 +112,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <param name="architecture"></param>
         /// <param name="version"></param>
         /// <response code="200">The specific product exists.</response>
-        /// <response code="404">The product with the specified product name does not exist. Therefore the changelog does not exist.</response>
+        /// <response code="404">The product with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ReleaseInformation), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
@@ -133,16 +135,16 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">There are existing versions for the specified platform and product.</response>
         /// <response code="404">There exists no version for the specified platform / product.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductVersionListResponseModel), 200)]
+        [ProducesResponseType(typeof(ProductVersionList), 200)]
         [HttpGet("versions/{product}/{os}/{architecture}")]
-        public async Task<ActionResult<ProductVersionListResponseModel>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
+        public async Task<ActionResult<ProductVersionList>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
             var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
             
             if (productVersions.IsNullOrEmpty()) 
                 return NotFound("No versions for the specified platform / product name found!");
 
-            return productVersions.ToProductVersionListResponse();
+            return new ProductVersionList(productVersions);
         }
         
         /// <summary>
@@ -234,10 +236,10 @@ namespace ReleaseServer.WebApi.Controllers
         {
             var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
             
-            if (latestVersion.IsNullOrEmpty())
-                return NotFound("The specified product was not found!");
-
-            return latestVersion.ToProductVersionResponse();
+           if (latestVersion == null)
+               return NotFound("The specified product was not found!");
+            
+            return new ProductVersionResponse(latestVersion);
         }
         
         /// <summary>

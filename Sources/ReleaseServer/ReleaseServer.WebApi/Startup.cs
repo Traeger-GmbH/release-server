@@ -12,7 +12,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ReleaseServer.WebApi.Auth;
+using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Extensions;
+using ReleaseServer.WebApi.JsonConverters;
 using ReleaseServer.WebApi.SwaggerDocu;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -35,7 +37,13 @@ namespace ReleaseServer.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    JsonConfiguration.Configure(options);
+                });
+            
             services.AddSwaggerGen(c =>
             {
                 

@@ -4,13 +4,12 @@ namespace ReleaseServer.WebApi.Models
 {
     public class ProductVersionResponse
     {
-        //Will be extended depending on the further requirements
+        //TODO: Handle with a custom json converter!
         public string Version { get; set; }
-    }
-    
-    public class ProductVersionListResponseModel
-    {
-        //Will be extended depending on the further requirements
-        public List<string> Versions { get; set; }
+
+        public ProductVersionResponse(ProductVersion productVersion)
+        {
+            Version = productVersion.ToString();
+        }
     }
 }

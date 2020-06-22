@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -67,7 +67,7 @@ namespace ReleaseServer.WebApi.Test
 
             //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "changelog.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes.json")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram.exe")));
             Assert.True(File.Exists(Path.Combine(testPath, "deployment.json")));
             
@@ -78,7 +78,7 @@ namespace ReleaseServer.WebApi.Test
 
             //Assert if the directory and the unzipped files exist
             Assert.True(Directory.Exists(testPath));
-            Assert.True(File.Exists(Path.Combine(testPath, "changelog_update.txt")));
+            Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes_update.json")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
             Assert.True(File.Exists(Path.Combine(testPath, "deployment_update.json")));
 
@@ -86,22 +86,57 @@ namespace ReleaseServer.WebApi.Test
             //Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
         }
 
+        
         [Fact]
         public void TestGetInfosByProductName()
         {
             //Setup
+            var testProductPath = Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.1");
             
             //Cleanup test dir from old tests (if they failed before)
-            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "product"));
+            TestUtils.CleanupDirIfExists(Path.Combine(ProjectDirectory, "TestData", "testproduct"));
+
+            Directory.CreateDirectory(testProductPath);
             
-            Directory.CreateDirectory(Path.Combine(ProjectDirectory, "TestData", "testproduct", "debian", "amd64", "1.0"));
+            var test = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData", "productx", "debian", "amd64", "1.1"));
+
+            foreach (var file in test.GetFiles())
+            {
+                file.CopyTo(Path.Combine(testProductPath, file.Name));
+            }
 
             var expectedProductInfo = new ProductInformation
             {
-                ProductIdentifier = "testproduct",
+                Identifier = "testproduct",
                 Os = "debian",
-                HwArchitecture = "amd64",
-                Version = "1.0".ToProductVersion(),
+                Architecture = "amd64",
+                Version = new ProductVersion("1.1"),
+                ReleaseNotes = new ReleaseNotes
+                {
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
+                    {
+                        {
+                            new CultureInfo("de"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added de 1"}
+                                }
+                            }
+                        },
+                        {
+                            new CultureInfo("en"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added en 1"}
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
             //Act
@@ -142,18 +177,15 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetVersions()
         {
             //Setup 
-            List<string> expectedVersions1 = new List<string>()
-                {"1.2-beta", "1.1"};
+            var expectedVersions1 = new List<ProductVersion>
+                {new ProductVersion("1.2-beta"), new ProductVersion("1.1")};
 
-            List<string> expectedVersions2 = new List<string>()
-            {
-                "1.1", "1.0"
-            };
+            var expectedVersions2 = new List<ProductVersion>
+                { new ProductVersion("1.1"), new ProductVersion("1.0")};
             
-            List<string> expectedVersions3 = new List<string>()
-            {
-                "1.0"
-            };
+            var expectedVersions3 = new List<ProductVersion>
+                {new ProductVersion("1.0")};
+
             
             //Act
             var testVersions1 = FsReleaseArtifactRepository.GetVersions("productx", "debian", "amd64");
@@ -172,23 +204,50 @@ namespace ReleaseServer.WebApi.Test
             //Setup 
             ReleaseInformation expectedReleaseInfo;
             
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            expectedReleaseInfo = new ReleaseInformation
             {
-                expectedReleaseInfo = new ReleaseInformation
+                ReleaseDate = new DateTime(2020, 02, 10),
+                
+                ReleaseNotes = new ReleaseNotes
                 {
-                    Changelog = "Release 1.0.0\r\n- This is an example\r\n- This is another example",
-                    ReleaseDate = new DateTime(2020, 02, 10)
-                };
-            }
-            else
-            {
-                expectedReleaseInfo = new ReleaseInformation
-                {
-                    Changelog = "Release 1.0.0\n- This is an example\n- This is another example",
-                    ReleaseDate = new DateTime(2020, 02, 10)
-                };
-
-            }
+                    
+                    Changes = new Dictionary<CultureInfo, List<ChangeSet>>
+                    {
+                        {new CultureInfo("de"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added de 1", "added de 2"},
+                                    Fixed = new List<string>{"fix de 1", "fix de 2"},
+                                    Breaking = new List<string>{"breaking de 1", "breaking de 2"},
+                                    Deprecated = new List<string>{"deprecated de 1", "deprecated de 2"}
+                                }
+                            }
+                        },
+                        {new CultureInfo("en"), new List<ChangeSet>
+                            {
+                                new ChangeSet
+                                {
+                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
+                                    Added = new List<string>{"added en 1", "added en 2"},
+                                    Fixed = new List<string>{"fix en 1", "fix en 2"},
+                                    Breaking = new List<string>{"breaking en 1", "breaking en 2"},
+                                    Deprecated = new List<string>{"deprecated en 1", "deprecated en 2"}
+                                },
+                                new ChangeSet
+                                {
+                                    Platforms = null,
+                                    Added = new List<string>{"added en 3"},
+                                    Fixed = new List<string>{"fix en 3"},
+                                    Breaking = new List<string>{"breaking en 3"},
+                                    Deprecated = new List<string>{"deprecated en 3"}
+                                }
+                            }
+                        }
+                    }
+                }
+            };
             
             //Act
             var testReleaseInfo = FsReleaseArtifactRepository.GetReleaseInfo("productx", "ubuntu",

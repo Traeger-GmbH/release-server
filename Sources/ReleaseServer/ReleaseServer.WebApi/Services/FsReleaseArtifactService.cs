@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,12 +71,12 @@ namespace ReleaseServer.WebApi.Services
                 FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
         }
 
-        public async Task<List<string>> GetVersions(string productName, string os, string architecture)
+        public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
         {
             return await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
         }
 
-        public async Task<string> GetLatestVersion(string productName, string os, string architecture)
+        public async Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture)
         {
             var versions = await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
 
@@ -99,7 +101,7 @@ namespace ReleaseServer.WebApi.Services
                 return null;
 
             return await Task.Run(() =>
-                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion));
+                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
@@ -209,7 +211,7 @@ namespace ReleaseServer.WebApi.Services
                 }
             }
 
-            //Check if the uploaded payload contains the rest of the expected parts
+            //Check if the uploaded payload contains the the artifact file
             if (payloadZipArchive.GetEntry(deploymentMetaInfo.ArtifactFileName) == null)
             {
                 var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
@@ -218,14 +220,41 @@ namespace ReleaseServer.WebApi.Services
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
 
-            if (payloadZipArchive.GetEntry(deploymentMetaInfo.ChangelogFileName) == null)
+            if (payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName) == null)
             {
-                var validationError = "the expected changelog file" + " \"" +  deploymentMetaInfo.ChangelogFileName +
+                var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                       "\"" +  " does not exist in the uploaded payload!";
                 Logger.LogError(validationError);
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
-
+            
+            //Check if the uploaded payload contains the release notes file
+            var releaseNotesEntry = payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName);
+            
+            if (releaseNotesEntry == null)
+            {
+                var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
+                                      "\"" +  " does not exist in the uploaded payload!";
+                Logger.LogError(validationError);
+                return new ValidationResult {IsValid = false, ValidationError = validationError};
+            }
+            
+            //Try to Deserialize the release notes and check if it is valid
+            using (StreamReader releaseNotesFile = new StreamReader(releaseNotesEntry.Open(), System.Text.Encoding.UTF8))
+            {
+                try
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Deserialize(releaseNotesFile, typeof(ReleaseNotes));
+                }
+                catch (Exception e)
+                {
+                    var validationError = "the release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
+                                          "\" is an invalid json file! " + "Error: " + e.Message;;
+                    return new ValidationResult { IsValid = false, ValidationError = validationError };
+                }
+            }
+            
             //The uploaded payload is valid
             return new ValidationResult {IsValid = true};
         }

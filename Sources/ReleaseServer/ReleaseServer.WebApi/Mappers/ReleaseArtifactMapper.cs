@@ -14,10 +14,10 @@ namespace ReleaseServer.WebApi.Mappers
             {
                 ProductInformation = new ProductInformation
                 {
-                    ProductIdentifier = product,
+                    Identifier = product,
                     Os = os,
-                    HwArchitecture = architecture,
-                    Version = version.ToProductVersion()
+                    Architecture = architecture,
+                    Version = new ProductVersion(version)
                 },
                 Payload = payload
             };
