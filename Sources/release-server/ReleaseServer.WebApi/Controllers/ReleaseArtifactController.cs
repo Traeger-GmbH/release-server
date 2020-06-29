@@ -21,14 +21,14 @@ namespace ReleaseServer.WebApi.Controllers
     [Route("[controller]")]
     public class ReleaseArtifactController : ControllerBase
     {
-        private IReleaseArtifactService ReleaseArtifactService;
-        private ILogger Logger;
+        private IReleaseArtifactService releaseArtifactService;
+        private ILogger logger;
 
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
             IReleaseArtifactService releaseArtifactService)
         {
-            Logger = logger;
-            ReleaseArtifactService = releaseArtifactService;
+            this.logger = logger;
+            this.releaseArtifactService = releaseArtifactService;
         }
         
         /// <summary>
@@ -54,12 +54,12 @@ namespace ReleaseServer.WebApi.Controllers
                 return BadRequest("No or invalid body provided (must be a Zip file)");
             
             //Validate the payload of the uploaded Zip file
-            var validationResult = ReleaseArtifactService.ValidateUploadPayload(artifact);
+            var validationResult = releaseArtifactService.ValidateUploadPayload(artifact);
 
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ValidationError);
             
-            await ReleaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
+            await releaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
             
             return Ok("Upload of the artifact successful!");
         }
@@ -75,7 +75,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("versions/{product}")]
         public async Task<ActionResult<ProductInformationList>> GetProductInfos([Required] string product)
         {
-            var productInfos = await ReleaseArtifactService.GetProductInfos(product);
+            var productInfos = await releaseArtifactService.GetProductInfos(product);
 
             if (productInfos.IsNullOrEmpty()) 
                 return NotFound("The specified product was not found!");
@@ -95,7 +95,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("platforms/{product}/{version}")]
         public async Task<ActionResult<PlatformsList>> GetPlatforms([Required] string product, [Required]string version)
         {
-            var platformsList = await ReleaseArtifactService.GetPlatforms(product, version);
+            var platformsList = await releaseArtifactService.GetPlatforms(product, version);
 
             if (platformsList.IsNullOrEmpty()) 
                 return NotFound("The specified product was not found or there exists no platform for the specified product!");
@@ -118,7 +118,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
         public async Task<ActionResult<ReleaseInformation>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            var releaseInfo = await ReleaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+            var releaseInfo = await releaseArtifactService.GetReleaseInfo(product, os, architecture, version);
 
             if (releaseInfo == null)
                 return NotFound("The Release information does not exist (the specified product was not found)!");
@@ -139,7 +139,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpGet("versions/{product}/{os}/{architecture}")]
         public async Task<ActionResult<ProductVersionList>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
-            var productVersions = await ReleaseArtifactService.GetVersions(product, os, architecture);
+            var productVersions = await releaseArtifactService.GetVersions(product, os, architecture);
             
             if (productVersions.IsNullOrEmpty()) 
                 return NotFound("No versions for the specified platform / product name found!");
@@ -163,7 +163,7 @@ namespace ReleaseServer.WebApi.Controllers
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = await ReleaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
+            var response = await releaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             if (response == null)
                 return NotFound("The specified product was not found!");
@@ -199,7 +199,7 @@ namespace ReleaseServer.WebApi.Controllers
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var response = await ReleaseArtifactService.GetLatestArtifact(product, os, architecture);
+            var response = await releaseArtifactService.GetLatestArtifact(product, os, architecture);
             
             if (response == null)
                 return NotFound("The specified product was not found!");
@@ -234,7 +234,7 @@ namespace ReleaseServer.WebApi.Controllers
         [ProducesResponseType(typeof(ProductVersionResponse), 200)]
         public async Task<ActionResult<ProductVersionResponse>> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
-            var latestVersion = await ReleaseArtifactService.GetLatestVersion(product, os, architecture);
+            var latestVersion = await releaseArtifactService.GetLatestVersion(product, os, architecture);
             
            if (latestVersion == null)
                return NotFound("The specified product was not found!");
@@ -255,7 +255,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            var artifactFound = await ReleaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
+            var artifactFound = await releaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
             
             if (!artifactFound) 
                 return NotFound("The product you want to delete does not exist!");
@@ -274,7 +274,7 @@ namespace ReleaseServer.WebApi.Controllers
         [HttpDelete("{product}")]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
-            var productFound = await ReleaseArtifactService.DeleteProductIfExists(product);
+            var productFound = await releaseArtifactService.DeleteProductIfExists(product);
             
             if (!productFound)
                 return NotFound("The products you want to delete do not exist!");
@@ -294,7 +294,7 @@ namespace ReleaseServer.WebApi.Controllers
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
 
-            var backupInfo = await ReleaseArtifactService.RunBackup();
+            var backupInfo = await releaseArtifactService.RunBackup();
             
             var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
 
@@ -324,7 +324,7 @@ namespace ReleaseServer.WebApi.Controllers
             if (backupFile == null)
                 return BadRequest();
             
-            await ReleaseArtifactService.RestoreBackup(backupFile);
+            await releaseArtifactService.RestoreBackup(backupFile);
 
             return Ok("backup successfully restored");
         }

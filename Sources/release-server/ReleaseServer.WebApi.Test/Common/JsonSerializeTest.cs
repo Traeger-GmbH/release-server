@@ -14,14 +14,14 @@ namespace ReleaseServer.WebApi.Test.Common
 {
     public class JsonSerializeTest
     {
-        private readonly string ProjectDirectory;
-        private readonly ReleaseNotes ExpectedReleaseNotes;
-        private readonly DeploymentMetaInfo ExpectedMeta;
+        private readonly string projectDirectory;
+        private readonly ReleaseNotes expectedReleaseNotes;
+        private readonly DeploymentMetaInfo expectedMeta;
 
         public JsonSerializeTest()
         {
-            ProjectDirectory = TestUtils.GetProjectDirectory();
-            ExpectedReleaseNotes = new ReleaseNotes
+            projectDirectory = TestUtils.GetProjectDirectory();
+            expectedReleaseNotes = new ReleaseNotes
             {
                 Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                 {
@@ -61,7 +61,7 @@ namespace ReleaseServer.WebApi.Test.Common
                     }
                 }
             };
-            ExpectedMeta =  new DeploymentMetaInfo
+            expectedMeta =  new DeploymentMetaInfo
             {
                 ReleaseNotesFileName = "releaseNotes.json",
                 ArtifactFileName = "artifact.zip",
@@ -73,23 +73,23 @@ namespace ReleaseServer.WebApi.Test.Common
         [Fact]
         public void DeserializeReleaseNotes()
         {
-            var parsedReleaseNotes = ReleaseNotes.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testReleaseNotes.json"));
+            var parsedReleaseNotes = ReleaseNotes.FromJsonFile(Path.Combine(projectDirectory, "TestData", "testReleaseNotes.json"));
 
-            parsedReleaseNotes.Should().BeEquivalentTo(ExpectedReleaseNotes);
+            parsedReleaseNotes.Should().BeEquivalentTo(expectedReleaseNotes);
         }
 
         [Fact]
         public void DeserializeDeploymentMetaInfo_Success()
         {
-            var parsedMeta = DeploymentMetaInfo.FromJsonFile(Path.Combine(ProjectDirectory, "TestData", "testDeployment.json"));
+            var parsedMeta = DeploymentMetaInfo.FromJsonFile(Path.Combine(projectDirectory, "TestData", "testDeployment.json"));
             
-            parsedMeta.Should().BeEquivalentTo(ExpectedMeta);
+            parsedMeta.Should().BeEquivalentTo(expectedMeta);
         }
         
         [Fact]
         public void DeserializeDeploymentMetaInfo_Error_No_ReleaseDate()
         {
-            var pathToInvalidMeta = Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+            var pathToInvalidMeta = Path.Combine(projectDirectory, "TestData", "validateUploadPayload",
                 "invalid_meta_format", "no_release_date_deployment.json");
             
             var exception = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() => 
@@ -102,7 +102,7 @@ namespace ReleaseServer.WebApi.Test.Common
         [Fact]
         public void DeserializeDeploymentMetaInfo_Error_Empty_ReleaseDate()
         {
-            var pathToMetaWithEmptyDate = Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+            var pathToMetaWithEmptyDate = Path.Combine(projectDirectory, "TestData", "validateUploadPayload",
                 "invalid_meta_format", "empty_release_date_deployment.json");
             
             var exception = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() => 

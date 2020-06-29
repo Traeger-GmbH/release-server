@@ -13,19 +13,19 @@ namespace ReleaseServer.WebApi.Test.Mappers
 {
     public class ReleaseArtifactMapperTest
     {
-        private readonly byte[] TestFile;
+        private readonly byte[] testFile;
 
         public ReleaseArtifactMapperTest()
         {
             var projectDirectory = TestUtils.GetProjectDirectory();
-            TestFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
+            testFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
         }
         
         [Fact]
         public void ConvertToReleaseArtifactTest()
         {
             //Setup
-            using var stream = new MemoryStream(TestFile);
+            using var stream = new MemoryStream(testFile);
             var testZip = new ZipArchive(stream);
             
             var expectedArtifact = new ReleaseArtifact

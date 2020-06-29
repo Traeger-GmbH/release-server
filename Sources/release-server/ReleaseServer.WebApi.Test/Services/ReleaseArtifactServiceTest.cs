@@ -18,26 +18,26 @@ namespace ReleaseServer.WebApi.Test.TestData
 {
     public class ReleaseArtifactServiceTest
     {
-        private IReleaseArtifactService FsReleaseArtifactService;
-        private IReleaseArtifactRepository FsReleaseArtifactRepository;
-        private readonly string ProjectDirectory;
+        private IReleaseArtifactService fsReleaseArtifactService;
+        private IReleaseArtifactRepository fsReleaseArtifactRepository;
+        private readonly string projectDirectory;
 
         public ReleaseArtifactServiceTest()
         {
             //Setup
             //Could be done smarter!
-            ProjectDirectory = TestUtils.GetProjectDirectory();
+            projectDirectory = TestUtils.GetProjectDirectory();
 
-            var artifactRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestData"));
-            var backupRootDirectory = new DirectoryInfo(Path.Combine(ProjectDirectory, "TestBackupDir"));
+            var artifactRootDirectory = new DirectoryInfo(Path.Combine(projectDirectory, "TestData"));
+            var backupRootDirectory = new DirectoryInfo(Path.Combine(projectDirectory, "TestBackupDir"));
 
-            FsReleaseArtifactRepository = new FsReleaseArtifactRepository(
+            fsReleaseArtifactRepository = new FsReleaseArtifactRepository(
                     Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                     artifactRootDirectory,
                     backupRootDirectory
                 );
-            FsReleaseArtifactService = new FsReleaseArtifactService(
-                    FsReleaseArtifactRepository,
+            fsReleaseArtifactService = new FsReleaseArtifactService(
+                    fsReleaseArtifactRepository,
                     Substitute.For<ILogger<FsReleaseArtifactService>>()
                 );
         }
@@ -46,8 +46,8 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestGetLatestVersion()
         {
            //Act
-            var testVersions1 = await FsReleaseArtifactService.GetLatestVersion("productx", "debian", "amd64");
-            var testVersions2 = await FsReleaseArtifactService.GetLatestVersion("productx", "ubuntu", "amd64");
+            var testVersions1 = await fsReleaseArtifactService.GetLatestVersion("productx", "debian", "amd64");
+            var testVersions2 = await fsReleaseArtifactService.GetLatestVersion("productx", "ubuntu", "amd64");
 
             //Assert
             Assert.Equal(new ProductVersion("1.2-beta"), testVersions1);
@@ -58,7 +58,7 @@ namespace ReleaseServer.WebApi.Test.TestData
         public async void TestGetLatestVersion_Not_Found()
         {
             //Act
-            var testVersion = await FsReleaseArtifactService.GetLatestVersion("nonExistentProduct", "noOs", "noArch");
+            var testVersion = await fsReleaseArtifactService.GetLatestVersion("nonExistentProduct", "noOs", "noArch");
 
             //Assert
             Assert.Null(testVersion);
@@ -68,7 +68,7 @@ namespace ReleaseServer.WebApi.Test.TestData
         public void TestValidateUploadPayload_Valid()
         {
             //Prepare
-            var testUploadPayload = File.ReadAllBytes(Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload",
+            var testUploadPayload = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "validateUploadPayload",
                 "valid", "test_payload_valid.zip")); 
             
             var testFormFile = new FormFile(new MemoryStream(testUploadPayload),
@@ -78,7 +78,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 fileName: "test_zip_valid.zip");
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.True(validationResult.IsValid);
             Assert.Null(validationResult.ValidationError);
@@ -90,8 +90,8 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
             });
 
             var testZipFile = TestUtils.CreateTestZipFile(filePaths);
@@ -105,7 +105,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected artifact \"testprogram.exe\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -117,8 +117,8 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json")
             });
             
             var testZipFile = TestUtils.CreateTestZipFile(filePaths);
@@ -132,7 +132,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the expected release notes file \"releaseNotes.json\" does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -144,9 +144,9 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "invalid_meta_format", "deployment.json"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "invalid_meta_format", "deployment.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
                 
             });
 
@@ -162,7 +162,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                 "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -174,9 +174,9 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "invalid_meta_structure", "deployment.json"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "invalid_meta_structure", "deployment.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json"),
                 
             });
             
@@ -193,7 +193,7 @@ namespace ReleaseServer.WebApi.Test.TestData
 
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -205,8 +205,8 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json")
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "releaseNotes.json")
             });
             
             var testZipFile = TestUtils.CreateTestZipFile(filePaths);
@@ -220,7 +220,7 @@ namespace ReleaseServer.WebApi.Test.TestData
             var expectedValidationError = "the deployment.json does not exist in the uploaded payload!";
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -232,9 +232,9 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_format", "releaseNotes.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_format", "releaseNotes.json"),
                 
             });
             
@@ -250,7 +250,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                                           "Error: Unexpected character encountered while parsing value: i. Path '', line 0, position 0.";
             
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);
@@ -262,9 +262,9 @@ namespace ReleaseServer.WebApi.Test.TestData
             //Prepare
             var filePaths = new List<string>(new[]
             {
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
-                Path.Combine(ProjectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_structure", "releaseNotes.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "testprogram.exe"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "valid", "deployment.json"),
+                Path.Combine(projectDirectory, "TestData", "validateUploadPayload", "test_payload_invalid_release_notes_structure", "releaseNotes.json"),
                 
             });
             
@@ -280,7 +280,7 @@ namespace ReleaseServer.WebApi.Test.TestData
                                           " Error: Required property 'Changes' not found in JSON. Path '', line 3, position 1.";
 
             //Act
-            var validationResult = FsReleaseArtifactService.ValidateUploadPayload(testFormFile);
+            var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
             Assert.Equal(expectedValidationError, validationResult.ValidationError);

@@ -9,18 +9,18 @@ namespace ReleaseServer.WebApi.Test.Extensions
 {
     public class DirectoryInfoExtensionTest
     {
-        private readonly string ProjectDirectory;
+        private readonly string projectDirectory;
 
         public DirectoryInfoExtensionTest()
         {
-            ProjectDirectory = TestUtils.GetProjectDirectory();
+            projectDirectory = TestUtils.GetProjectDirectory();
         }
 
         [Fact]
         public void DeleteFileContent()
         {
             //Setup
-            var testDir = Path.Combine(ProjectDirectory, "TestDirectoryForDeletion");
+            var testDir = Path.Combine(projectDirectory, "TestDirectoryForDeletion");
             
             //Cleanup test dir from old tests (if they failed before)
             TestUtils.CleanupDirIfExists(Path.Combine(testDir));
@@ -47,8 +47,8 @@ namespace ReleaseServer.WebApi.Test.Extensions
         public void MoveDirectory_Success()
         {
             //Setup
-            var testDestinationDir = Path.Combine(ProjectDirectory, "TestDestinationDir");
-            var testSourceDir = Path.Combine(ProjectDirectory, "TestSourceDir");
+            var testDestinationDir = Path.Combine(projectDirectory, "TestDestinationDir");
+            var testSourceDir = Path.Combine(projectDirectory, "TestSourceDir");
             
             //Cleanup test dir from old tests (if they failed before)
             TestUtils.CleanupDirIfExists(testDestinationDir);
@@ -77,8 +77,8 @@ namespace ReleaseServer.WebApi.Test.Extensions
         public void MoveDirectory_Error()
         {
             //Setup
-            var testDestinationDir = Path.Combine(ProjectDirectory, "TestDestinationDir");
-            var testSourceDir = Path.Combine(ProjectDirectory, "TestSourceDir");
+            var testDestinationDir = Path.Combine(projectDirectory, "TestDestinationDir");
+            var testSourceDir = Path.Combine(projectDirectory, "TestSourceDir");
             
             //Cleanup test dir from old tests (if they failed before)
             TestUtils.CleanupDirIfExists(testDestinationDir);

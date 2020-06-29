@@ -4,17 +4,12 @@ using Newtonsoft.Json;
 
 using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Test.Utils;
-
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.JsonConverters
 {
     public class ProductVersionConverterTest
     {
-
-        private readonly string ProjectDirectory = TestUtils.GetProjectDirectory();
-        
         [Fact]
         public void TestWriteJson_Success()
         {

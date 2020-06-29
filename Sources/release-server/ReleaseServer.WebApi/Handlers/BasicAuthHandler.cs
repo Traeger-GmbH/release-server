@@ -17,7 +17,7 @@ namespace ReleaseServer.WebApi.Auth
 {
     public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        private readonly IConfiguration Configuration;
+        private readonly IConfiguration configuration;
 
         public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -25,7 +25,7 @@ namespace ReleaseServer.WebApi.Auth
             UrlEncoder encoder,
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            Configuration = configuration;
+            this.configuration = configuration;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -83,8 +83,8 @@ namespace ReleaseServer.WebApi.Auth
             //Didn't have to be async, but later if there are DB operations needed.
             var validCredentials = await Task.Run(() =>
                 new Credentials{
-                    Username = Configuration["Credentials:Username"],
-                    Password = Configuration["Credentials:Password"]});
+                    Username = configuration["Credentials:Username"],
+                    Password = configuration["Credentials:Password"]});
             
             if (CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username)) && 
                 CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), Encoding.UTF8.GetBytes(validCredentials.Password)))

@@ -21,66 +21,66 @@ namespace ReleaseServer.WebApi.Services
 {
     public class FsReleaseArtifactService : IReleaseArtifactService
     {
-        private IReleaseArtifactRepository FsReleaseArtifactRepository;
-        private ILogger Logger;
-        private static SemaphoreSlim DirectoryLock;
+        private IReleaseArtifactRepository fsReleaseArtifactRepository;
+        private ILogger logger;
+        private static SemaphoreSlim directoryLock;
 
         public FsReleaseArtifactService(IReleaseArtifactRepository fsReleaseArtifactRepository,
             ILogger<FsReleaseArtifactService> logger)
         {
-            FsReleaseArtifactRepository = fsReleaseArtifactRepository;
-            Logger = logger;
-            DirectoryLock = new SemaphoreSlim(1, 1);
+            this.fsReleaseArtifactRepository = fsReleaseArtifactRepository;
+            this.logger = logger;
+            directoryLock = new SemaphoreSlim(1, 1);
         }
 
         public async Task StoreArtifact(string product, string os, string architecture, string version,
             IFormFile payload)
         {
-            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
             using var zipPayload = new ZipArchive(payload.OpenReadStream());
             
             var artifact =
                 ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
 
-            await DirectoryLock.WaitAsync();
+            await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                await Task.Run(() => FsReleaseArtifactRepository.StoreArtifact(artifact));
+                await Task.Run(() => fsReleaseArtifactRepository.StoreArtifact(artifact));
             }
             finally
             {
-                DirectoryLock.Release();
+                directoryLock.Release();
             }
             
         }
 
         public async Task<List<ProductInformation>> GetProductInfos(string productName)
         {
-            return await Task.Run(() => FsReleaseArtifactRepository.GetInfosByProductName(productName));
+            return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
         }
 
         public async Task<List<string>> GetPlatforms(string productName, string version)
         {
-            return await Task.Run(() => FsReleaseArtifactRepository.GetPlatforms(productName, version));
+            return await Task.Run(() => fsReleaseArtifactRepository.GetPlatforms(productName, version));
         }
 
         public async Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version)
         {
             return await Task.Run(() =>
-                FsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
+                fsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
         }
 
         public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
         {
-            return await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
+            return await Task.Run(() => fsReleaseArtifactRepository.GetVersions(productName, os, architecture));
         }
 
         public async Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture)
         {
-            var versions = await Task.Run(() => FsReleaseArtifactRepository.GetVersions(productName, os, architecture));
+            var versions = await Task.Run(() => fsReleaseArtifactRepository.GetVersions(productName, os, architecture));
 
             if (versions.IsNullOrEmpty())
                 return null;
@@ -92,7 +92,7 @@ namespace ReleaseServer.WebApi.Services
             string version)
         {
             return await Task.Run(() =>
-                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version));
+                fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version));
         }
 
         public async Task<ArtifactDownload> GetLatestArtifact(string productName, string os, string architecture)
@@ -103,38 +103,38 @@ namespace ReleaseServer.WebApi.Services
                 return null;
 
             return await Task.Run(() =>
-                FsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
+                fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
             string version)
         {
-            await DirectoryLock.WaitAsync();
+            await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
                 return await Task.Run(() =>
-                    FsReleaseArtifactRepository.DeleteSpecificArtifactIfExists(productName, os, architecture, version));
+                    fsReleaseArtifactRepository.DeleteSpecificArtifactIfExists(productName, os, architecture, version));
             }
             finally
             {
-                DirectoryLock.Release();
+                directoryLock.Release();
             }
         }
 
         public async Task<bool> DeleteProductIfExists(string productName)
         {
-            await DirectoryLock.WaitAsync();
+            await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                return await Task.Run(() => FsReleaseArtifactRepository.DeleteProductIfExists(productName));
+                return await Task.Run(() => fsReleaseArtifactRepository.DeleteProductIfExists(productName));
             }
             finally
             {
-                DirectoryLock.Release();
+                directoryLock.Release();
             }
         }
 
@@ -142,16 +142,16 @@ namespace ReleaseServer.WebApi.Services
         {
             BackupInformation backup;
 
-            await DirectoryLock.WaitAsync();
+            await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                backup = await Task.Run(() => FsReleaseArtifactRepository.RunBackup());
+                backup = await Task.Run(() => fsReleaseArtifactRepository.RunBackup());
             }
             finally
             {
-                DirectoryLock.Release();
+                directoryLock.Release();
             }
 
             return backup;
@@ -160,20 +160,20 @@ namespace ReleaseServer.WebApi.Services
         public async Task RestoreBackup(IFormFile payload)
         {
             
-            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
             using var zipPayload = new ZipArchive(payload.OpenReadStream());
             
-            await DirectoryLock.WaitAsync();
+            await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
             try
             {
-                await Task.Run(() => FsReleaseArtifactRepository.RestoreBackup(zipPayload));
+                await Task.Run(() => fsReleaseArtifactRepository.RestoreBackup(zipPayload));
             }
             finally
             {
-                DirectoryLock.Release();
+                directoryLock.Release();
             }
         
         }
@@ -182,7 +182,7 @@ namespace ReleaseServer.WebApi.Services
         {
             DeploymentMetaInfo deploymentMetaInfo;
             
-            Logger.LogDebug("convert the uploaded payload to a ZIP archive");
+            logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
             using var payloadZipArchive = new ZipArchive(payload.OpenReadStream());
             
@@ -192,7 +192,7 @@ namespace ReleaseServer.WebApi.Services
             if (deploymentInfoEntry == null)
             {
                 var validationError = "the deployment.json does not exist in the uploaded payload!";
-                Logger.LogError(validationError);
+                logger.LogError(validationError);
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
 
@@ -208,7 +208,7 @@ namespace ReleaseServer.WebApi.Services
                 {
                     var validationError = "the deployment meta information (deployment.json) is invalid! "
                                           + "Error: " + e.Message;
-                    Logger.LogError(validationError);
+                    logger.LogError(validationError);
                     return new ValidationResult { IsValid = false, ValidationError = validationError };
                 }
             }
@@ -218,7 +218,7 @@ namespace ReleaseServer.WebApi.Services
             {
                 var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
                                       "\"" + " does not exist in the uploaded payload!";
-                Logger.LogError(validationError);
+                logger.LogError(validationError);
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
 
@@ -226,7 +226,7 @@ namespace ReleaseServer.WebApi.Services
             {
                 var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                       "\"" +  " does not exist in the uploaded payload!";
-                Logger.LogError(validationError);
+                logger.LogError(validationError);
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
             
@@ -237,7 +237,7 @@ namespace ReleaseServer.WebApi.Services
             {
                 var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                       "\"" +  " does not exist in the uploaded payload!";
-                Logger.LogError(validationError);
+                logger.LogError(validationError);
                 return new ValidationResult {IsValid = false, ValidationError = validationError};
             }
             

@@ -13,17 +13,17 @@ namespace ReleaseServer.WebApi.Repositories
 {
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
-        private readonly DirectoryInfo ArtifactRootDir, BackupRootDir;
-        private ILogger Logger;
+        private readonly DirectoryInfo artifactRootDir, backupRootDir;
+        private ILogger logger;
 
         public FsReleaseArtifactRepository(
             ILogger<FsReleaseArtifactRepository> logger,
             DirectoryInfo artifactDirectory,
             DirectoryInfo backupDirectory)
         {
-            ArtifactRootDir = artifactDirectory;
-            BackupRootDir = backupDirectory;
-            Logger = logger;
+            artifactRootDir = artifactDirectory;
+            backupRootDir = backupDirectory;
+            this.logger = logger;
         }
 
         public void StoreArtifact(ReleaseArtifact artifact)
@@ -45,14 +45,14 @@ namespace ReleaseServer.WebApi.Repositories
 
                 //Extract the payload to the temporary directory
                 artifact.Payload.ExtractToDirectory(tmpDir.ToString());
-                Logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
+                logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
 
                 var artifactDirectory = new DirectoryInfo(artifactPath);
 
                 //If the directory already exists, delete the old content in there
                 if (artifactDirectory.Exists)
                 {
-                    Logger.LogDebug("This path already exists! Old content will be deleted!");
+                    logger.LogDebug("This path already exists! Old content will be deleted!");
                 }
                 else
                 {
@@ -61,7 +61,7 @@ namespace ReleaseServer.WebApi.Repositories
 
                 tmpDir.Move(artifactDirectory, true);
 
-                Logger.LogInformation("The Artifact was successfully stored");
+                logger.LogInformation("The Artifact was successfully stored");
 
                 //Cleanup the tmp directory
                 tmpDir.Parent.Delete(true);
@@ -69,7 +69,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogCritical(e.Message);
+                logger.LogCritical(e.Message);
                 throw;
             }
         }
@@ -77,7 +77,7 @@ namespace ReleaseServer.WebApi.Repositories
         public List<ProductInformation> GetInfosByProductName(string productName)
         {
             var productInformation =
-                from productDir in ArtifactRootDir.EnumerateDirectories()
+                from productDir in artifactRootDir.EnumerateDirectories()
                 where productDir.Name == productName
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
@@ -122,7 +122,7 @@ namespace ReleaseServer.WebApi.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogCritical(e.Message);
+                logger.LogCritical(e.Message);
                 throw;
             }
         }
@@ -150,13 +150,13 @@ namespace ReleaseServer.WebApi.Repositories
 
                 }
 
-                Logger.LogWarning("The directory {0} does not exist!", path);
+                logger.LogWarning("The directory {0} does not exist!", path);
                 return null;
             }
 
             catch (Exception e)
             {
-                Logger.LogCritical(e.Message);
+                logger.LogCritical(e.Message);
                 throw;
             }
         }
@@ -175,7 +175,7 @@ namespace ReleaseServer.WebApi.Repositories
 
         public bool DeleteProductIfExists(string productName)
         {
-            var path = Path.Combine(ArtifactRootDir.ToString(), productName);
+            var path = Path.Combine(artifactRootDir.ToString(), productName);
 
             if (!Directory.Exists(path))
                 return false;
@@ -188,7 +188,7 @@ namespace ReleaseServer.WebApi.Repositories
         public List<ProductVersion> GetVersions(string productName, string os, string architecture)
         {
             var versions =
-                from productDir in ArtifactRootDir.EnumerateDirectories()
+                from productDir in artifactRootDir.EnumerateDirectories()
                 where productDir.Name == productName
                 from osDir in productDir.EnumerateDirectories()
                 where osDir.Name == os
@@ -203,7 +203,7 @@ namespace ReleaseServer.WebApi.Repositories
         public List<string> GetPlatforms(string productName, string version)
         {
             var platforms =
-                from productDir in ArtifactRootDir.EnumerateDirectories()
+                from productDir in artifactRootDir.EnumerateDirectories()
                 where productDir.Name == productName
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
@@ -219,20 +219,20 @@ namespace ReleaseServer.WebApi.Repositories
             var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
 
             string backupFileName = "backup_" + timeStamp + ".zip";
-            string backupArchiveFileName = Path.Combine(BackupRootDir.ToString(), backupFileName);
+            string backupArchiveFileName = Path.Combine(backupRootDir.ToString(), backupFileName);
 
             //Clear the backup folder first
-            if (BackupRootDir.Exists)
+            if (backupRootDir.Exists)
             {
-                BackupRootDir.DeleteContent();
+                backupRootDir.DeleteContent();
             }
             else
             {
-                BackupRootDir.Create();
+                backupRootDir.Create();
             }
 
             //Create the backup -> zip the whole ArtifactRoot folder
-            ZipFile.CreateFromDirectory(ArtifactRootDir.ToString(), backupArchiveFileName);
+            ZipFile.CreateFromDirectory(artifactRootDir.ToString(), backupArchiveFileName);
 
             return new BackupInformation
             {
@@ -246,32 +246,32 @@ namespace ReleaseServer.WebApi.Repositories
             try
             {
                 //Clear the whole artifact root directory or create it, if it's not existing
-                if (ArtifactRootDir.Exists)
+                if (artifactRootDir.Exists)
                 {
-                    ArtifactRootDir.DeleteContent();
+                    artifactRootDir.DeleteContent();
                 }
                 else
                 {
-                    ArtifactRootDir.Create();
+                    artifactRootDir.Create();
                 }
 
-                backupPayload.ExtractToDirectory(ArtifactRootDir.ToString());
+                backupPayload.ExtractToDirectory(artifactRootDir.ToString());
             }
             catch (Exception e)
             {
-                Logger.LogCritical("unexpected error during restoring the backup: {message}", e.Message);
+                logger.LogCritical("unexpected error during restoring the backup: {message}", e.Message);
                 throw;
             }
         }
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
-            return Path.Combine(ArtifactRootDir.ToString(), product, os, architecture, version);
+            return Path.Combine(artifactRootDir.ToString(), product, os, architecture, version);
         }
 
         private string GenerateTemporaryPath()
         {
-            return Path.Combine(ArtifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
+            return Path.Combine(artifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
         private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
