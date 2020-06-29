@@ -1,6 +1,4 @@
-using System;
 using System.IO.Compression;
-using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Mappers

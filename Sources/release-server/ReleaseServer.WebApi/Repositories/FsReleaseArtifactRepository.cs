@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using ReleaseServer.WebApi.Common;
+
 using ReleaseServer.WebApi.Extensions;
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi.Repositories

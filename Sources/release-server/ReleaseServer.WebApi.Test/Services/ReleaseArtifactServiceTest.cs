@@ -1,13 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Services;
 using ReleaseServer.WebApi.Repositories;
-using Xunit;
 using ReleaseServer.WebApi.Test.Utils;
+
+using Xunit;
+
 
 namespace ReleaseServer.WebApi.Test.TestData
 {

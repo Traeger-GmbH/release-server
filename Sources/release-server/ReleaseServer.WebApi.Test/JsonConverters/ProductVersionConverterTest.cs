@@ -1,10 +1,11 @@
 using System;
-using System.IO;
+
 using Newtonsoft.Json;
+
 using ReleaseServer.WebApi.Config;
-using ReleaseServer.WebApi.JsonConverters;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
+
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.JsonConverters

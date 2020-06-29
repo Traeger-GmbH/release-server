@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
+
 using Castle.Core.Internal;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using ReleaseServer.WebApi.Mappers;
+
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Services;
 

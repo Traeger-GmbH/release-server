@@ -2,7 +2,7 @@ namespace ReleaseServer.WebApi.Config
 {
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
-    using ReleaseServer.WebApi.JsonConverters;
+    using JsonConverters;
 
     public static class JsonConfiguration
     {

@@ -1,28 +1,31 @@
 using System.IO;
 using System.IO.Compression;
+
 using FluentAssertions;
+
 using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
+
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Mappers
 {
     public class ReleaseArtifactMapperTest
     {
-        private readonly byte[] testFile;
+        private readonly byte[] TestFile;
 
         public ReleaseArtifactMapperTest()
         {
             var projectDirectory = TestUtils.GetProjectDirectory();
-            testFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
+            TestFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "test_zip.zip"));
         }
         
         [Fact]
         public void ConvertToReleaseArtifactTest()
         {
             //Setup
-            using var stream = new MemoryStream(testFile);
+            using var stream = new MemoryStream(TestFile);
             var testZip = new ZipArchive(stream);
             
             var expectedArtifact = new ReleaseArtifact

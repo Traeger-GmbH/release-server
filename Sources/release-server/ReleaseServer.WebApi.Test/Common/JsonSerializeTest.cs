@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+
 using FluentAssertions;
-using ReleaseServer.WebApi.Common;
+
 using ReleaseServer.WebApi.Models;
 using ReleaseServer.WebApi.Test.Utils;
+
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Common
