@@ -6,10 +6,7 @@
 //--------------------------------------------------------------------------------------------------
 
 using System;
-
 using Newtonsoft.Json;
-
-using ReleaseServer.WebApi.Config;
 using ReleaseServer.WebApi.Models;
 using Xunit;
 

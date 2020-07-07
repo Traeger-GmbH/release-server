@@ -10,9 +10,7 @@ using System.IO.Compression;
 
 using FluentAssertions;
 
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Test.Utils;
 
 using Xunit;
 

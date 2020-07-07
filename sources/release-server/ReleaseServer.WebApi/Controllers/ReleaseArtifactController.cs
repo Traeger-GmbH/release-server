@@ -20,9 +20,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Services;
 
-namespace ReleaseServer.WebApi.Controllers
+namespace ReleaseServer.WebApi
 {
     [Authorize]
     [ApiController]

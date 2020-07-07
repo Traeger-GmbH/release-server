@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using ReleaseServer.WebApi.Models;
 
-namespace ReleaseServer.WebApi.Services
+namespace ReleaseServer.WebApi
 {
     public interface IReleaseArtifactService
     {

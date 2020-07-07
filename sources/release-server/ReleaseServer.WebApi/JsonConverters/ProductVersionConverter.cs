@@ -7,10 +7,10 @@
 
 using System;
 using Newtonsoft.Json;
+
 using ReleaseServer.WebApi.Models;
 
-
-namespace ReleaseServer.WebApi.JsonConverters
+namespace ReleaseServer.WebApi
 {
     public class ProductVersionConverter : JsonConverter<ProductVersion>
     {

@@ -13,11 +13,9 @@ using System.IO.Compression;
 using System.Linq;
 
 using Microsoft.Extensions.Logging;
-
-using ReleaseServer.WebApi.Extensions;
 using ReleaseServer.WebApi.Models;
 
-namespace ReleaseServer.WebApi.Repositories
+namespace ReleaseServer.WebApi
 {
     public class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {

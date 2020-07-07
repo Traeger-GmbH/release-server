@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 
-namespace ReleaseServer.WebApi.Extensions
+namespace ReleaseServer.WebApi
 {
     public static class DirectoryInfoExtension
     {

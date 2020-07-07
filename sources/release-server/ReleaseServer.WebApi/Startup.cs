@@ -22,11 +22,6 @@ using Microsoft.OpenApi.Models;
 
 using Newtonsoft.Json;
 
-using ReleaseServer.WebApi.Auth;
-using ReleaseServer.WebApi.Config;
-using ReleaseServer.WebApi.Extensions;
-using ReleaseServer.WebApi.SwaggerDocu;
-
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi

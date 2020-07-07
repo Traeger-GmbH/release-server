@@ -9,10 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace ReleaseServer.WebApi.Test.Utils
+namespace ReleaseServer.WebApi.Test
 {
     public static class TestUtils
     {

@@ -7,8 +7,8 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+
 using Newtonsoft.Json;
-using ReleaseServer.WebApi.Common;
 
 namespace ReleaseServer.WebApi.Models
 {

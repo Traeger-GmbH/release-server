@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ReleaseServer.WebApi.SwaggerDocu
+namespace ReleaseServer.WebApi
 {
     public class BasicAuthOperationsFilter : IOperationFilter
     {

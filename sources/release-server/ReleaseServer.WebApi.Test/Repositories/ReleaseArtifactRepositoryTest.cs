@@ -16,12 +16,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Test.Utils;
-using ReleaseServer.WebApi.Repositories;
-
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test

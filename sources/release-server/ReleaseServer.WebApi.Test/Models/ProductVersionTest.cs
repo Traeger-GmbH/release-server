@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using ReleaseServer.WebApi.Models;
+
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Models

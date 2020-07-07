@@ -19,12 +19,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-
-using ReleaseServer.WebApi.Mappers;
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Repositories;
 
-namespace ReleaseServer.WebApi.Services
+namespace ReleaseServer.WebApi
 {
     public class FsReleaseArtifactService : IReleaseArtifactService
     {

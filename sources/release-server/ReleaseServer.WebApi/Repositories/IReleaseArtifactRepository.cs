@@ -7,10 +7,9 @@
 
 using System.Collections.Generic;
 using System.IO.Compression;
-
 using ReleaseServer.WebApi.Models;
 
-namespace ReleaseServer.WebApi.Repositories
+namespace ReleaseServer.WebApi
 {
     public interface IReleaseArtifactRepository     
     {

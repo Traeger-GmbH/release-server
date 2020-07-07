@@ -7,7 +7,6 @@
 
 using System;
 using Newtonsoft.Json;
-using ReleaseServer.WebApi.Common;
 
 namespace ReleaseServer.WebApi.Models
 {

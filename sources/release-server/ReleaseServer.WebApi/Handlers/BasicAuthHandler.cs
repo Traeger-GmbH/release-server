@@ -21,7 +21,8 @@ using Microsoft.Extensions.Options;
 
 using ReleaseServer.WebApi.Models;
 
-namespace ReleaseServer.WebApi.Auth
+
+namespace ReleaseServer.WebApi
 {
     public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {

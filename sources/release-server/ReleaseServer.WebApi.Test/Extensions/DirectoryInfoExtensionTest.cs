@@ -6,10 +6,6 @@
 //--------------------------------------------------------------------------------------------------
 
 using System.IO;
-
-using ReleaseServer.WebApi.Extensions;
-using ReleaseServer.WebApi.Test.Utils;
-
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.Extensions

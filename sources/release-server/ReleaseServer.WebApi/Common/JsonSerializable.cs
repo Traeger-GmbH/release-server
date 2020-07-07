@@ -7,9 +7,8 @@
 
 using System.IO;
 using Newtonsoft.Json;
-using ReleaseServer.WebApi.Config;
 
-namespace ReleaseServer.WebApi.Common
+namespace ReleaseServer.WebApi
 {
     public class JsonSerializable<T>
     {

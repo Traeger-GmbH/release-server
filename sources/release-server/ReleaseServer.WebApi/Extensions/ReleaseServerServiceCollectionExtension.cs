@@ -12,10 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using ReleaseServer.WebApi.Repositories;
-using ReleaseServer.WebApi.Services;
-
-namespace ReleaseServer.WebApi.Extensions
+namespace ReleaseServer.WebApi
 {
     public static class ReleaseServerServiceCollectionExtension
     {

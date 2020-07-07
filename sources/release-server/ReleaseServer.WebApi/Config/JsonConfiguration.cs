@@ -6,7 +6,7 @@
 // <author>Timo Walter</author>
 //--------------------------------------------------------------------------------------------------
 
-namespace ReleaseServer.WebApi.Config
+namespace ReleaseServer.WebApi
 {
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;

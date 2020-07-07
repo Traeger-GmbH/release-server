@@ -8,7 +8,7 @@
 using System.IO.Compression;
 using ReleaseServer.WebApi.Models;
 
-namespace ReleaseServer.WebApi.Mappers
+namespace ReleaseServer.WebApi
 {
     public static class ReleaseArtifactMapper
     {

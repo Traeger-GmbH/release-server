@@ -13,7 +13,6 @@ using System.IO;
 using FluentAssertions;
 
 using ReleaseServer.WebApi.Models;
-using ReleaseServer.WebApi.Test.Utils;
 
 using Xunit;
 
