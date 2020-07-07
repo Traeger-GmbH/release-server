@@ -1,3 +1,11 @@
+//--------------------------------------------------------------------------------------------------
+// <copyright file="JsonConfiguration.cs" company="Traeger IndustryComponents GmbH">
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+// </copyright>
+// <author>Fabian Traeger</author>
+// <author>Timo Walter</author>
+//--------------------------------------------------------------------------------------------------
+
 namespace ReleaseServer.WebApi.Config
 {
     using Microsoft.AspNetCore.Mvc;

@@ -1,3 +1,10 @@
+//--------------------------------------------------------------------------------------------------
+// <copyright file="ProductVersionConverter.cs" company="Traeger IndustryComponents GmbH">
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+// </copyright>
+// <author>Timo Walter</author>
+//--------------------------------------------------------------------------------------------------
+
 using System;
 using Newtonsoft.Json;
 using ReleaseServer.WebApi.Models;
