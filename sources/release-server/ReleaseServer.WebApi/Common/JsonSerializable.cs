@@ -10,8 +10,17 @@ using Newtonsoft.Json;
 
 namespace ReleaseServer.WebApi
 {
+    /// <summary>
+    /// Provides methods for deserializing Json sources to the specified Type>.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class JsonSerializable<T>
     {
+        /// <summary>
+        /// Retrieves the specified type from a Json file w
+        /// </summary>
+        /// <param name="filePath">The path to the Json file.</param>
+        /// <returns>An object of the specified type.</returns>
         public static T FromJsonFile(string filePath)
         {
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(filePath), JsonConfiguration.Settings);

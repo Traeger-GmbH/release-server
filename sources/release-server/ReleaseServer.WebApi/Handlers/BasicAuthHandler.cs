@@ -24,7 +24,7 @@ using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
-    public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    internal class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         private readonly IConfiguration configuration;
 

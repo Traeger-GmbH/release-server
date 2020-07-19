@@ -6,13 +6,12 @@
 // <author>Timo Walter</author>
 //--------------------------------------------------------------------------------------------------
 
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+
 namespace ReleaseServer.WebApi
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Newtonsoft.Json;
-    using JsonConverters;
-
-    public static class JsonConfiguration
+    internal static class JsonConfiguration
     {
         public static void Configure(MvcNewtonsoftJsonOptions options)
         {
