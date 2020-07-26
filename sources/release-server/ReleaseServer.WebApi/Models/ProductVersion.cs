@@ -9,12 +9,27 @@ using System;
 
 namespace ReleaseServer.WebApi.Models
 {
+    /// <summary>
+    /// Provides the information of an artifact product version and implements several operations for
+    /// the <see cref="ProductVersion"/>.
+    /// </summary>
     public class ProductVersion : IComparable<ProductVersion>
     {
+        /// <summary>
+        /// Gets or sets the version number of the artifact.
+        /// </summary>
         public Version VersionNumber { get; set; }
 
+        /// <summary>
+        /// Gets or sets the version suffix of the artifact (e.g. -alpha, -beta).
+        /// </summary>
         public string VersionSuffix { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductVersion"/> class.
+        /// </summary>
+        /// <param name="version">The product version of the artifact as string.</param>
+        /// <remarks>The constructor separates the <see cref="VersionSuffix"/> from the <see cref="VersionNumber"/>.</remarks>
         public ProductVersion(string version)
         {
             var versionElements = version.Split("-", 2);
@@ -31,6 +46,12 @@ namespace ReleaseServer.WebApi.Models
             }
         }
         
+
+        /// <summary>
+        /// Compares two instances of <see cref="ProductVersion"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="ProductVersion"/> for comparison.</param>
+        /// <returns> 1 (GreaterThan), 0 (Equal), -1 (LessThan)</returns>
         public int CompareTo(ProductVersion other)
         {
             var versionNumberComparison = VersionNumber.CompareTo(other.VersionNumber);
@@ -59,6 +80,10 @@ namespace ReleaseServer.WebApi.Models
             return versionNumberComparison;
         }
         
+        /// <summary>
+        /// Converts the <see cref="ProductVersion"/> to a string representation.
+        /// </summary>
+        /// <returns>The <see cref="ProductVersion"/> as string.</returns>
         public override string ToString()
         {
             if (VersionSuffix == "")
@@ -69,6 +94,11 @@ namespace ReleaseServer.WebApi.Models
             return VersionNumber + "-" + VersionSuffix;
         }
 
+        /// <summary>
+        /// Determines, if an instance <see cref="ProductVersion"/> equals another instance of <see cref="ProductVersion"/>
+        /// </summary>
+        /// <param name="obj">Another instance of <see cref="ProductVersion"/> for comparison.</param>
+        /// <returns>True, if the instances ar equal on type and content. False, if they are not equal.</returns>
         public override bool Equals(object obj)
         {
             if ((obj == null) || GetType() != obj.GetType()) 
@@ -79,17 +109,14 @@ namespace ReleaseServer.WebApi.Models
             var other = (ProductVersion) obj;
             return VersionNumber.Equals(other.VersionNumber) && VersionSuffix.Equals(other.VersionSuffix);
         }
-        
-        protected bool Equals(ProductVersion other)
-        {
-            return Equals(VersionNumber, other.VersionNumber) && VersionSuffix == other.VersionSuffix;
-        }
 
+        /// <summary>
+        /// Determines the hash code of an instance of <see cref="ProductVersion"/>.
+        /// </summary>
+        /// <returns>The hash code of the instance.</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine(VersionNumber, VersionSuffix);
         }
-        
-        
     }
 }

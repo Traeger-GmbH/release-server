@@ -6,8 +6,12 @@
 //--------------------------------------------------------------------------------------------------
 
 using System;
+using System.Runtime.CompilerServices;
+
 using Newtonsoft.Json;
+
 using ReleaseServer.WebApi.Models;
+
 using Xunit;
 
 namespace ReleaseServer.WebApi.Test.JsonConverters

@@ -9,10 +9,20 @@ using System.Collections.Generic;
 
 namespace ReleaseServer.WebApi.Models
 {
+    /// <summary>
+    /// Provides the information of the available versions of a specific artifact.
+    /// </summary>
     public class ProductVersionList
     {
-        public List<ProductVersion> Versions { get; set; }
+        /// <summary>
+        /// Gets the available versions for the corresponding artifact.
+        /// </summary>
+        public List<ProductVersion> Versions { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductVersionList"/> class.
+        /// </summary>
+        /// <param name="productVersions">A list of <see cref="ProductVersion"/> instances.</param>
         public ProductVersionList(List<ProductVersion> productVersions)
         {
             Versions = productVersions;

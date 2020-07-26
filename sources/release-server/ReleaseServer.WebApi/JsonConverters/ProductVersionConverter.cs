@@ -12,7 +12,7 @@ using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
-    public class ProductVersionConverter : JsonConverter<ProductVersion>
+    internal class ProductVersionConverter : JsonConverter<ProductVersion>
     {
         public override void WriteJson(JsonWriter writer, ProductVersion value, JsonSerializer serializer)
         {

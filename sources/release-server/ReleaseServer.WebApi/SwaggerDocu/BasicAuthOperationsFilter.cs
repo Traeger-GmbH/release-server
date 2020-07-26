@@ -13,7 +13,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ReleaseServer.WebApi
 {
-    public class BasicAuthOperationsFilter : IOperationFilter
+    internal class BasicAuthOperationsFilter : IOperationFilter
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {

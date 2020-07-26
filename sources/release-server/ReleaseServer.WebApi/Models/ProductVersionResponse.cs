@@ -7,11 +7,21 @@
 
 namespace ReleaseServer.WebApi.Models
 {
+    /// <summary>
+    /// Defines the structure of the product version response body.
+    /// </summary>
+    //TODO: Handle with a custom json converter!
     public class ProductVersionResponse
     {
-        //TODO: Handle with a custom json converter!
-        public string Version { get; set; }
+        /// <summary>
+        /// Gets the product version as string.
+        /// </summary>
+        public string Version { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductVersionResponse"/> class.
+        /// </summary>
+        /// <param name="productVersion">The product version.</param>
         public ProductVersionResponse(ProductVersion productVersion)
         {
             Version = productVersion.ToString();

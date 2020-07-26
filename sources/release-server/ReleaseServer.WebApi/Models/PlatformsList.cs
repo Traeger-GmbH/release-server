@@ -9,10 +9,20 @@ using System.Collections.Generic;
 
 namespace ReleaseServer.WebApi.Models
 {
+    /// <summary>
+    /// Provides the information of the available platforms for a specific artifact.
+    /// </summary>
     public class PlatformsList
     {
-        public List<string> Platforms { get; set; }
+        /// <summary>
+        /// Gets the available platforms for the corresponding artifact.
+        /// </summary>
+        public List<string> Platforms { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlatformsList"/> class.
+        /// </summary>
+        /// <param name="platforms">The list of platforms.</param>
         public PlatformsList(List<string> platforms)
         {
             Platforms = platforms;
