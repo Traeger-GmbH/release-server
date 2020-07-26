@@ -36,7 +36,8 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Moves the content of the<see cref="sourceDirectory"/> to the directory of the path <see cref="destinationPath"/>
+        /// Moves the content of the source directory (given as <see cref="DirectoryInfo"/>) to the destination
+        /// directory (given as string).
         /// </summary>
         /// <param name="sourceDirectory">The <see cref="DirectoryInfo"/> of the source directory.</param>
         /// <param name="destinationPath">The path of the destination directory.</param>
@@ -49,7 +50,8 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Moves the content of the <see cref="sourceDirectory"/> to the directory of the <see cref="destinationDirectory"/>.
+        /// Moves the content of the source directory (given as <see cref="DirectoryInfo"/>) to the destination
+        /// directory (given as <see cref="DirectoryInfo"/>).
         /// </summary>
         /// <param name="sourceDirectory">The <see cref="DirectoryInfo"/> of the source directory.</param>
         /// <param name="destinationDirectory">The <see cref="DirectoryInfo"/> of the destination directory.</param>
@@ -75,7 +77,7 @@ namespace ReleaseServer.WebApi
         }
         
         /// <summary>
-        /// Ensures if it's possible to write to the specified <see cref="directory"/> and throws an exception, if not.
+        /// Ensures if it's possible to write to the specified directory and throws an exception, if not.
         /// </summary>
         /// <param name="directory">The <see cref="DirectoryInfo"/> to the directory, that has to be checked.</param>
         /// <exception cref="UnauthorizedAccessException">Will be thrown, if it's unable to write to the directory.</exception>
