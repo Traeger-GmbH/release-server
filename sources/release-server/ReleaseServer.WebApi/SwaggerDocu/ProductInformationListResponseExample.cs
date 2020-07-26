@@ -11,7 +11,7 @@ using System.Globalization;
 using ReleaseServer.WebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-public class ProductInformationListExample : IExamplesProvider<ProductInformationList>
+internal class ProductInformationListExample : IExamplesProvider<ProductInformationList>
 {
     public ProductInformationList GetExamples()
     {

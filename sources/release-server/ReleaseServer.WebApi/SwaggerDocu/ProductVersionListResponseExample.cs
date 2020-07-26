@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ProductVersionListExample : IExamplesProvider<ProductVersionList>
+    internal class ProductVersionListExample : IExamplesProvider<ProductVersionList>
     {
         public ProductVersionList GetExamples()
         {

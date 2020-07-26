@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class PlatformsResponseExample : IExamplesProvider<PlatformsList>
+    internal class PlatformsResponseExample : IExamplesProvider<PlatformsList>
     {
         public PlatformsList GetExamples()
         {

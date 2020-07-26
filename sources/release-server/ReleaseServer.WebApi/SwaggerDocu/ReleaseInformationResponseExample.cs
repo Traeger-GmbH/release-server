@@ -13,7 +13,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi.SwaggerDocu
 {
-    public class ReleaseInformationResponseExample : IExamplesProvider<ReleaseInformation>
+    internal class ReleaseInformationResponseExample : IExamplesProvider<ReleaseInformation>
     {
         public ReleaseInformation GetExamples()
         {

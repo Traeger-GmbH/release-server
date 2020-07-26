@@ -11,7 +11,7 @@ namespace ReleaseServer.WebApi.Models
 {
     public class ProductVersionList
     {
-        public List<ProductVersion> Versions;
+        public List<ProductVersion> Versions { get; set; }
 
         public ProductVersionList(List<ProductVersion> productVersions)
         {

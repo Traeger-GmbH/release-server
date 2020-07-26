@@ -23,6 +23,10 @@ using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
+    /// <summary>
+    /// A secured ApiController that provides several endpoints for managing release artifacts (upload / download
+    /// artifacts, get several information about the stored artifacts)
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -31,6 +35,11 @@ namespace ReleaseServer.WebApi
         private IReleaseArtifactService releaseArtifactService;
         private ILogger logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReleaseArtifactController"/> class.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/> to enable logging for the <see cref="ReleaseArtifactController"/>.</param>
+        /// <param name="releaseArtifactService">The service that handles the business logic of the application.</param>
         public ReleaseArtifactController(ILogger<ReleaseArtifactController> logger,
             IReleaseArtifactService releaseArtifactService)
         {
@@ -41,11 +50,13 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// Uploads a specific release artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
-        /// <param name="version"></param>
-        /// <param name="artifact"></param>
+        /// <param name="product">The product name of the uploaded artifact.</param>
+        /// <param name="os">The operating system of the uploaded artifact.</param>
+        /// <param name="architecture">The hardware architecture of the uploaded artifact.</param>
+        /// <param name="version">The version of the uploaded artifact.</param>
+        /// <param name="artifact">The payload of the uploaded artifact (Zip file).</param>
+        /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
+        /// if the payload is invalid.</returns>
         /// <response code="200">Upload of the artifact was successful.</response>
         /// <response code="400">No or invalid body provided (must be a Zip file).</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
@@ -72,11 +83,13 @@ namespace ReleaseServer.WebApi
         }
         
         /// <summary>
-        /// Retrieves a list of all available versions of the specified product.
+        /// Retrieves a list of all available versions of the specified artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <response code="200">A product with the specified product name exists.</response>
-        /// <response code="404">The specified product does not exist.</response>
+        /// <param name="product">The product name of the searched artifact.</param>
+        /// <returns>A <see cref="ProductInformationList"/> with the available product infos. A <see cref="NotFoundObjectResult"/>, if
+        /// the specified artifact does not exist.</returns>
+        /// <response code="200">An artifact with the specified product name exists.</response>
+        /// <response code="404">The specified artifact does not exist.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductInformationList), 200)]
         [HttpGet("versions/{product}")]
@@ -85,18 +98,20 @@ namespace ReleaseServer.WebApi
             var productInfos = await releaseArtifactService.GetProductInfos(product);
 
             if (productInfos.IsNullOrEmpty()) 
-                return NotFound("The specified product was not found!");
+                return NotFound("The specified artifact was not found!");
             
             return new ProductInformationList(productInfos);
         }
 
         /// <summary>
-        /// Retrieves all available platforms for a specific product.
+        /// Retrieves all available platforms for a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="version"></param>
-        /// <response code="200">There are existing Platforms for the specified product name.</response>
-        /// <response code="404">The product does not exist or there exists no platform for the specified product.</response>
+        /// <param name="product">The product name of the artifact.</param>
+        /// <param name="version">The version of the artifact.</param>
+        /// <returns>A <see cref="PlatformsList"/> with the available platforms. A <see cref="NotFoundObjectResult"/>, if
+        /// no platforms were found or if there exists no artifact with the specified product name.</returns>
+        /// <response code="200">There are existing platforms for the specified product name.</response>
+        /// <response code="404">The artifact does not exist or there exists no platform for the specified product name.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(PlatformsList), 200)]
         [HttpGet("platforms/{product}/{version}")]
@@ -105,21 +120,23 @@ namespace ReleaseServer.WebApi
             var platformsList = await releaseArtifactService.GetPlatforms(product, version);
 
             if (platformsList.IsNullOrEmpty()) 
-                return NotFound("The specified product was not found or there exists no platform for the specified product!");
+                return NotFound("The specified artifact was not found or there exists no platform for the specified product name!");
             
             
             return new PlatformsList(platformsList);
         }
         
         /// <summary>
-        /// Retrieves the Release information of a specific product.
+        /// Retrieves the release information of a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
-        /// <param name="version"></param>
-        /// <response code="200">The specific product exists.</response>
-        /// <response code="404">The product with the specified product name does not exist. Therefore the release notes do not exist.</response>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <param name="version">The version of the specified artifact.</param>
+        /// <returns>A <see cref="ReleaseInformation"/> with the release information. A <see cref="NotFoundObjectResult"/>, if
+        /// the release information for the specified artifact was not found.</returns>
+        /// <response code="200">The release information of the specified artifact exists.</response>
+        /// <response code="404">The artifact with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ReleaseInformation), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
@@ -128,17 +145,19 @@ namespace ReleaseServer.WebApi
             var releaseInfo = await releaseArtifactService.GetReleaseInfo(product, os, architecture, version);
 
             if (releaseInfo == null)
-                return NotFound("The Release information does not exist (the specified product was not found)!");
+                return NotFound("The Release information does not exist (the specified artifact was not found)!");
 
             return releaseInfo;
         }
         
         /// <summary>
-        /// Retrieves all available versions that are fitting to a specific product / platform (HW architecture + OS).
+        /// Retrieves all available versions that are fitting to a specific product name / platform (HW architecture + OS).
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <returns>A <see cref="ProductVersionList"/> with the available versions. A <see cref="NotFoundObjectResult"/>, if
+        /// there exists no version for the specified platform / product name.</returns>
         /// <response code="200">There are existing versions for the specified platform and product.</response>
         /// <response code="404">There exists no version for the specified platform / product.</response>
         [AllowAnonymous]
@@ -155,14 +174,16 @@ namespace ReleaseServer.WebApi
         }
         
         /// <summary>
-        /// Retrieves the artifact of the specified product.
+        /// Retrieves a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
-        /// <param name="version"></param>
-        /// <response code="200">There exists a product with the specified parameters.</response>
-        /// <response code="404">There exists no product with the specified parameters.</response>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <param name="version">The version of the specified artifact.</param>
+        /// <returns>A <see cref="FileContentResult"/> with the specified artifact. A <see cref="NotFoundObjectResult"/>, if
+        /// the specified artifact does not exist.</returns>
+        /// <response code="200">There exists an artifact with the specified parameters.</response>
+        /// <response code="404">There exists no artifact with the specified parameters.</response>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
@@ -173,7 +194,7 @@ namespace ReleaseServer.WebApi
             var response = await releaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             if (response == null)
-                return NotFound("The specified product was not found!");
+                return NotFound("The specified artifact was not found!");
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -192,13 +213,15 @@ namespace ReleaseServer.WebApi
         }
         
         /// <summary>
-        /// Retrieves the latest artifact of a specific product.
+        /// Retrieves the latest version of a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
-        /// <response code="200">The specified product exists (the ZIP file with the artifact will be retrieved)</response>
-        /// <response code="404">The product is not available vor the specified platform (OS + arch)</response>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <returns>A <see cref="FileContentResult"/> with the latest version of the artifact. A <see cref="NotFoundObjectResult"/>, if
+        /// the artifact is not available for the specified platform (OS + arch)</returns>
+        /// <response code="200">The specified artifact exists (the ZIP file with the artifact will be retrieved)</response>
+        /// <response code="404">The artifact is not available for the specified platform (OS + arch)</response>
         [AllowAnonymous]
         [HttpGet("download/{product}/{os}/{architecture}/latest")]
         public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
@@ -209,7 +232,7 @@ namespace ReleaseServer.WebApi
             var response = await releaseArtifactService.GetLatestArtifact(product, os, architecture);
             
             if (response == null)
-                return NotFound("The specified product was not found!");
+                return NotFound("The specified artifact was not found!");
 
             //Determine the content type
             if (!provider.TryGetContentType(response.FileName, out contentType))
@@ -228,14 +251,16 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Retrieves the latest version of a specific product.
+        /// Retrieves the latest version of a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <returns>A <see cref="ProductVersionResponse"/> with the latest version information.A <see cref="NotFoundObjectResult"/>,
+        /// if not there is no artifact available for the specified parameters.</returns>
         /// <response code="200">The specified product exists.</response>
-        /// <response code="404">The product is not available for the specified platform (OS + HW architecture)
-        /// or the product with the specified product name does not exist</response>
+        /// <response code="404">The artifact is not available for the specified platform (OS + HW architecture)
+        /// or the artifact with the specified product name does not exist</response>
         [AllowAnonymous]
         [HttpGet("latest/{product}/{os}/{architecture}")]
         [ProducesResponseType(typeof(ProductVersionResponse), 200)]
@@ -244,55 +269,56 @@ namespace ReleaseServer.WebApi
             var latestVersion = await releaseArtifactService.GetLatestVersion(product, os, architecture);
             
            if (latestVersion == null)
-               return NotFound("The specified product was not found!");
+               return NotFound("The specified artifact was not found!");
             
             return new ProductVersionResponse(latestVersion);
         }
         
         /// <summary>
-        /// Deletes the specified product.
+        /// Deletes a specific artifact.
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="os"></param>
-        /// <param name="architecture"></param>
-        /// <param name="version"></param>
-        /// <response code="200">The specified product got deleted successfully.</response>
+        /// <param name="product">The product name of the specified artifact.</param>
+        /// <param name="os">The operating system of the specified artifact.</param>
+        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
+        /// <param name="version">The version of the specified artifact.</param>
+        /// <returns>An <see cref="OkObjectResult"/> if the deletion was successful and <see cref="NotFoundObjectResult"/>, if not.</returns>
+        /// <response code="200">The specified artifact got deleted successfully.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
-        /// <response code="404">There exists no product with the specified product name.</response>
+        /// <response code="404">There exists no artifact with the specified parameters.</response>
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var artifactFound = await releaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
             
             if (!artifactFound) 
-                return NotFound("The product you want to delete does not exist!");
+                return NotFound("The artifact you want to delete does not exist!");
 
             return Ok("artifact successfully deleted");
         }
         
         /// <summary>
-        /// Deletes all products of a specific product name.
+        /// Deletes all artifacts of a specific product name.
         /// </summary>
-        /// <param name="product"></param>
-        /// <returns></returns>
-        /// <response code="200">All products of the specified product name got deleted successfully.</response>
+        /// <param name="product">The product name of the artifacts, that have to be deleted.</param>
+        /// <returns>An <see cref="OkObjectResult"/> if the deletion was successful and <see cref="NotFoundObjectResult"/>, if not.</returns>
+        /// <response code="200">All artifacts of the specified product name got deleted successfully.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
-        /// <response code="404">There exists no product with the specified product name.</response>
+        /// <response code="404">There exists no artifact with the specified product name.</response>
         [HttpDelete("{product}")]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
             var productFound = await releaseArtifactService.DeleteProductIfExists(product);
             
             if (!productFound)
-                return NotFound("The products you want to delete do not exist!");
+                return NotFound("The artifacts you want to delete do not exist!");
 
-            return Ok("product successfully deleted");
+            return Ok("artifacts successfully deleted");
         }
         
         /// <summary>
         /// Backups the whole artifact directory and retrieves it as a ZIP file.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The created <see cref="FileStreamResult"/> with the backup.</returns>
         /// <response code="200">The artifact directory backup was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpGet("backup")]
@@ -320,8 +346,8 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// Restores the uploaded backup file.
         /// </summary>
-        /// <param name="backupFile"></param>
-        /// <returns></returns>
+        /// <param name="backupFile">The uploaded backup file (ZIP file).</param>
+        /// <returns>An <see cref="OkObjectResult"/> if the restore operation was successful and <see cref="BadRequestResult"/>, if not.</returns>
         /// <response code="200">The restore process was successful.</response>
         /// <response code="400">No body provided.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
@@ -336,7 +362,10 @@ namespace ReleaseServer.WebApi
             return Ok("backup successfully restored");
         }
 
-        //Commented out, because swagger runs into a fetch error
+       /// <summary>
+       /// Catches all other routes, which are not defined and returns a <see cref="NotFoundObjectResult"/>.
+       /// </summary>
+       /// <returns>An <see cref="NotFoundObjectResult"/>.</returns>
        [AllowAnonymous]
        [ApiExplorerSettings(IgnoreApi = true)]
        [Route("{*url}", Order = 999)]
