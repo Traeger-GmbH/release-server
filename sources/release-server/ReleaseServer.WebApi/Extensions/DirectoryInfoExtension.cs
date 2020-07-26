@@ -11,8 +11,15 @@ using System.IO;
 
 namespace ReleaseServer.WebApi
 {
+    /// <summary>
+    /// An extension class for operations with objects of the <see cref="DirectoryInfo"/> class.
+    /// </summary>
     public static class DirectoryInfoExtension
     {
+        /// <summary>
+        /// Deletes all files of the given directory.
+        /// </summary>
+        /// <param name="directory">The <see cref="DirectoryInfo"/> of the directory that has to be cleaned up.</param>
         public static void DeleteContent(this DirectoryInfo directory)
         {
             if (!directory.Exists) return;
@@ -28,30 +35,50 @@ namespace ReleaseServer.WebApi
             }
         }
 
-        public static void Move(this DirectoryInfo directory, string path, bool overwriteExisting = false)
+        /// <summary>
+        /// Moves the content of the<see cref="sourceDirectory"/> to the directory of the path <see cref="destinationPath"/>
+        /// </summary>
+        /// <param name="sourceDirectory">The <see cref="DirectoryInfo"/> of the source directory.</param>
+        /// <param name="destinationPath">The path of the destination directory.</param>
+        /// <param name="overwriteExisting">Option for overwriting the existing content in the destination directory.
+        /// The existing content will be overwritten, if the option is set to true (default: false).</param>
+        public static void Move(this DirectoryInfo sourceDirectory, string destinationPath, bool overwriteExisting = false)
         {
-            var destination = new DirectoryInfo(path);
-            directory.Move(destination, overwriteExisting);
+            var destination = new DirectoryInfo(destinationPath);
+            sourceDirectory.Move(destination, overwriteExisting);
         }
 
-        public static void Move(this DirectoryInfo directory, DirectoryInfo destination, bool overwriteExisting = false)
+        /// <summary>
+        /// Moves the content of the <see cref="sourceDirectory"/> to the directory of the <see cref="destinationDirectory"/>.
+        /// </summary>
+        /// <param name="sourceDirectory">The <see cref="DirectoryInfo"/> of the source directory.</param>
+        /// <param name="destinationDirectory">The <see cref="DirectoryInfo"/> of the destination directory.</param>
+        /// <param name="overwriteExisting">Option for overwriting the existing content in the destination directory.
+        /// The existing content will be overwritten, if the option is set to true (default: false).</param>
+        /// <exception cref="IOException">Will be thrown, if the destination directory already exists.</exception>
+        public static void Move(this DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory, bool overwriteExisting = false)
         {
-            destination.Refresh();
-            if (destination.Exists)
+            destinationDirectory.Refresh();
+            if (destinationDirectory.Exists)
             {
                 if (overwriteExisting)
                 {
-                    destination.Delete(true);
+                    destinationDirectory.Delete(true);
                 }
                 else
                 {
-                    throw new IOException($"Could not move directory: New path {destination.FullName} already exists.");
+                    throw new IOException($"Could not move directory: New path {destinationDirectory.FullName} already exists.");
                 }
             }
 
-            Directory.Move(directory.FullName, destination.FullName);
+            Directory.Move(sourceDirectory.FullName, destinationDirectory.FullName);
         }
         
+        /// <summary>
+        /// Ensures if it's possible to write to the specified <see cref="directory"/> and throws an exception, if not.
+        /// </summary>
+        /// <param name="directory">The <see cref="DirectoryInfo"/> to the directory, that has to be checked.</param>
+        /// <exception cref="UnauthorizedAccessException">Will be thrown, if it's unable to write to the directory.</exception>
         public static void EnsureWritable(this DirectoryInfo directory) {            
             if (!directory.IsWritable())
             {
@@ -59,7 +86,7 @@ namespace ReleaseServer.WebApi
             }
         }
         
-        public static bool IsWritable(this DirectoryInfo directory)
+        private static bool IsWritable(this DirectoryInfo directory)
         {
             bool writable = false;
             

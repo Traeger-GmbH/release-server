@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ReleaseServer.WebApi
 {
-    public static class ReleaseServerServiceCollectionExtension
+    internal static class ReleaseServerServiceCollectionExtension
     {
         public static IServiceCollection AddFsReleaseArtifactService(this IServiceCollection services, IConfiguration configuration)
         {
