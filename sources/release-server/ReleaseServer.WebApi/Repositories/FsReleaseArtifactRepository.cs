@@ -17,7 +17,7 @@ using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
-    public class FsReleaseArtifactRepository : IReleaseArtifactRepository
+    internal class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
         private readonly DirectoryInfo artifactRootDir, backupRootDir;
         private ILogger logger;
@@ -100,11 +100,11 @@ namespace ReleaseServer.WebApi
             return productInformation.ToList();
         }
 
-        public ReleaseInformation GetReleaseInfo(string product, string os, string architecture, string version)
+        public ReleaseInformation GetReleaseInfo(string productName, string os, string architecture, string version)
         {
             try
             {
-                var path = GenerateArtifactPath(product, os, architecture, version);
+                var path = GenerateArtifactPath(productName, os, architecture, version);
 
                 if (Directory.Exists(path))
                 {

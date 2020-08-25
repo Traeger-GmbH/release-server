@@ -23,7 +23,7 @@ using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
-    public class FsReleaseArtifactService : IReleaseArtifactService
+    internal class FsReleaseArtifactService : IReleaseArtifactService
     {
         private IReleaseArtifactRepository fsReleaseArtifactRepository;
         private ILogger logger;
@@ -37,7 +37,7 @@ namespace ReleaseServer.WebApi
             directoryLock = new SemaphoreSlim(1, 1);
         }
 
-        public async Task StoreArtifact(string product, string os, string architecture, string version,
+        public async Task StoreArtifact(string productName, string os, string architecture, string version,
             IFormFile payload)
         {
             logger.LogDebug("convert the uploaded payload to a ZIP archive");
@@ -45,7 +45,7 @@ namespace ReleaseServer.WebApi
             using var zipPayload = new ZipArchive(payload.OpenReadStream());
             
             var artifact =
-                ReleaseArtifactMapper.ConvertToReleaseArtifact(product, os, architecture, version, zipPayload);
+                ReleaseArtifactMapper.ConvertToReleaseArtifact(productName, os, architecture, version, zipPayload);
 
             await directoryLock.WaitAsync();
 

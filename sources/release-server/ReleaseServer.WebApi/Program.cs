@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ReleaseServer.WebApi
 {
-    public class Program
+    internal class Program
     {
         public static void Main(string[] args)
         {

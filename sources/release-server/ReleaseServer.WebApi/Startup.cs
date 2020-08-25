@@ -26,7 +26,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi
 {
-    public class Startup
+    internal class Startup
     {
         public Startup(IWebHostEnvironment env)
         {
