@@ -13,16 +13,8 @@ namespace ReleaseServer.WebApi
 {
     internal static class JsonConfiguration
     {
-        public static void Configure(MvcNewtonsoftJsonOptions options)
-        {
-            Configure(options.SerializerSettings);
-        }
-
-        public static void Configure(JsonSerializerSettings settings)
-        {
-            settings.Converters.Add(new ProductVersionConverter());
-        }
-
+        #region ---------- Public static Properties ----------
+        
         public static JsonSerializerSettings Settings
         {
             get
@@ -32,5 +24,21 @@ namespace ReleaseServer.WebApi
                 return settings;
             }
         }
+        
+        #endregion
+
+        #region ---------- Public static methods ----------
+        
+        public static void Configure(MvcNewtonsoftJsonOptions options)
+        {
+            Configure(options.SerializerSettings);
+        }
+
+        public static void Configure(JsonSerializerSettings settings)
+        {
+            settings.Converters.Add(new ProductVersionConverter());
+        }
+        
+        #endregion
     }
 }

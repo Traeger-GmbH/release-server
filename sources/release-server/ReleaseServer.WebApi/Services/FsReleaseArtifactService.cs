@@ -25,10 +25,22 @@ namespace ReleaseServer.WebApi
 {
     internal class FsReleaseArtifactService : IReleaseArtifactService
     {
+        
+        #region ---------- Private fields ----------
+        
         private IReleaseArtifactRepository fsReleaseArtifactRepository;
         private ILogger logger;
+        
+        #endregion
+        
+        #region ---------- Private static fields ----------
+        
         private static SemaphoreSlim directoryLock;
 
+        #endregion
+        
+        #region ---------- Public constructors ----------
+        
         public FsReleaseArtifactService(IReleaseArtifactRepository fsReleaseArtifactRepository,
             ILogger<FsReleaseArtifactService> logger)
         {
@@ -36,6 +48,10 @@ namespace ReleaseServer.WebApi
             this.logger = logger;
             directoryLock = new SemaphoreSlim(1, 1);
         }
+        
+        #endregion
+
+        #region ---------- Public methods ----------
 
         public async Task StoreArtifact(string productName, string os, string architecture, string version,
             IFormFile payload)
@@ -264,5 +280,7 @@ namespace ReleaseServer.WebApi
             //The uploaded payload is valid
             return new ValidationResult {IsValid = true};
         }
+        
+        #endregion
     }
 }

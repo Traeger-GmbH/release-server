@@ -14,12 +14,8 @@ namespace ReleaseServer.WebApi.Models
     /// </summary>
     public class PlatformsList
     {
-        /// <summary>
-        /// Gets the available platforms for the corresponding artifact.
-        /// </summary>
-        /// <value>The available platforms for the corresponding artifact (e.g. ubuntu-amd64, debian-arm64).</value>
-        public List<string> Platforms { get; }
-
+        #region ---------- Public constructors ----------
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="PlatformsList"/> class.
         /// </summary>
@@ -28,5 +24,17 @@ namespace ReleaseServer.WebApi.Models
         {
             Platforms = platforms;
         }
+        
+        #endregion
+        
+        #region ---------- Public properties ----------
+        
+        /// <summary>
+        /// Gets the available platforms for the corresponding artifact.
+        /// </summary>
+        /// <value>The available platforms for the corresponding artifact (e.g. ubuntu-amd64, debian-arm64).</value>
+        public List<string> Platforms { get; }
+
+        #endregion
     }
 }

@@ -13,12 +13,8 @@ namespace ReleaseServer.WebApi.Models
     //TODO: Handle with a custom json converter!
     public class ProductVersionResponse
     {
-        /// <summary>
-        /// Gets the product version as string.
-        /// </summary>
-        /// <value>The product version.</value>
-        public string Version { get; }
-
+        #region ---------- Public constructors ----------
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductVersionResponse"/> class.
         /// </summary>
@@ -27,5 +23,17 @@ namespace ReleaseServer.WebApi.Models
         {
             Version = productVersion.ToString();
         }
+        
+        #endregion
+        
+        #region ---------- Public properties ----------
+        
+        /// <summary>
+        /// Gets the product version as string.
+        /// </summary>
+        /// <value>The product version.</value>
+        public string Version { get; }
+        
+        #endregion
     }
 }

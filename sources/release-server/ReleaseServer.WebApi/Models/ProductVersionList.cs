@@ -14,13 +14,8 @@ namespace ReleaseServer.WebApi.Models
     /// </summary>
     public class ProductVersionList
     {
-        /// <summary>
-        /// Gets the available versions for the corresponding artifact.
-        /// </summary>
-        /// <value>All available versions for the specified artifact. It's empty, if there exists no artifact with the
-        /// specified criteria.</value>
-        public List<ProductVersion> Versions { get; }
-
+        #region ---------- Public constructors ----------
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductVersionList"/> class.
         /// </summary>
@@ -29,5 +24,19 @@ namespace ReleaseServer.WebApi.Models
         {
             Versions = productVersions;
         }
+        
+        #endregion
+        
+        #region ---------- Public properties ----------
+        
+        /// <summary>
+        /// Gets the available versions for the corresponding artifact.
+        /// </summary>
+        /// <value>All available versions for the specified artifact. It's empty, if there exists no artifact with the
+        /// specified criteria.</value>
+        public List<ProductVersion> Versions { get; }
+        
+        #endregion
+        
     }
 }

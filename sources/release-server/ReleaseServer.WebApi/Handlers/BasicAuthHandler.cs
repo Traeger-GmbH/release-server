@@ -26,7 +26,14 @@ namespace ReleaseServer.WebApi
 {
     internal class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        
+        #region ---------- Private fields ----------
+        
         private readonly IConfiguration configuration;
+        
+        #endregion
+        
+        #region ---------- Public constructors ----------
 
         public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -36,6 +43,12 @@ namespace ReleaseServer.WebApi
         {
             this.configuration = configuration;
         }
+        
+        #endregion
+        
+        #region ---------- Methods ----------
+        
+        #region ---------- Protected methods ----------
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -71,7 +84,11 @@ namespace ReleaseServer.WebApi
             
             return AuthenticateResult.Fail("Invalid credentials!");
         }
-
+        
+        #endregion
+        
+        #region ---------- Private methods ----------
+        
         private static Credentials ExtractCredentialsFromHeader(AuthenticationHeaderValue authHeader)
         {
             //Extract base 64 encoded credentials from the header
@@ -101,5 +118,8 @@ namespace ReleaseServer.WebApi
             
             return null;
         }
+        
+        #endregion
+        #endregion
     }
 }

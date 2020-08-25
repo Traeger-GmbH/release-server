@@ -28,6 +28,14 @@ namespace ReleaseServer.WebApi
 {
     internal class Startup
     {
+        #region ---------- Public properties ----------
+        
+        public IConfiguration Configuration { get; }
+        
+        #endregion
+        
+        #region ---------- Public constructors ----------
+        
         public Startup(IWebHostEnvironment env)
         {
             var conf = new ConfigurationBuilder()
@@ -37,9 +45,11 @@ namespace ReleaseServer.WebApi
             
             Configuration = conf;
         }
-
-        public IConfiguration Configuration { get; }
-
+        
+        #endregion
+        
+        #region ---------- Public methods ----------
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -123,5 +133,7 @@ namespace ReleaseServer.WebApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Release Server API V1");
             });
         }
+        
+        #endregion
     }
 }

@@ -14,13 +14,8 @@ namespace ReleaseServer.WebApi.Models
     /// </summary>
     public class ProductInformationList
     {
-        /// <summary>
-        /// Gets the a list of product information for several artifacts. 
-        /// </summary>
-        /// <value>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects. It's empty, if there
-        /// exists no product information for the specified product.</value>
-        public List<ProductInformation> ProductInformation { get; }
-
+        #region ---------- Public constructors ----------
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductInformationList"/> class.
         /// </summary>
@@ -29,5 +24,19 @@ namespace ReleaseServer.WebApi.Models
         {
             ProductInformation = productInfoList;
         }
+        
+        #endregion
+        
+        #region ---------- Public properties ----------
+        
+        /// <summary>
+        /// Gets the a list of product information for several artifacts. 
+        /// </summary>
+        /// <value>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects. It's empty, if there
+        /// exists no product information for the specified product.</value>
+        public List<ProductInformation> ProductInformation { get; }
+        
+        #endregion
+        
     }
 }

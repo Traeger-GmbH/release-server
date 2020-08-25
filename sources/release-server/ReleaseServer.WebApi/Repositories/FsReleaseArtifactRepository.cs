@@ -19,8 +19,14 @@ namespace ReleaseServer.WebApi
 {
     internal class FsReleaseArtifactRepository : IReleaseArtifactRepository
     {
+        #region ---------- Private fields ----------
+        
         private readonly DirectoryInfo artifactRootDir, backupRootDir;
         private ILogger logger;
+        
+        #endregion
+        
+        #region ---------- Public constructors ----------
 
         public FsReleaseArtifactRepository(
             ILogger<FsReleaseArtifactRepository> logger,
@@ -31,6 +37,12 @@ namespace ReleaseServer.WebApi
             backupRootDir = backupDirectory;
             this.logger = logger;
         }
+        
+        #endregion
+        
+        #region ---------- Methods ----------
+        
+        #region ---------- Public methods ----------
 
         public void StoreArtifact(ReleaseArtifact artifact)
         {
@@ -269,6 +281,10 @@ namespace ReleaseServer.WebApi
                 throw;
             }
         }
+        
+        #endregion
+        
+        #region ---------- Private methods ----------
 
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
@@ -290,5 +306,8 @@ namespace ReleaseServer.WebApi
             return
                 DeploymentMetaInfo.FromJsonFile(deploymentMetaName.FullName);
         }
+        
+        #endregion
+        #endregion
     }
 }

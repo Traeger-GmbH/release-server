@@ -32,9 +32,15 @@ namespace ReleaseServer.WebApi
     [Route("[controller]")]
     public class ReleaseArtifactController : ControllerBase
     {
+        #region ---------- Private fields ----------
+
         private IReleaseArtifactService releaseArtifactService;
         private ILogger logger;
 
+        #endregion
+
+        #region ---------- Public methods ----------
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseArtifactController"/> class.
         /// </summary>
@@ -373,5 +379,7 @@ namespace ReleaseServer.WebApi
         {
             return NotFound("");
         }
+       
+       #endregion
     }
 }
