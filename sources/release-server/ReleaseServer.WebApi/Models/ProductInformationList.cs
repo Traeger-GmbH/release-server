@@ -17,6 +17,8 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets the a list of product information for several artifacts. 
         /// </summary>
+        /// <value>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects. It's empty, if there
+        /// exists no product information for the specified product.</value>
         public List<ProductInformation> ProductInformation { get; }
 
         /// <summary>

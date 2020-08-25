@@ -15,11 +15,13 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets or sets the name of the downloaded artifact file.
         /// </summary>
+        /// <value>The name the downloaded artifact files.</value>
         public string FileName { get; set; }
         
         /// <summary>
         /// Gets or sets the payload of the downloaded artifact file (contains the artifact incl. meta information).
         /// </summary>
+        /// <value>The payload of the downloaded artifact.</value>
         public byte[] Payload { get; set; }
     }
 }

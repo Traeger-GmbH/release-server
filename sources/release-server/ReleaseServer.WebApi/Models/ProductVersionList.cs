@@ -17,6 +17,8 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets the available versions for the corresponding artifact.
         /// </summary>
+        /// <value>All available versions for the specified artifact. It's empty, if there exists no artifact with the
+        /// specified criteria.</value>
         public List<ProductVersion> Versions { get; }
 
         /// <summary>

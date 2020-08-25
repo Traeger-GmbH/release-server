@@ -13,13 +13,15 @@ namespace ReleaseServer.WebApi.Models
     public class ValidationResult
     {
         /// <summary>
-        /// Gets or set the validation flag (true -> valid, false -> invalid).
+        /// Gets or set the validation flag.
         /// </summary>
+        /// <value>The validation flag is `true`, if it's valid and `false` if not.</value>
         public bool IsValid { get; set;}
 
         /// <summary>
         /// Gets or sets the concrete validation error.
         /// </summary>
+        /// <value>The concrete validation error. The <see cref="string"/> is empty, if there exists no error.</value>
         public string ValidationError { get; set;}
     }
 }

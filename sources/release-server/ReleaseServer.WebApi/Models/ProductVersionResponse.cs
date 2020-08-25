@@ -16,6 +16,7 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets the product version as string.
         /// </summary>
+        /// <value>The product version.</value>
         public string Version { get; }
 
         /// <summary>

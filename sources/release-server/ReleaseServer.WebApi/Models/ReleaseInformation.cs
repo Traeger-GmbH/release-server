@@ -18,11 +18,13 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets or sets the release notes.
         /// </summary>
+        /// <value>The release notes of the artifact in form of an <see cref="ReleaseNotes"/> object.</value>
         public ReleaseNotes ReleaseNotes { get; set;}
 
         /// <summary>
         /// Gets or sets the release date.
         /// </summary>
+        /// <value>The release date of the artifact</value>
         public DateTime ReleaseDate { get; set;}
     }
 }

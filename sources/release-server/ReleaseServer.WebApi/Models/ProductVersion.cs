@@ -18,11 +18,14 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets or sets the version number of the artifact.
         /// </summary>
+        /// <value>The version number of the artifact (e.g. 1.0, 1.1).This value is always set.</value>
         public Version VersionNumber { get; set; }
 
         /// <summary>
         /// Gets or sets the version suffix of the artifact (e.g. -alpha, -beta).
         /// </summary>
+        /// <value>The version suffix of the artifact (e.g. -alpha, -beta). This value is not set, if the artifact version
+        /// has no suffix.</value>
         public string VersionSuffix { get; set; }
 
         /// <summary>

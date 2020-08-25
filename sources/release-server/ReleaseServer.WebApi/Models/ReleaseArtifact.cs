@@ -17,11 +17,13 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets or sets the product information of the artifact.
         /// </summary>
+        /// <value>The product information of the artifact in form of an <see cref="ProductInformation"/> object.</value>
         public ProductInformation ProductInformation { get; set; }
         
         /// <summary>
         /// Gets or sets the payload of the artifact in form of a <see cref="ZipArchive"/>.
         /// </summary>
+        /// <value>The payload of the release artifact artifact in form of a <see cref="ZipArchive"/>.</value>
         public ZipArchive Payload { get; set; }
     }
 }
