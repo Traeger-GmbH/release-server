@@ -46,8 +46,6 @@ namespace ReleaseServer.WebApi
         
         #endregion
         
-        #region ---------- Methods ----------
-        
         #region ---------- Protected methods ----------
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -119,7 +117,6 @@ namespace ReleaseServer.WebApi
             return null;
         }
         
-        #endregion
         #endregion
     }
 }

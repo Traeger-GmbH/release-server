@@ -51,7 +51,7 @@ namespace ReleaseServer.WebApi
         
         #endregion
 
-        #region ---------- Public methods ----------
+        #region ---------- Public methods (by IReleaseArtifactService) ----------
 
         public async Task StoreArtifact(string productName, string os, string architecture, string version,
             IFormFile payload)

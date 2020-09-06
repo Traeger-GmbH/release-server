@@ -39,7 +39,7 @@ namespace ReleaseServer.WebApi
 
         #endregion
 
-        #region ---------- Public methods ----------
+        #region ---------- Public constructors ----------
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseArtifactController"/> class.
@@ -52,6 +52,9 @@ namespace ReleaseServer.WebApi
             this.logger = logger;
             this.releaseArtifactService = releaseArtifactService;
         }
+        #endregion
+        
+        #region ---------- Public methods ----------
         
         /// <summary>
         /// Uploads a specific release artifact.

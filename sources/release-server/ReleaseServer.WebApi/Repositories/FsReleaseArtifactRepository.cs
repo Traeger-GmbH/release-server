@@ -40,9 +40,7 @@ namespace ReleaseServer.WebApi
         
         #endregion
         
-        #region ---------- Methods ----------
-        
-        #region ---------- Public methods ----------
+        #region ---------- Public methods (by IReleaseArtifactRepository) ----------
 
         public void StoreArtifact(ReleaseArtifact artifact)
         {
@@ -307,7 +305,6 @@ namespace ReleaseServer.WebApi
                 DeploymentMetaInfo.FromJsonFile(deploymentMetaName.FullName);
         }
         
-        #endregion
         #endregion
     }
 }
