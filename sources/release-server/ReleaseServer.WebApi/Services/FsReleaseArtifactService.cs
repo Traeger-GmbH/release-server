@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// <copyright file="FsReleaseArtifactService.cs" company="Traeger IndustryComponents GmbH">
+// <copyright file="FsReleaseArtifactService.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
 // <author>Timo Walter</author>
