@@ -13,8 +13,18 @@ using Microsoft.Extensions.Logging;
 
 namespace ReleaseServer.WebApi
 {
-    internal class Program
+    /// <summary>
+    /// This class provides the entry point for the ReleaseServer.WebApi application. It is used
+    /// to setup the <see cref="IHostBuilder"/>.
+    /// </summary>
+    public class Program
     {
+        #region ---------- Public static methods ----------
+        
+        /// <summary>
+        /// The "main" method of the application.
+        /// </summary>
+        /// <param name="args">The arguments of the application.</param>
         public static void Main(string[] args)
         {
             try
@@ -28,6 +38,11 @@ namespace ReleaseServer.WebApi
             }
         }
 
+        /// <summary>
+        /// Creates and configures the host.
+        /// </summary>
+        /// <param name="args">The arguments of the application.</param>
+        /// <returns>The created host.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging((context, logging) =>
@@ -38,5 +53,7 @@ namespace ReleaseServer.WebApi
                     logging.AddConsole();
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+            
+        #endregion
     }
 }

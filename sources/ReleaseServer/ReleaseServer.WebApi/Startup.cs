@@ -26,16 +26,28 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ReleaseServer.WebApi
 {
-    internal class Startup
+    /// <summary>
+    /// This class provides the opportunity to configure the services and request processing pipeline of
+    /// the ReleaseServer.WebApi application.
+    /// </summary>
+    public class Startup
     {
         #region ---------- Public properties ----------
         
+        /// <summary>
+        /// Gets the configuration of the application.
+        /// </summary>
+        /// <value>The specified configuration of the application.</value>
         public IConfiguration Configuration { get; }
         
         #endregion
         
         #region ---------- Public constructors ----------
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="env">Information about the web hosting environment of the application.</param>
         public Startup(IWebHostEnvironment env)
         {
             var conf = new ConfigurationBuilder()
@@ -50,7 +62,10 @@ namespace ReleaseServer.WebApi
         
         #region ---------- Public methods ----------
         
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> interface to add several service features to the application.</param>
         public void ConfigureServices(IServiceCollection services)
         {
             services
@@ -100,7 +115,11 @@ namespace ReleaseServer.WebApi
             services.AddFsReleaseArtifactService(Configuration);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">Provides the mechanisms to configure the request pipeline of the application.</param>
+        /// <param name="env">Information about the web hosting environment of the application.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
