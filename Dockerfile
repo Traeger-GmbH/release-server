@@ -1,3 +1,11 @@
+#--------------------------------------------------------------------------------------------------
+# <copyright file="Dockerfile" company="Traeger IndustryComponents GmbH">
+#     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+# </copyright>
+# <author>Fabian Traeger</author>
+# <author>Timo Walter</author>
+#--------------------------------------------------------------------------------------------------
+
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS builder
 LABEL maintainer=info@traeger.de
 
