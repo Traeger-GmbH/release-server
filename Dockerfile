@@ -12,7 +12,7 @@ LABEL maintainer=info@traeger.de
 WORKDIR /app
 
 # Copy resources and restore
-COPY ./Sources/ReleaseServer/ReleaseServer.WebApi .
+COPY ./sources/ReleaseServer/ReleaseServer.WebApi .
 RUN dotnet restore
 
 # Build the app
