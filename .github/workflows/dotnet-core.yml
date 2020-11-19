@@ -4,9 +4,12 @@ on: [push, pull_request]
 
 jobs:
   build:
-
-    runs-on: [ubuntu-latest, windows-latest, macos-latest]
-
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -14,8 +17,11 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Install dependencies
-      run: dotnet restore ./sources/ReleaseServer/
+      run: dotnet restore
+      working-directory: ./sources/ReleaseServer/
     - name: Build
-      run: dotnet build ./sources/ReleaseServer/ --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./sources/ReleaseServer/
     - name: Test
-      run: dotnet test ./sources/ReleaseServer/ --no-restore --verbosity normal
+      run: dotnet test --no-restore --verbosity normal
+      working-directory: ./sources/ReleaseServer/
