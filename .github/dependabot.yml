@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Dependencies of the WebApi project
+  - package-ecosystem: "nuget" 
+    directory: "/sources/ReleaseServer/ReleaseServer.WebApi" # Location of package manifests
+    schedule:
+      interval: "daily"
+    reviewers:
+    - f-porter
+    - tiwalter
+    
+  # Dependencies of the WebApi-Test project
+  - package-ecosystem: "nuget" 
+    directory: "/sources/ReleaseServer/ReleaseServer.WebApi.Test" # Location of package manifests
+    schedule:
+      interval: "daily"
+    reviewers:
+    - f-porter
+    - tiwalter
