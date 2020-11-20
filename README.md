@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.com/Traeger-GmbH/release-server.svg?branch=master)
+![Build Status](https://github.com/Traeger-GmbH/release-server/workflows/build/badge.svg?branch=master)
 
 # Release server
 
