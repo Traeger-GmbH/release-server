@@ -10,7 +10,7 @@
         <PackageReference Include="FluentAssertions" Version="5.9.0" />
         <PackageReference Include="JsonConverters.Collections" Version="1.0.62" />
         <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="3.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.1.0-preview1.19506.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
         <PackageReference Include="Moq" Version="4.13.0" />
