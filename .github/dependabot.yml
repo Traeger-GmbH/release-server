@@ -1,18 +1,8 @@
 version: 2
-updates:
-  # Dependencies of the WebApi project
+updates:    
+  # Dependencies of the WebApi-Test & WebApi project (the WebApi project is referenced via the "ProjectReference")
   - package-ecosystem: "nuget" 
-    directory: "/sources/ReleaseServer/ReleaseServer.WebApi" # Location of package manifests
-    schedule:
-      interval: "daily"
-    open-pull-requests-limit: 10
-    reviewers:
-    - f-porter
-    - tiwalter
-    
-  # Dependencies of the WebApi-Test project
-  - package-ecosystem: "nuget" 
-    directory: "/sources/ReleaseServer/ReleaseServer.WebApi.Test" # Location of package manifests
+    directory: "/sources/ReleaseServer/ReleaseServer.WebApi.Test"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
