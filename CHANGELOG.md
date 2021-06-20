@@ -1,4 +1,4 @@
-## v0.2.0 / 2021-06-20
+## v0.2.0
 
 * [FEATURE] Proof & apply code style and conventions #34 
 * [FEATURE] Introduce a changelog with categories, affected platforms and internationalization for the managed artifacts #55 
@@ -12,7 +12,7 @@
 * [FEATURE] Add a "catch all" route #35
 * [CHANGE] Upgrade to .Net Core v3.1 #29
 
-## v0.1.0 / 2019-12-15
+## v0.1.0
 
 * [FEATURE] Enable the Release Server to run in a Docker Container #22
 * [CHANGE] Compare passwords in constant time to avoid timing attack vulnerabilities #33
