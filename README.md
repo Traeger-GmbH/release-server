@@ -16,29 +16,29 @@ You have two options to setup the release server.
 
 1. Download the [docker-compose.yml](https://github.com/Traeger-GmbH/release-server/blob/master/docker-compose.yml) and put it in a directory of your choice.
 
-2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it in the same directory of 1.
+2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/examples) and put it in the same directory of 1.
 
-3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and __base64 encoded__ password.
+3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and password.
 
-4. Run the application with docker-compose: `docker-compose -f "docker-compose.yml" up -d --build`
+4. Run the application with docker-compose: `docker-compose -f "docker-compose.yml" up -d`
 
-Now, the release server is reachable at https://localhost:5001.
-The Swagger UI can be found at https://localhost:5001/swagger.
+Now, the release server is reachable at http://localhost:5001.
+The Swagger UI can be found at http://localhost:5001/swagger.
 
 ### Run with Docker
 
 1. Pull the Docker image: `docker pull traeger/release-server:latest`
 
-2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/Example) and put it into a directory of your choice.
+2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/examples) and put it into a directory of your choice.
 
-3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and __base64 encoded__ password.
+3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and password.
 
-4. Run the application with docker run: `docker run -d -v <path_to_your_directory>/appsettings.json:/app/appsettings.json -v <path_to_your_directory>/artifacts:/app/artifacts -p 5001:5001  traeger/release-server:latest`
+4. Run the application with docker run: `docker run -d -v <path_to_your_directory>/appsettings.json:/app/appsettings.json -v <path_to_your_directory>/artifacts:/app/artifacts -v <path_to_your_directory>/backups:/app/backups -p 5001:5001  traeger/release-server:latest`
  
     __Note:__ You have to replace the placeholder of the docker run command!  
 
-Now, the release server is reachable at https://localhost:5001.
-The Swagger UI can be found at https://localhost:5001/swagger.
+Now, the release server is reachable at http://localhost:5001.
+The Swagger UI can be found at http://localhost:5001/swagger.
 
 ## Usage
 
@@ -54,11 +54,11 @@ __Structure of the artifact payload:__ The payload has to be a zip file and has 
 - the meta information in form of the deployment.json
 - a changelog
 
-You can find an example artifact payload in form of a zip file here: [Example artifact payload](https://github.com/Traeger-GmbH/release-server/tree/master/Example)
+You can find an example artifact payload in form of a zip file here: [Example artifact payload](https://github.com/Traeger-GmbH/release-server/tree/master/examples)
 
 __PUT request to upload an artifact__:
 
-`curl -k -X PUT https://localhost:5001/releaseartifact/upload/<your_prodcut_name>/debian/amd64/1.0 -H 'Authorization: Basic <base 64 encoded "username:password">' -H 'content-type: multipart/form-data' -F =@/path/to/the/artifactPayload`
+`curl -k -X PUT http://localhost:5001/releaseartifact/upload/<your_prodcut_name>/debian/amd64/1.0 -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F =@/path/to/the/artifactPayload;type=application/zip`
 
 __Note:__ You have replace the placeholder in the PUT request (product name, authorization header)
 
@@ -71,23 +71,49 @@ Message: Upload of the artifact successful!
 
 __GET request to list the products__:
 
- `curl -k -X GET https://localhost:5001/releaseartifact/versions/<your_product_name>`
+ `curl -k -X GET http://localhost:5001/releaseartifact/versions/<your_product_name>`
 
  __Response example:__
 
     {
-        "productInformation": [
-            {
-                "identifier": "softwareX",
-                "version": "1.0",
-                "os": "debian",
-                "architecture": "amd64"
-            },
-            {
-                "identifier": "softwareX",
-                "version": "1.1-beta",
-                "os": "debian",
-                "architecture": "amd64"
+    "productInformation": [
+        {
+            "identifier": "softwareX",
+            "version": "1.0",
+            "os": "ubuntu",
+            "architecture": "arm64",
+            "releaseNotes": {
+                "changes": {
+                    "de": [
+                        {
+                            "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                            ],
+                            "added": [
+                                "added de 1"
+                            ],
+                            "fixed": null,
+                            "breaking": null,
+                            "deprecated": null
+                        }
+                    ],
+                    "en": [
+                        {
+                            "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                            ],
+                            "added": [
+                                "added en 1"
+                            ],
+                            "fixed": null,
+                            "breaking": null,
+                            "deprecated": null
+                        }
+                    ]
+                }
             }
-        ]
-    }
+        }
+    ]
+}
