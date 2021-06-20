@@ -76,44 +76,44 @@ __GET request to list the products__:
  __Response example:__
 
     {
-    "productInformation": [
-        {
-            "identifier": "softwareX",
-            "version": "1.0",
-            "os": "ubuntu",
-            "architecture": "arm64",
-            "releaseNotes": {
-                "changes": {
-                    "de": [
-                        {
-                            "platforms": [
-                                "windows/any",
-                                "linux/rpi"
-                            ],
-                            "added": [
-                                "added de 1"
-                            ],
-                            "fixed": null,
-                            "breaking": null,
-                            "deprecated": null
-                        }
-                    ],
-                    "en": [
-                        {
-                            "platforms": [
-                                "windows/any",
-                                "linux/rpi"
-                            ],
-                            "added": [
-                                "added en 1"
-                            ],
-                            "fixed": null,
-                            "breaking": null,
-                            "deprecated": null
-                        }
-                    ]
+        "productInformation": [
+            {
+                "identifier": "softwareX",
+                "version": "1.0",
+                "os": "ubuntu",
+                "architecture": "arm64",
+                "releaseNotes": {
+                    "changes": {
+                        "de": [
+                            {
+                                "platforms": [
+                                    "windows/any",
+                                    "linux/rpi"
+                                ],
+                                "added": [
+                                    "added de 1"
+                                ],
+                                "fixed": null,
+                                "breaking": null,
+                                "deprecated": null
+                            }
+                        ],
+                        "en": [
+                            {
+                                "platforms": [
+                                    "windows/any",
+                                    "linux/rpi"
+                                ],
+                                "added": [
+                                    "added en 1"
+                                ],
+                                "fixed": null,
+                                "breaking": null,
+                                "deprecated": null
+                            }
+                        ]
+                    }
                 }
             }
-        }
-    ]
-}
+        ]
+    }
