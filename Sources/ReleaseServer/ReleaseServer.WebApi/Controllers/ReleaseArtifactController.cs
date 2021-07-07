@@ -81,7 +81,7 @@ namespace ReleaseServer.WebApi.Controllers
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductInformationListResponseModel), 200)]
+        [ProducesResponseType(typeof(ProductInformationList), 200)]
         [SeparatedQueryString]
         [HttpGet("products/{product}")]
         public async Task<ActionResult<ProductInformationList>> GetProduct(
