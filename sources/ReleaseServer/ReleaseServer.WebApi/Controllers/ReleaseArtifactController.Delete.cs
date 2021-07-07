@@ -1,25 +1,15 @@
 //--------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseArtifactController.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+// <copyright file="ReleaseArtifactController.Delete.cs" company="Traeger Industry Components GmbH">
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Fabian Traeger</author>
 // <author>Timo Walter</author>
 //--------------------------------------------------------------------------------------------------
 
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading.Tasks;
 
-using Castle.Core.Internal;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
-
-using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
