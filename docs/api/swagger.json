@@ -1,0 +1,1581 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Release Server API",
+    "description": "An application for managing your own release artifacts. The release server provides several REST endpoints for the following operations.",
+    "contact": {
+      "name": "Traeger Industry Components GmbH",
+      "url": "https://www.traeger.de",
+      "email": "info@traeger.de"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/ReleaseArtifact/upload/{product}/{os}/{architecture}/{version}": {
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Uploads a specific release artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the uploaded artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the uploaded artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the uploaded artifact."
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The version of the uploaded artifact."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "artifact"
+                ],
+                "type": "object",
+                "properties": {
+                  "artifact": {
+                    "type": "string",
+                    "description": "The payload of the uploaded artifact (Zip file).",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "artifact": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload of the artifact was successful."
+          },
+          "400": {
+            "description": "No or invalid body provided (must be a Zip file)."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/versions/{product}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves a list of all available versions of the specified artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the searched artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the searched artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An artifact with the specified product name exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformationList"
+                },
+                "example": {
+                  "productInformation": [
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.0",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": [
+                                "fix de 1",
+                                "fix de 2"
+                              ],
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": [
+                                "breaking en 1",
+                                "breaking en 2"
+                              ],
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": [
+                                "fix en 3"
+                              ],
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.1-beta",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": null,
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformationList"
+                },
+                "example": {
+                  "productInformation": [
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.0",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": [
+                                "fix de 1",
+                                "fix de 2"
+                              ],
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": [
+                                "breaking en 1",
+                                "breaking en 2"
+                              ],
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": [
+                                "fix en 3"
+                              ],
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.1-beta",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": null,
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformationList"
+                },
+                "example": {
+                  "productInformation": [
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.0",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": [
+                                "fix de 1",
+                                "fix de 2"
+                              ],
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": [
+                                "windows/any",
+                                "linux/rpi"
+                              ],
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": [
+                                "breaking en 1",
+                                "breaking en 2"
+                              ],
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": [
+                                "fix en 3"
+                              ],
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "identifier": "softwareX",
+                      "version": "1.1-beta",
+                      "os": "debian",
+                      "architecture": "amd64",
+                      "releaseNotes": {
+                        "changes": {
+                          "de": [
+                            {
+                              "platforms": [
+                                "windows/any"
+                              ],
+                              "added": [
+                                "added de 1",
+                                "added de 2"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking de 1",
+                                "breaking de 2"
+                              ],
+                              "deprecated": [
+                                "deprecated de 1",
+                                "deprecated de 2"
+                              ]
+                            }
+                          ],
+                          "en": [
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 1",
+                                "added en 2"
+                              ],
+                              "fixed": [
+                                "fix en 1",
+                                "fix en 2"
+                              ],
+                              "breaking": null,
+                              "deprecated": [
+                                "deprecated en 1",
+                                "deprecated en 2"
+                              ]
+                            },
+                            {
+                              "platforms": null,
+                              "added": [
+                                "added en 3"
+                              ],
+                              "fixed": null,
+                              "breaking": [
+                                "breaking en 3"
+                              ],
+                              "deprecated": [
+                                "deprecated en 3"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified artifact does not exist."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/platforms/{product}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves all available platforms for a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the artifact."
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The version of the artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "There are existing platforms for the specified product name.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsList"
+                },
+                "example": {
+                  "platforms": [
+                    "debian-amd64",
+                    "debian-arm64"
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsList"
+                },
+                "example": {
+                  "platforms": [
+                    "debian-amd64",
+                    "debian-arm64"
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsList"
+                },
+                "example": {
+                  "platforms": [
+                    "debian-amd64",
+                    "debian-arm64"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The artifact does not exist or there exists no platform for the specified product name."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/info/{product}/{os}/{architecture}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the release information of a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The version of the specified artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The release information of the specified artifact exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseInformation"
+                },
+                "example": {
+                  "releaseNotes": {
+                    "changes": {
+                      "de": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added de 1",
+                            "added de 2"
+                          ],
+                          "fixed": [
+                            "fix de 1",
+                            "fix de 2"
+                          ],
+                          "breaking": [
+                            "breaking de 1",
+                            "breaking de 2"
+                          ],
+                          "deprecated": [
+                            "deprecated de 1",
+                            "deprecated de 2"
+                          ]
+                        }
+                      ],
+                      "en": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added en 1",
+                            "added en 2"
+                          ],
+                          "fixed": [
+                            "fix en 1",
+                            "fix en 2"
+                          ],
+                          "breaking": [
+                            "breaking en 1",
+                            "breaking en 2"
+                          ],
+                          "deprecated": [
+                            "deprecated en 1",
+                            "deprecated en 2"
+                          ]
+                        },
+                        {
+                          "platforms": null,
+                          "added": [
+                            "added en 3"
+                          ],
+                          "fixed": [
+                            "fix en 3"
+                          ],
+                          "breaking": [
+                            "breaking en 3"
+                          ],
+                          "deprecated": [
+                            "deprecated en 3"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "releaseDate": "2020-02-01T00:00:00"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseInformation"
+                },
+                "example": {
+                  "releaseNotes": {
+                    "changes": {
+                      "de": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added de 1",
+                            "added de 2"
+                          ],
+                          "fixed": [
+                            "fix de 1",
+                            "fix de 2"
+                          ],
+                          "breaking": [
+                            "breaking de 1",
+                            "breaking de 2"
+                          ],
+                          "deprecated": [
+                            "deprecated de 1",
+                            "deprecated de 2"
+                          ]
+                        }
+                      ],
+                      "en": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added en 1",
+                            "added en 2"
+                          ],
+                          "fixed": [
+                            "fix en 1",
+                            "fix en 2"
+                          ],
+                          "breaking": [
+                            "breaking en 1",
+                            "breaking en 2"
+                          ],
+                          "deprecated": [
+                            "deprecated en 1",
+                            "deprecated en 2"
+                          ]
+                        },
+                        {
+                          "platforms": null,
+                          "added": [
+                            "added en 3"
+                          ],
+                          "fixed": [
+                            "fix en 3"
+                          ],
+                          "breaking": [
+                            "breaking en 3"
+                          ],
+                          "deprecated": [
+                            "deprecated en 3"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "releaseDate": "2020-02-01T00:00:00"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseInformation"
+                },
+                "example": {
+                  "releaseNotes": {
+                    "changes": {
+                      "de": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added de 1",
+                            "added de 2"
+                          ],
+                          "fixed": [
+                            "fix de 1",
+                            "fix de 2"
+                          ],
+                          "breaking": [
+                            "breaking de 1",
+                            "breaking de 2"
+                          ],
+                          "deprecated": [
+                            "deprecated de 1",
+                            "deprecated de 2"
+                          ]
+                        }
+                      ],
+                      "en": [
+                        {
+                          "platforms": [
+                            "windows/any",
+                            "linux/rpi"
+                          ],
+                          "added": [
+                            "added en 1",
+                            "added en 2"
+                          ],
+                          "fixed": [
+                            "fix en 1",
+                            "fix en 2"
+                          ],
+                          "breaking": [
+                            "breaking en 1",
+                            "breaking en 2"
+                          ],
+                          "deprecated": [
+                            "deprecated en 1",
+                            "deprecated en 2"
+                          ]
+                        },
+                        {
+                          "platforms": null,
+                          "added": [
+                            "added en 3"
+                          ],
+                          "fixed": [
+                            "fix en 3"
+                          ],
+                          "breaking": [
+                            "breaking en 3"
+                          ],
+                          "deprecated": [
+                            "deprecated en 3"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "releaseDate": "2020-02-01T00:00:00"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The artifact with the specified product name does not exist. Therefore the release notes do not exist."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/versions/{product}/{os}/{architecture}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves all available versions that are fitting to a specific product name / platform (HW architecture + OS).",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "There are existing versions for the specified platform and product.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionList"
+                },
+                "example": {
+                  "versions": [
+                    "1.1",
+                    "1.0"
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionList"
+                },
+                "example": {
+                  "versions": [
+                    "1.1",
+                    "1.0"
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionList"
+                },
+                "example": {
+                  "versions": [
+                    "1.1",
+                    "1.0"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "There exists no version for the specified platform / product."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/download/{product}/{os}/{architecture}/{version}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The version of the specified artifact.",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "There exists an artifact with the specified parameters."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified parameters."
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/download/{product}/{os}/{architecture}/latest": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the latest version of a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified artifact exists (the ZIP file with the artifact will be retrieved)"
+          },
+          "404": {
+            "description": "The artifact is not available for the specified platform (OS + arch)"
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/latest/{product}/{os}/{architecture}": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the latest version of a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified product exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponse"
+                },
+                "example": {
+                  "version": "1.1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponse"
+                },
+                "example": {
+                  "version": "1.1"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductVersionResponse"
+                },
+                "example": {
+                  "version": "1.1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The artifact is not available for the specified platform (OS + HW architecture)\r\n            or the artifact with the specified product name does not exist"
+          }
+        }
+      }
+    },
+    "/ReleaseArtifact/{product}/{os}/{architecture}/{version}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the specified artifact."
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The operating system of the specified artifact."
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The hardware architecture of the specified artifact."
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The version of the specified artifact."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified artifact got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified parameters."
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/{product}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes all artifacts of a specific product name.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the artifacts, that have to be deleted.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The product name of the artifacts, that have to be deleted."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All artifacts of the specified product name got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified product name."
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/backup": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Backups the whole artifact directory and retrieves it as a ZIP file.",
+        "responses": {
+          "200": {
+            "description": "The artifact directory backup was successful."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/ReleaseArtifact/restore": {
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Restores the uploaded backup file.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "backupFile"
+                ],
+                "type": "object",
+                "properties": {
+                  "backupFile": {
+                    "type": "string",
+                    "description": "The uploaded backup file (ZIP file).",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "backupFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The restore process was successful."
+          },
+          "400": {
+            "description": "No body provided."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Version": {
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "minor": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "build": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "majorRevision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "minorRevision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        }
+      },
+      "ProductVersion": {
+        "type": "object",
+        "properties": {
+          "versionNumber": {
+            "$ref": "#/components/schemas/Version"
+          },
+          "versionSuffix": {
+            "type": "string",
+            "description": "Gets or sets the version suffix of the artifact (e.g. -alpha, -beta).",
+            "nullable": true
+          }
+        },
+        "description": "Provides the information of an artifact product version and implements several operations for\r\nthe ReleaseServer.WebApi.Models.ProductVersion."
+      },
+      "ChangeSet": {
+        "type": "object",
+        "properties": {
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the platforms, which are affected by the changes.",
+            "nullable": true
+          },
+          "added": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the added features of the release.",
+            "nullable": true
+          },
+          "fixed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the issues, that have been fixed",
+            "nullable": true
+          },
+          "breaking": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the breaking changes of the release.",
+            "nullable": true
+          },
+          "deprecated": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the deprecated components.",
+            "nullable": true
+          }
+        },
+        "description": "Provides the information of the code changes of a certain release."
+      },
+      "ReleaseNotes": {
+        "type": "object",
+        "properties": {
+          "changes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ChangeSet"
+              }
+            },
+            "description": "Gets or sets the code / product changes with this release (required).",
+            "nullable": true
+          }
+        },
+        "description": "Provides the the release notes with all the changes."
+      },
+      "ProductInformation": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Gets or sets the product identifier (product name) of the artifact.",
+            "nullable": true
+          },
+          "version": {
+            "$ref": "#/components/schemas/ProductVersion"
+          },
+          "os": {
+            "type": "string",
+            "description": "Gets or sets the operating system of the artifact.",
+            "nullable": true
+          },
+          "architecture": {
+            "type": "string",
+            "description": "Gets or sets the hardware architecture of the artifact.",
+            "nullable": true
+          },
+          "releaseNotes": {
+            "$ref": "#/components/schemas/ReleaseNotes"
+          }
+        },
+        "description": "Provides product information about a specific artifact."
+      },
+      "ProductInformationList": {
+        "type": "object",
+        "properties": {
+          "productInformation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductInformation"
+            },
+            "description": "Gets the a list of product information for several artifacts.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "description": "Provides a list of product information for several artifacts."
+      },
+      "PlatformsList": {
+        "type": "object",
+        "properties": {
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets the available platforms for the corresponding artifact.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "description": "Provides the information of the available platforms for a specific artifact."
+      },
+      "ReleaseInformation": {
+        "type": "object",
+        "properties": {
+          "releaseNotes": {
+            "$ref": "#/components/schemas/ReleaseNotes"
+          },
+          "releaseDate": {
+            "type": "string",
+            "description": "Gets or sets the release date.",
+            "format": "date-time"
+          }
+        },
+        "description": "Provides the structure of the release information"
+      },
+      "ProductVersionList": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVersion"
+            },
+            "description": "Gets the available versions for the corresponding artifact.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "description": "Provides the information of the available versions of a specific artifact."
+      },
+      "ProductVersionResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "Gets the product version as string.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "description": "Defines the structure of the product version response body."
+      }
+    },
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "description": "Input your username and password to access this API",
+        "scheme": "basic"
+      }
+    }
+  }
+}

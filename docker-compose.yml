@@ -9,3 +9,4 @@ services:
     volumes: 
       - ./appsettings.json:/app/appsettings.json
       - ./artifacts:/app/artifacts
+      - ./backups:/app/backups
