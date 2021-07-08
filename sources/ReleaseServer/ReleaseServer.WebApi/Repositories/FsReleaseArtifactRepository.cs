@@ -107,42 +107,6 @@ namespace ReleaseServer.WebApi
                     ReleaseNotes = GetReleaseInfo(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name).ReleaseNotes
                 };
 
-            string readChangelog(string os, string architecture, ProductVersion version) {
-                var path = GenerateArtifactPath(productName, os, architecture, version.ToString());
-                if (Directory.Exists(path))
-                {
-                    var dir = new DirectoryInfo(path);
-                    var files = dir.GetFiles();
-
-                    var deploymentMetaInfo = GetDeploymentMetaInfo(files);
-                    
-                    var changelogFile = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
-                    if (File.Exists(changelogFile)) {
-                        return File.ReadAllText(changelogFile);
-                    }
-                    else {
-                        return null;
-                    }
-                }
-
-                return null;
-            }
-
-            string readReleaseDate(string os, string architecture, ProductVersion version) {
-                var path = GenerateArtifactPath(productName, os, architecture, version.ToString());
-                if (Directory.Exists(path))
-                {
-                    var dir = new DirectoryInfo(path);
-                    var files = dir.GetFiles();
-
-                    var deploymentMetaInfo = GetDeploymentMetaInfo(files);
-                    
-                    return deploymentMetaInfo.ReleaseDate.ToString();
-                }
-
-                return null;
-            }
-
             return productInformation.ToList();
         }
 
