@@ -71,19 +71,7 @@ namespace ReleaseServer.WebApi
 
             return Ok("backup successfully restored");
         }
-
-       /// <summary>
-       /// Catches all other routes, which are not defined and returns a <see cref="NotFoundObjectResult"/>.
-       /// </summary>
-       /// <returns>An <see cref="NotFoundObjectResult"/>.</returns>
-       [AllowAnonymous]
-       [ApiExplorerSettings(IgnoreApi = true)]
-       [Route("{*url}", Order = 999)]
-        public IActionResult CatchAll()
-        {
-            return NotFound("");
-        }
        
-       #endregion
+        #endregion
     }
 }
