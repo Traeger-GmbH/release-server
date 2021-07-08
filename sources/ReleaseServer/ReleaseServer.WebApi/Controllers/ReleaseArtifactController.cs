@@ -9,6 +9,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
@@ -56,7 +57,16 @@ namespace ReleaseServer.WebApi
         {
             return NotFound("");
         }
-       
+
+        #endregion
+
+        #region ---------- Private methods ----------
+
+        private static int CompareByVersion(ProductInformation x, ProductInformation y)
+        {
+            return x.Version.CompareTo(y.Version);
+        }
+
         #endregion
     }
 }
