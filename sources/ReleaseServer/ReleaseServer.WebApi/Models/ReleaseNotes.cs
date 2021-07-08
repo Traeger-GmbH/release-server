@@ -17,12 +17,21 @@ namespace ReleaseServer.WebApi.Models
     /// </summary>
     public class ReleaseNotes : JsonSerializable<ReleaseNotes>
     {
-        
         /// <summary>
         /// Gets or sets the code / product changes with this release (required).
         /// </summary>
         /// <value>The changes of the code / product within a release. This is required field.</value>
         [JsonRequired]
         public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set;}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsSecurityPatch { get; set; } = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsPreviewRelease { get; set; } = false;
     }
 }
