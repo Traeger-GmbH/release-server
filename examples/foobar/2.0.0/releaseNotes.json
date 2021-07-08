@@ -1,0 +1,24 @@
+{
+  "changes": {
+    "de": [
+      {
+        "added": [],
+        "fixed": [],
+        "breaking": [
+          "Funktion foo wird nicht mehr unterstützt."
+        ],
+        "deprecated": []
+      }
+    ],
+    "en": [
+      {
+        "added": [],
+        "fixed": [],
+        "breaking": [
+          "Function foo is not supported anymore."
+        ],
+        "deprecated": []
+      }
+    ]
+  }
+}
