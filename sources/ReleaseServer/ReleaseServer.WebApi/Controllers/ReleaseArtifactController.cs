@@ -19,7 +19,7 @@ namespace ReleaseServer.WebApi
     /// </summary>
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("artifacts")]
     public partial class ReleaseArtifactController : ControllerBase
     {
         #region ---------- Private fields ----------
