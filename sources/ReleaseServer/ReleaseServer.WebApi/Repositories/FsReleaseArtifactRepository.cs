@@ -127,8 +127,7 @@ namespace ReleaseServer.WebApi
                     
                     return new ReleaseInformation
                     {
-                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName), 
-                        ReleaseDate = deploymentMetaInfo.ReleaseDate
+                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName)
                     };
                 }
 

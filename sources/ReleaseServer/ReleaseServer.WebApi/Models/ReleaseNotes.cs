@@ -1,10 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseNotes.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
+// <author>Fabian Traeger</author>
 //--------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -23,6 +25,13 @@ namespace ReleaseServer.WebApi.Models
         /// <value>The changes of the code / product within a release. This is required field.</value>
         [JsonRequired]
         public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set;}
+
+        /// <summary>
+        /// Gets or sets the release date (required).
+        /// </summary>
+        /// <value>The release date of the artifact (is a required field).</value>
+        [JsonRequired]
+        public DateTime ReleaseDate { get; set; }
 
         /// <summary>
         /// 

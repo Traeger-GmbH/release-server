@@ -126,8 +126,8 @@ namespace ReleaseServer.WebApi.Test
                             {
                                 new ChangeSet
                                 {
-                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
-                                    Added = new List<string>{"added de 1"}
+                                    Platforms = new List<string> { "windows/any", "linux/rpi" },
+                                    Added = new List<string> { "added de 1" }
                                 }
                             }
                         },
@@ -136,12 +136,13 @@ namespace ReleaseServer.WebApi.Test
                             {
                                 new ChangeSet
                                 {
-                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
-                                    Added = new List<string>{"added en 1"}
+                                    Platforms = new List<string> { "windows/any", "linux/rpi" },
+                                    Added = new List<string> { "added en 1" }
                                 }
                             }
                         }
-                    }
+                    },
+                    ReleaseDate = new DateTime(2020, 02, 1)
                 }
             };
 
@@ -212,11 +213,9 @@ namespace ReleaseServer.WebApi.Test
             
             expectedReleaseInfo = new ReleaseInformation
             {
-                ReleaseDate = new DateTime(2020, 02, 10),
-                
                 ReleaseNotes = new ReleaseNotes
-                {
-                    
+                {    
+                   ReleaseDate = new DateTime(2020, 02, 10),
                     Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
                         {new CultureInfo("de"), new List<ChangeSet>

@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // <copyright file="DeploymentMetaInfo.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
+// <author>Fabian Traeger</author>
 //--------------------------------------------------------------------------------------------------
 
-using System;
 using Newtonsoft.Json;
 
 namespace ReleaseServer.WebApi.Models
@@ -28,12 +28,5 @@ namespace ReleaseServer.WebApi.Models
         /// <value>The name of the artifact file (is a required field).</value>
         [JsonRequired]
         public string ArtifactFileName { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the release date (required).
-        /// </summary>
-        /// <value>The release date of the artifact (is a required field).</value>
-        [JsonRequired]
-        public DateTime ReleaseDate { get; set;}
     }
 }
