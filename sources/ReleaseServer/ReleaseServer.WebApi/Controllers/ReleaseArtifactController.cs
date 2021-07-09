@@ -62,7 +62,7 @@ namespace ReleaseServer.WebApi
 
         #region ---------- Private methods ----------
 
-        private static int CompareByVersion(ProductInformation x, ProductInformation y)
+        private static int CompareByVersion(DeploymentInformation x, DeploymentInformation y)
         {
             return x.Version.CompareTo(y.Version);
         }

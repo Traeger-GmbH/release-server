@@ -40,10 +40,10 @@ namespace ReleaseServer.WebApi
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductInformationList), 200)]
+        [ProducesResponseType(typeof(DeploymentInformationList), 200)]
         [SeparatedQueryString]
         [HttpGet("products/{product}")]
-        public async Task<ActionResult<ProductInformationList>> GetProduct(
+        public async Task<ActionResult<DeploymentInformationList>> GetProduct(
             [Required] string product,
             [FromQuery] List<string> architectures,
             [FromQuery] List<string> operatingSystems,
@@ -81,28 +81,28 @@ namespace ReleaseServer.WebApi
                 productInfos.Reverse();
             }
 
-            return new ProductInformationList(productInfos, limit, offset);
+            return new DeploymentInformationList(productInfos, limit, offset);
         }
 
         /// <summary>
         /// Retrieves a list of all available versions of the specified artifact.
         /// </summary>
         /// <param name="product">The product name of the searched artifact.</param>
-        /// <returns>A <see cref="ProductInformationList"/> with the available product infos. A <see cref="NotFoundObjectResult"/>, if
+        /// <returns>A <see cref="DeploymentInformationList"/> with the available product infos. A <see cref="NotFoundObjectResult"/>, if
         /// the specified artifact does not exist.</returns>
         /// <response code="200">An artifact with the specified product name exists.</response>
         /// <response code="404">The specified artifact does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ProductInformationList), 200)]
+        [ProducesResponseType(typeof(DeploymentInformationList), 200)]
         [HttpGet("versions/{product}")]
-        public async Task<ActionResult<ProductInformationList>> GetProductInfos([Required] string product)
+        public async Task<ActionResult<DeploymentInformationList>> GetProductInfos([Required] string product)
         {
             var productInfos = await releaseArtifactService.GetProductInfos(product);
 
             if (productInfos.IsNullOrEmpty()) 
                 return NotFound("The specified artifact was not found!");
             
-            return new ProductInformationList(productInfos);
+            return new DeploymentInformationList(productInfos);
         }
 
         /// <summary>

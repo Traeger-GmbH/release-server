@@ -111,7 +111,7 @@ namespace ReleaseServer.WebApi.Test
                 file.CopyTo(Path.Combine(testProductPath, file.Name));
             }
 
-            var expectedProductInfo = new ProductInformation
+            var expectedProductInfo = new DeploymentInformation
             {
                 Identifier = "testproduct",
                 Os = "debian",

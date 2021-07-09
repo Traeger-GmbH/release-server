@@ -27,8 +27,8 @@ namespace ReleaseServer.WebApi
         /// Retrieves the product information of specific product name.
         /// </summary>
         /// <param name="productName">The name of the specific product.</param>
-        /// <returns>The corresponding <see cref="ProductInformation"/> in form of a <see cref="List{T}"/>.</returns>
-        List<ProductInformation> GetInfosByProductName(string productName);
+        /// <returns>The corresponding <see cref="DeploymentInformation"/> in form of a <see cref="List{T}"/>.</returns>
+        List<DeploymentInformation> GetInfosByProductName(string productName);
 
         /// <summary>
         /// Retrieves the release information of a specific artifact.

@@ -90,7 +90,7 @@ namespace ReleaseServer.WebApi
             }
         }
 
-        public List<ProductInformation> GetInfosByProductName(string productName)
+        public List<DeploymentInformation> GetInfosByProductName(string productName)
         {
             var productInformation =
                 from productDir in artifactRootDir.EnumerateDirectories()
@@ -98,7 +98,7 @@ namespace ReleaseServer.WebApi
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select new ProductInformation
+                select new DeploymentInformation
                 {
                     Identifier = productDir.Name,
                     Os = osDir.Name,

@@ -77,7 +77,7 @@ namespace ReleaseServer.WebApi
             
         }
 
-        public async Task<List<ProductInformation>> GetProductInfos(string productName)
+        public async Task<List<DeploymentInformation>> GetProductInfos(string productName)
         {
             return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
         }

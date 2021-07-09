@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// <copyright file="ProductInformationList.cs" company="Traeger Industry Components GmbH">
+// <copyright file="DeploymentInformationList.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
@@ -14,15 +14,15 @@ namespace ReleaseServer.WebApi.Models
     /// <summary>
     /// Provides a list of product information for several artifacts.
     /// </summary>
-    public class ProductInformationList
+    public class DeploymentInformationList
     {
         #region ---------- Public constructors ----------
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProductInformationList"/> class.
+        /// Initializes a new instance of the <see cref="DeploymentInformationList"/> class.
         /// </summary>
         /// <param name="productInfoList">A list of <see cref="ProductInformation"/> instances.</param>
-        public ProductInformationList(IEnumerable<ProductInformation> productInfoList)
+        public DeploymentInformationList(IEnumerable<DeploymentInformation> productInfoList)
             : this(productInfoList, productInfoList.Count(), 0)
         {
             ProductInformation = productInfoList;
@@ -34,7 +34,7 @@ namespace ReleaseServer.WebApi.Models
         /// <param name="productInfoList"></param>
         /// <param name="limit"></param>
         /// <param name="offset"></param>
-        public ProductInformationList(IEnumerable<ProductInformation> productInfoList, int limit, int offset)
+        public DeploymentInformationList(IEnumerable<DeploymentInformation> productInfoList, int limit, int offset)
         {
             this.ProductInformation = productInfoList.Skip(offset).Take(limit);
             this.TotalCount = productInfoList.Count();
@@ -53,7 +53,7 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         /// <value>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects. It's empty, if there
         /// exists no product information for the specified product.</value>
-        public IEnumerable<ProductInformation> ProductInformation { get; }
+        public IEnumerable<DeploymentInformation> ProductInformation { get; }
 
         /// <summary>
         /// 

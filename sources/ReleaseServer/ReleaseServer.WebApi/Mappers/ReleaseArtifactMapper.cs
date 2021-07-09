@@ -29,7 +29,7 @@ namespace ReleaseServer.WebApi
         {
             return new ReleaseArtifact
             {
-                ProductInformation = new ProductInformation
+                ProductInformation = new DeploymentInformation
                 {
                     Identifier = product,
                     Os = os,

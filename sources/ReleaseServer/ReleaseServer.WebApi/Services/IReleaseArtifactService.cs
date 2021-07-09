@@ -33,8 +33,8 @@ namespace ReleaseServer.WebApi
         /// Retrieves the product information of specific product name (asynchronously).
         /// </summary>
         /// <param name="productName">The name of the specific product.</param>
-        /// <returns>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects.</returns>
-        Task<List<ProductInformation>> GetProductInfos(string productName);
+        /// <returns>A <see cref="List{T}"/> of <see cref="DeploymentInformation"/> objects.</returns>
+        Task<List<DeploymentInformation>> GetProductInfos(string productName);
         
         /// <summary>
         /// Retrieves all available platforms for a specific artifact (asynchronously).

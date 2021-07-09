@@ -1,8 +1,9 @@
 //--------------------------------------------------------------------------------------------------
-// <copyright file="ProductInformation.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+// <copyright file="DeploymentInformation.cs" company="Traeger Industry Components GmbH">
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
+// <author>Fabian Traeger</author>
 //--------------------------------------------------------------------------------------------------
 
 namespace ReleaseServer.WebApi.Models
@@ -10,7 +11,7 @@ namespace ReleaseServer.WebApi.Models
     /// <summary>
     /// Provides product information about a specific artifact.
     /// </summary>
-    public class ProductInformation
+    public class DeploymentInformation
     {
         /// <summary>
         /// Gets or sets the product identifier (product name) of the artifact.
