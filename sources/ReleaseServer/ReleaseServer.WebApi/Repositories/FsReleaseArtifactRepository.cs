@@ -293,7 +293,7 @@ namespace ReleaseServer.WebApi
             return Path.Combine(artifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
-        private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
+        private DeploymentMetaInformation GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
         {
             var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
 
@@ -301,7 +301,7 @@ namespace ReleaseServer.WebApi
                 throw new Exception("meta information of the specified product does not exist!");
 
             return
-                DeploymentMetaInfo.FromJsonFile(deploymentMetaName.FullName);
+                DeploymentMetaInformation.FromJsonFile(deploymentMetaName.FullName);
         }
         
         #endregion

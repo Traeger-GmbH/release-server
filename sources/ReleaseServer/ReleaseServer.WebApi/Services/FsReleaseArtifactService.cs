@@ -200,7 +200,7 @@ namespace ReleaseServer.WebApi
 
         public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
-            DeploymentMetaInfo deploymentMetaInfo;
+            DeploymentMetaInformation deploymentMetaInfo;
             
             logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
@@ -222,7 +222,7 @@ namespace ReleaseServer.WebApi
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    deploymentMetaInfo = (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo));
+                    deploymentMetaInfo = (DeploymentMetaInformation) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInformation));
                 }
                 catch (Exception e)
                 {

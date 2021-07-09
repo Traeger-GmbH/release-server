@@ -22,7 +22,7 @@ namespace ReleaseServer.WebApi.Test.Common
     {
         private readonly string projectDirectory;
         private readonly ReleaseNotes expectedReleaseNotes;
-        private readonly DeploymentMetaInfo expectedMeta;
+        private readonly DeploymentMetaInformation expectedMeta;
 
         public JsonSerializeTest()
         {
@@ -68,7 +68,7 @@ namespace ReleaseServer.WebApi.Test.Common
                 },
                 ReleaseDate = new DateTime(2020, 02, 01)
             };
-            expectedMeta =  new DeploymentMetaInfo
+            expectedMeta =  new DeploymentMetaInformation
             {
                 ReleaseNotesFileName = "releaseNotes.json",
                 ArtifactFileName = "artifact.zip"
@@ -87,7 +87,7 @@ namespace ReleaseServer.WebApi.Test.Common
         [Fact]
         public void DeserializeDeploymentMetaInfo_Success()
         {
-            var parsedMeta = DeploymentMetaInfo.FromJsonFile(Path.Combine(projectDirectory, "TestData", "testDeployment.json"));
+            var parsedMeta = DeploymentMetaInformation.FromJsonFile(Path.Combine(projectDirectory, "TestData", "testDeployment.json"));
             
             parsedMeta.Should().BeEquivalentTo(expectedMeta);
         }

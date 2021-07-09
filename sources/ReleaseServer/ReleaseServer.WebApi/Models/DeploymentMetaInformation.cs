@@ -13,7 +13,7 @@ namespace ReleaseServer.WebApi.Models
     /// <summary>
     /// Provides the meta information of the uploaded artifact. 
     /// </summary>
-    public class DeploymentMetaInfo : JsonSerializable<DeploymentMetaInfo>
+    public class DeploymentMetaInformation : JsonSerializable<DeploymentMetaInformation>
     {
         /// <summary>
         /// Gets or sets the filename of the release notes (required).
