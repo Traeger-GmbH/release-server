@@ -44,23 +44,30 @@ namespace ReleaseServer.WebApi
 
             var response = await releaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
-            if (response == null)
-                return NotFound("The specified artifact was not found!");
+            if (response != null)
+            {
+                // Determine the content type
+                if (!provider.TryGetContentType(response.FileName, out contentType))
+                {
+                    contentType = "application/octet-stream";
+                }
 
-            //Determine the content type
-            if (!provider.TryGetContentType(response.FileName, out contentType))
-            {
-                contentType = "application/octet-stream";
+                //Set the filename of the response
+                var cd = new System.Net.Mime.ContentDisposition
+                {
+                    FileName = response.FileName
+                };
+                Response.Headers.Add("Content-Disposition", cd.ToString());
+
+                return new FileContentResult(response.Payload, contentType);
             }
-            
-            //Set the filename of the response
-            var cd = new ContentDispositionHeaderValue("attachment")
+            else
             {
-                FileNameStar = response.FileName
-            };
-            Response.Headers.Add("Content-Disposition", cd.ToString());
-            
-            return new FileContentResult(response.Payload, contentType);
+                return NotFoundResponseFactory.Create(
+                    this.HttpContext,
+                    "Resource not found",
+                    "The specified artifact does not exist.");
+            }
         }
         
         /// <summary>
@@ -81,24 +88,31 @@ namespace ReleaseServer.WebApi
             string contentType;
 
             var response = await releaseArtifactService.GetLatestArtifact(product, os, architecture);
-            
-            if (response == null)
-                return NotFound("The specified artifact was not found!");
 
-            //Determine the content type
-            if (!provider.TryGetContentType(response.FileName, out contentType))
+            if (response != null)
             {
-                contentType = "application/octet-stream";
+                // Determine the content type
+                if (!provider.TryGetContentType(response.FileName, out contentType))
+                {
+                    contentType = "application/octet-stream";
+                }
+
+                //Set the filename of the response
+                var cd = new System.Net.Mime.ContentDisposition
+                {
+                    FileName = response.FileName
+                };
+                Response.Headers.Add("Content-Disposition", cd.ToString());
+
+                return new FileContentResult(response.Payload, contentType);
             }
-            
-            //Set the filename of the response
-            var cd = new System.Net.Mime.ContentDisposition
+            else
             {
-                FileName = response.FileName
-            };
-            Response.Headers.Add("Content-Disposition", cd.ToString());
-            
-            return new FileContentResult(response.Payload, contentType);
+                return NotFoundResponseFactory.Create(
+                    this.HttpContext,
+                    "Resource not found",
+                    "The specified artifact does not exist.");
+            }
         }
 
         #endregion

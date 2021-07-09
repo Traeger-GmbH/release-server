@@ -38,19 +38,36 @@ namespace ReleaseServer.WebApi
         public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, 
             [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
-            
-            if (artifact == null || artifact.ContentType != "application/zip")
-                return BadRequest("No or invalid body provided (must be a Zip file)");
-            
-            //Validate the payload of the uploaded Zip file
-            var validationResult = releaseArtifactService.ValidateUploadPayload(artifact);
+            if (artifact == null)
+            {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "The required upload body is missing.");
+            }
+            else if (artifact.ContentType != "application/zip")
+            {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "The required upload body not a .zip file.");
+            }
+            else
+            {
+                //Validate the payload of the uploaded Zip file
+                var validationResult = releaseArtifactService.ValidateUploadPayload(artifact);
 
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.ValidationError);
+                if (!validationResult.IsValid)
+                {
+                    return BadRequestResponseFactory.Create(
+                        HttpContext,
+                        "Bad request",
+                        validationResult.ValidationError);
+                }
             
-            await releaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
-            
-            return Ok("Upload of the artifact successful!");
+                await releaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
+                return Ok();
+            }
         }
        
         #endregion

@@ -37,10 +37,17 @@ namespace ReleaseServer.WebApi
         {
             var artifactFound = await releaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
             
-            if (!artifactFound) 
-                return NotFound("The artifact you want to delete does not exist!");
-
-            return Ok("artifact successfully deleted");
+            if (artifactFound)
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    this.HttpContext,
+                    "Resource not found",
+                    "The specified artifact does not exist.");
+            }
         }
         
         /// <summary>
@@ -55,11 +62,18 @@ namespace ReleaseServer.WebApi
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
             var productFound = await releaseArtifactService.DeleteProductIfExists(product);
-            
-            if (!productFound)
-                return NotFound("The artifacts you want to delete do not exist!");
 
-            return Ok("artifacts successfully deleted");
+            if (productFound)
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    this.HttpContext,
+                    "Resource not found",
+                    "The specified product does not exist.");
+            }
         }
 
         #endregion

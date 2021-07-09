@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-
+using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -126,6 +126,8 @@ namespace ReleaseServer.WebApi
                         .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000));
                 });
             });
+
+            services.AddProblemDetails();
         }
 
         /// <summary>
@@ -140,6 +142,8 @@ namespace ReleaseServer.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseProblemDetails();
 
             app.UseRouting();
             app.UseCors();

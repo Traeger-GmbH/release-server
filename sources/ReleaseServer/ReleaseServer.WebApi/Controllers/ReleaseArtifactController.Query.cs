@@ -54,34 +54,41 @@ namespace ReleaseServer.WebApi
         {
             var productInfos = (await releaseArtifactService.GetDeploymentInformations(product));
 
-            if (productInfos.IsNullOrEmpty())
-                return NotFound("The specified product was not found!");
-
-            productInfos = productInfos
-                .Where((release) => {
-                    var match = true;
-                    if (architectures.Count > 0)
-                    {
-                        match &= architectures.Contains(release.Architecture);
-                    }
-                    if (operatingSystems.Count > 0)
-                    {
-                        match &= operatingSystems.Contains(release.Os);
-                    }
-                    return match;
-                })
-                .ToList();
-
-            if (productInfos.IsNullOrEmpty())
-                return NotFound($"There is no release of \"${product}\" that matches the specified filter criteria.");
-
-            productInfos.Sort(CompareByVersion);
-            if (sortOrder == SortOrder.Descending)
+            if (!productInfos.IsNullOrEmpty())
             {
-                productInfos.Reverse();
-            }
+                productInfos = productInfos
+                    .Where((release) => {
+                        var match = true;
+                        if (architectures.Count > 0)
+                        {
+                            match &= architectures.Contains(release.Architecture);
+                        }
+                        if (operatingSystems.Count > 0)
+                        {
+                            match &= operatingSystems.Contains(release.Os);
+                        }
+                        return match;
+                    })
+                    .ToList();
 
-            return new DeploymentInformationList(productInfos, limit, offset);
+                if (productInfos.IsNullOrEmpty())
+                    return NotFound($"There is no release of \"${product}\" that matches the specified filter criteria.");
+
+                productInfos.Sort(CompareByVersion);
+                if (sortOrder == SortOrder.Descending)
+                {
+                    productInfos.Reverse();
+                }
+
+                return new DeploymentInformationList(productInfos, limit, offset);
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "The specified product does not exist.");
+            }
         }
 
         /// <summary>
@@ -99,10 +106,17 @@ namespace ReleaseServer.WebApi
         {
             var productInfos = await releaseArtifactService.GetDeploymentInformations(product);
 
-            if (productInfos.IsNullOrEmpty()) 
-                return NotFound("The specified artifact was not found!");
-            
-            return new DeploymentInformationList(productInfos);
+            if (!productInfos.IsNullOrEmpty())
+            {
+                return new DeploymentInformationList(productInfos);
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "The specified product does not exist.");
+            }
         }
 
         /// <summary>
@@ -121,11 +135,18 @@ namespace ReleaseServer.WebApi
         {
             var platformsList = await releaseArtifactService.GetPlatforms(product, version);
 
-            if (platformsList.IsNullOrEmpty()) 
-                return NotFound("The specified artifact was not found or there exists no platform for the specified product name!");
-            
-            
-            return new PlatformsList(platformsList);
+            if (!platformsList.IsNullOrEmpty())
+            {
+
+                return new PlatformsList(platformsList);
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "The specified product does not exist.");
+            }
         }
 
         /// <summary>
@@ -146,10 +167,18 @@ namespace ReleaseServer.WebApi
         {
             var result = await releaseArtifactService.GetDeploymentInformation(product, os, architecture, version);
 
-            if (result == null)
-                return NotFound("The Deployment information does not exist (the specified artifact was not found)!");
+            if (result != null)
+            {
 
-            return result;
+                return result;
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "The specified deployment does not exist.");
+            }
         }
         
         /// <summary>
@@ -168,11 +197,18 @@ namespace ReleaseServer.WebApi
         public async Task<ActionResult<ProductVersionList>> GetVersions([Required] string product, [Required] string os, [Required] string architecture)
         {
             var productVersions = await releaseArtifactService.GetVersions(product, os, architecture);
-            
-            if (productVersions.IsNullOrEmpty()) 
-                return NotFound("No versions for the specified platform / product name found!");
 
-            return new ProductVersionList(productVersions);
+            if (!productVersions.IsNullOrEmpty())
+            {
+                return new ProductVersionList(productVersions);
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "No versions for the specified platform exist.");
+            }
         }
         
         /// <summary>
@@ -192,11 +228,18 @@ namespace ReleaseServer.WebApi
         public async Task<ActionResult<ProductVersionResponse>> GetLatestVersion([Required] string product, [Required] string os, [Required] string architecture)
         {
             var latestVersion = await releaseArtifactService.GetLatestVersion(product, os, architecture);
-            
-           if (latestVersion == null)
-               return NotFound("The specified artifact was not found!");
-            
-            return new ProductVersionResponse(latestVersion);
+
+            if (latestVersion != null)
+            {
+                return new ProductVersionResponse(latestVersion);
+            }
+            else
+            {
+                return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "The specified deployment does not exist.");
+            }
         }
 
         #endregion

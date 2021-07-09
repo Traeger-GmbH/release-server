@@ -64,12 +64,19 @@ namespace ReleaseServer.WebApi
         [HttpPut("restore")]
         public async Task<IActionResult> Restore([Required] IFormFile backupFile)
         {
-            if (backupFile == null)
-                return BadRequest();
-            
-            await releaseArtifactService.RestoreBackup(backupFile);
+            if (backupFile != null)
+            {
+                await releaseArtifactService.RestoreBackup(backupFile);
+                return Ok();
+            }
+            else
+            {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "The required backup file is missing.");
+            }            
 
-            return Ok("backup successfully restored");
         }
        
         #endregion
