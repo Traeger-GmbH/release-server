@@ -37,8 +37,8 @@ namespace ReleaseServer.WebApi
         /// <param name="os">The operating system of the release artifact.</param>
         /// <param name="architecture">The HW architecture of the release artifact.</param>
         /// <param name="version">The version of the release artifact</param>
-        /// <returns>The corresponding <see cref="ReleaseInformation"/>.</returns>
-        ReleaseInformation GetReleaseInfo(string productName, string os, string architecture, string version);
+        /// <returns>The corresponding <see cref="DeploymentInformation"/>.</returns>
+        DeploymentInformation GetDeploymentInformation(string productName, string os, string architecture, string version);
         
         /// <summary>
         /// Retrieves a specific release artifact and converts it into a <see cref="ArtifactDownload"/> object.

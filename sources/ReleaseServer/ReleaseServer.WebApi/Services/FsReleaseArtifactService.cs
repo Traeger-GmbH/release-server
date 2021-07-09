@@ -77,7 +77,7 @@ namespace ReleaseServer.WebApi
             
         }
 
-        public async Task<List<DeploymentInformation>> GetProductInfos(string productName)
+        public async Task<List<DeploymentInformation>> GetDeploymentInformations(string productName)
         {
             return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
         }
@@ -87,10 +87,10 @@ namespace ReleaseServer.WebApi
             return await Task.Run(() => fsReleaseArtifactRepository.GetPlatforms(productName, version));
         }
 
-        public async Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version)
+        public async Task<DeploymentInformation> GetDeploymentInformation(string productName, string os, string architecture, string version)
         {
             return await Task.Run(() =>
-                fsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
+                fsReleaseArtifactRepository.GetDeploymentInformation(productName, os, architecture, version));
         }
 
         public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)

@@ -98,19 +98,12 @@ namespace ReleaseServer.WebApi
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select new DeploymentInformation
-                {
-                    Identifier = productDir.Name,
-                    Os = osDir.Name,
-                    Architecture = hwArchDir.Name,
-                    Version = new ProductVersion(versionDir.Name),
-                    ReleaseNotes = GetReleaseInfo(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name).ReleaseNotes
-                };
+                select GetDeploymentInformation(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name);
 
             return productInformation.ToList();
         }
 
-        public ReleaseInformation GetReleaseInfo(string productName, string os, string architecture, string version)
+        public DeploymentInformation GetDeploymentInformation(string productName, string os, string architecture, string version)
         {
             try
             {
@@ -124,16 +117,19 @@ namespace ReleaseServer.WebApi
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
                     var releaseNotesFileName = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
-                    
-                    return new ReleaseInformation
+
+                    return new DeploymentInformation
                     {
-                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName)
+                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName),
+                        Architecture = architecture,
+                        Os = os,
+                        Version = new ProductVersion(version),
+                        Identifier = productName
                     };
                 }
 
                 //The artifact directory (thus the specified artifact) does not exist.
                 return null;
-
             }
             catch (Exception e)
             {

@@ -52,7 +52,7 @@ namespace ReleaseServer.WebApi
             [FromQuery] int offset = 0
             )
         {
-            var productInfos = (await releaseArtifactService.GetProductInfos(product));
+            var productInfos = (await releaseArtifactService.GetDeploymentInformations(product));
 
             if (productInfos.IsNullOrEmpty())
                 return NotFound("The specified product was not found!");
@@ -97,7 +97,7 @@ namespace ReleaseServer.WebApi
         [HttpGet("versions/{product}")]
         public async Task<ActionResult<DeploymentInformationList>> GetProductInfos([Required] string product)
         {
-            var productInfos = await releaseArtifactService.GetProductInfos(product);
+            var productInfos = await releaseArtifactService.GetDeploymentInformations(product);
 
             if (productInfos.IsNullOrEmpty()) 
                 return NotFound("The specified artifact was not found!");
@@ -127,7 +127,7 @@ namespace ReleaseServer.WebApi
             
             return new PlatformsList(platformsList);
         }
-        
+
         /// <summary>
         /// Retrieves the release information of a specific artifact.
         /// </summary>
@@ -135,21 +135,21 @@ namespace ReleaseServer.WebApi
         /// <param name="os">The operating system of the specified artifact.</param>
         /// <param name="architecture">The hardware architecture of the specified artifact.</param>
         /// <param name="version">The version of the specified artifact.</param>
-        /// <returns>A <see cref="ReleaseInformation"/> with the release information. A <see cref="NotFoundObjectResult"/>, if
+        /// <returns>A <see cref="DeploymentInformation"/> with the release information. A <see cref="NotFoundObjectResult"/>, if
         /// the release information for the specified artifact was not found.</returns>
         /// <response code="200">The release information of the specified artifact exists.</response>
         /// <response code="404">The artifact with the specified product name does not exist. Therefore the release notes do not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ReleaseInformation), 200)]
+        [ProducesResponseType(typeof(DeploymentInformation), 200)]
         [HttpGet("info/{product}/{os}/{architecture}/{version}")]
-        public async Task<ActionResult<ReleaseInformation>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
+        public async Task<ActionResult<DeploymentInformation>> GetReleaseInfo([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
-            var releaseInfo = await releaseArtifactService.GetReleaseInfo(product, os, architecture, version);
+            var result = await releaseArtifactService.GetDeploymentInformation(product, os, architecture, version);
 
-            if (releaseInfo == null)
-                return NotFound("The Release information does not exist (the specified artifact was not found)!");
+            if (result == null)
+                return NotFound("The Deployment information does not exist (the specified artifact was not found)!");
 
-            return releaseInfo;
+            return result;
         }
         
         /// <summary>
