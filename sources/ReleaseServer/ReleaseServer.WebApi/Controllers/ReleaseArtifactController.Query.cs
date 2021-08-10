@@ -37,6 +37,7 @@ namespace ReleaseServer.WebApi
         /// <param name="sortOrder">Defines how the results will be ordered by their version numbers.</param>
         /// <param name="limit">Paging parameter: Maximum number of elements that will be returned.</param>
         /// <param name="offset">Paging parameter: Offset of the first element to be returned.</param>
+        /// <param name="version"></param>
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
@@ -49,7 +50,8 @@ namespace ReleaseServer.WebApi
             [FromQuery] List<string> operatingSystems,
             [FromQuery] SortOrder sortOrder = SortOrder.Descending,
             [FromQuery] int limit = 50,
-            [FromQuery] int offset = 0
+            [FromQuery] int offset = 0,
+            [FromQuery] string version = null
             )
         {
             var productInfos = (await releaseArtifactService.GetDeploymentInformations(product));
@@ -67,12 +69,21 @@ namespace ReleaseServer.WebApi
                         {
                             match &= operatingSystems.Contains(release.Os);
                         }
+                        if (version != null)
+                        {
+                            match &= release.Version == new ProductVersion(version);
+                        }
                         return match;
                     })
                     .ToList();
 
                 if (productInfos.IsNullOrEmpty())
-                    return NotFound($"There is no release of \"${product}\" that matches the specified filter criteria.");
+                {
+                    return NotFoundResponseFactory.Create(
+                    HttpContext,
+                    "Resource not found.",
+                    "There is no release of \"{product}\" that matches the specified filter criteria.");
+                }
 
                 productInfos.Sort(CompareByVersion);
                 if (sortOrder == SortOrder.Descending)
