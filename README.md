@@ -42,13 +42,15 @@ The Swagger UI can be found at http://localhost:5001/swagger.
 
 ## Usage
 
-The first two REST endpoint examples are documented above. 
+The first two REST endpoint examples are documented in the following paragraphs. 
 
 For more information about the other endpoints and their usage, read the [Swagger documentation](https://github.com/Traeger-GmbH/release-server/blob/master/Docs/api/swagger.json) .
 
-### Upload an Artifact
+### Uploading an Artifact
 
-__Structure of the artifact payload:__ The payload has to be a zip file and has to contain the following elements:
+__Structure of the artifact payload:__
+
+The payload has to be a zip file and has to contain the following elements:
 
 - the artifact itself (exe, zip or something else)
 - the meta information in form of the deployment.json
@@ -56,64 +58,74 @@ __Structure of the artifact payload:__ The payload has to be a zip file and has 
 
 You can find an example artifact payload in form of a zip file here: [Example artifact payload](https://github.com/Traeger-GmbH/release-server/tree/master/examples)
 
-__PUT request to upload an artifact__:
+__`PUT` request to upload an artifact__:
 
-`curl -k -X PUT http://localhost:5001/releaseartifact/upload/<your_prodcut_name>/debian/amd64/1.0 -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F =@/path/to/the/artifactPayload;type=application/zip`
+`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F =@/path/to/the/artifactPayload;type=application/zip`
 
-__Note:__ You have replace the placeholder in the PUT request (product name, authorization header)
+> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
 
-__Response example:__
+__Example response:__
 
-Status: 200 OK
-Message: Upload of the artifact successful!
+Status: `200 OK`
 
-### List all available products
+### Listing all available deployments of a specific product
 
-__GET request to list the products__:
+__`GET` request to list the deployments__:
 
- `curl -k -X GET http://localhost:5001/releaseartifact/versions/<your_product_name>`
+`curl -k -X GET http://localhost:5000/artifacts/<product_name>/info`
 
- __Response example:__
+> __Note:__ You have replace the placeholder in the PUT request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>` which has to be base64 encoded)
 
+__Example response:__
+
+Status: `200 (OK)`
+
+Body:
+
+```json
+{
+  "productInformation": [
     {
-        "productInformation": [
-            {
-                "identifier": "softwareX",
-                "version": "1.0",
-                "os": "ubuntu",
-                "architecture": "arm64",
-                "releaseNotes": {
-                    "changes": {
-                        "de": [
-                            {
-                                "platforms": [
-                                    "windows/any",
-                                    "linux/rpi"
-                                ],
-                                "added": [
-                                    "added de 1"
-                                ],
-                                "fixed": null,
-                                "breaking": null,
-                                "deprecated": null
-                            }
-                        ],
-                        "en": [
-                            {
-                                "platforms": [
-                                    "windows/any",
-                                    "linux/rpi"
-                                ],
-                                "added": [
-                                    "added en 1"
-                                ],
-                                "fixed": null,
-                                "breaking": null,
-                                "deprecated": null
-                            }
-                        ]
-                    }
-                }
+      "identifier": "softwareX",
+      "version": "1.0",
+      "os": "ubuntu",
+      "architecture": "arm64",
+      "releaseNotes": {
+        "changes": {
+          "de": [
+          {
+              "platforms": [
+                "windows/any",
+                "linux/rpi"
+              ],
+              "added": [
+                "added de 1"
+              ],
+              "fixed": null,
+              "breaking": null,
+              "deprecated": null
             }
-        ]
+          ],
+          "en": [
+            {
+              "platforms": [
+                "windows/any",
+                "linux/rpi"
+              ],
+              "added": [
+                "added en 1"
+              ],
+              "fixed": null,
+              "breaking": null,
+              "deprecated": null
+            }
+          ]
+        },
+        "releaseDate": "2021-07-25T00:00:00",
+        "isSecurityPatch": false,
+        "isPreviewRelease": false
+      },
     }
+  ]
+}
+```
