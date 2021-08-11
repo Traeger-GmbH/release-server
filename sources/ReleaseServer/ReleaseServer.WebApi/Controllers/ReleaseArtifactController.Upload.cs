@@ -32,7 +32,7 @@ namespace ReleaseServer.WebApi
         /// <response code="400">No or invalid body provided (must be a Zip file).</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">Internal error.</response>
-        [HttpPut("upload/{product}/{os}/{architecture}/{version}")]
+        [HttpPut("{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
         public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, 

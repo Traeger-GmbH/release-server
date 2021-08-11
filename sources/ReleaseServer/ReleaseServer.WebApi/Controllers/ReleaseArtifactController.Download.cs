@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Net.Http.Headers;
 
 namespace ReleaseServer.WebApi
 {
@@ -36,7 +35,7 @@ namespace ReleaseServer.WebApi
         /// <response code="200">There exists an artifact with the specified parameters.</response>
         /// <response code="404">There exists no artifact with the specified parameters.</response>
         [AllowAnonymous]
-        [HttpGet("download/{product}/{os}/{architecture}/{version}")]
+        [HttpGet("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
             var provider = new FileExtensionContentTypeProvider();
@@ -81,7 +80,7 @@ namespace ReleaseServer.WebApi
         /// <response code="200">The specified artifact exists (the ZIP file with the artifact will be retrieved)</response>
         /// <response code="404">The artifact is not available for the specified platform (OS + arch)</response>
         [AllowAnonymous]
-        [HttpGet("download/{product}/{os}/{architecture}/latest")]
+        [HttpGet("{product}/{os}/{architecture}/latest")]
         public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
             var provider = new FileExtensionContentTypeProvider();
