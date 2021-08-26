@@ -46,10 +46,10 @@ namespace ReleaseServer.WebApi
         {
 
             var artifactPath = GenerateArtifactPath(
-                artifact.ProductInformation.Identifier,
-                artifact.ProductInformation.Os,
-                artifact.ProductInformation.Architecture,
-                artifact.ProductInformation.Version.ToString());
+                artifact.DeploymentInformation.Identifier,
+                artifact.DeploymentInformation.Os,
+                artifact.DeploymentInformation.Architecture,
+                artifact.DeploymentInformation.Version.ToString());
 
             var tmpDir = new DirectoryInfo(GenerateTemporaryPath());
 

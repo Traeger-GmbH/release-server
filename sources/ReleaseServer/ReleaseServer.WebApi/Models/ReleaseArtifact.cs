@@ -17,8 +17,8 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Gets or sets the product information of the artifact.
         /// </summary>
-        /// <value>The product information of the artifact in form of an <see cref="ProductInformation"/> object.</value>
-        public DeploymentInformation ProductInformation { get; set; }
+        /// <value>The product information of the artifact in form of an <see cref="DeploymentInformation"/> object.</value>
+        public DeploymentInformation DeploymentInformation { get; set; }
         
         /// <summary>
         /// Gets or sets the payload of the artifact in form of a <see cref="ZipArchive"/>.
