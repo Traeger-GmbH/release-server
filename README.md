@@ -60,9 +60,9 @@ You can find an example artifact payload in form of a zip file here: [Example ar
 
 __`PUT` request to upload an artifact__:
 
-`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F =@/path/to/the/artifactPayload;type=application/zip`
+`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'artifact=@/path/to/the/artifactPayload;type=application/zip'`
 
-> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
+> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>`). The value inside the authorization header (`<username:password>`) has to be base64 encoded.
 
 __Example response:__
 
