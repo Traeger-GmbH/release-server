@@ -107,8 +107,8 @@ namespace ReleaseServer.WebApi
             //Didn't have to be async, but later if there are DB operations needed.
             var validCredentials = await Task.Run(() =>
                 new Credentials{
-                    Username = configuration["Credentials:Username"],
-                    Password = configuration["Credentials:Password"]});
+                    Username = configuration["CREDENTIALS_USERNAME"],
+                    Password = configuration["CREDENTIALS_PASSWORD"]});
             
             if (CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username)) && 
                 CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), Encoding.UTF8.GetBytes(validCredentials.Password)))
