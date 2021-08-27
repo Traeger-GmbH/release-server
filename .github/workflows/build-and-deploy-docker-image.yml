@@ -31,14 +31,7 @@ jobs:
         then
           TAG="latest";
         fi
-        echo ::set-output name=tags::$(echo "ghcr.io/traeger-gmbh/release-server:${TAG}%0Atraeger/release-server:${TAG}") 
-
-    -
-      name: Log in to Docker Hub
-      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        echo ::set-output name=tags::$(echo "ghcr.io/traeger-gmbh/release-server:${TAG}") 
         
     -
       name: Log in to GitHub
