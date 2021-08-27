@@ -22,5 +22,6 @@ RUN dotnet publish -c Release -o output/ReleaseServer
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS runtime
 WORKDIR /app
 COPY --from=builder /app/output ./
+ADD ./defaults/appsettings.json /app/
 
-ENTRYPOINT [ "dotnet", "ReleaseServer/ReleaseServer.WebApi.dll", "--urls", "http://0.0.0.0:5001"]
+ENTRYPOINT [ "dotnet", "ReleaseServer/ReleaseServer.WebApi.dll", "--urls", "http://0.0.0.0:5000"]
