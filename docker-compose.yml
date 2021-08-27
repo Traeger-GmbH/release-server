@@ -2,13 +2,16 @@ version: '3'
 
 services:
   release-server:
-    image: traeger/release-server:latest
+    image: ghcr.io/traeger-gmbh/release-server:latest
     working_dir: /app
     ports:
       - "5000:5000"
     environment:
-      - CREDENTIALS_USERNAME: TestUser
-      - CREDENTIALS_PASSWORD: SomePassword
+      - "CREDENTIALS_USERNAME=TestUser"
+      - "CREDENTIALS_PASSWORD=SomePassword"
     volumes: 
-      - ./artifacts:/app/artifacts
-      - ./backups:/app/backups
+      - backups:/app/backups
+      - artifacts:/app/artifacts
+volumes:
+  artifacts:
+  backups:
