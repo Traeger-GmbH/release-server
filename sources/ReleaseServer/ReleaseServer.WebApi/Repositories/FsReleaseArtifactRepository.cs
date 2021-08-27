@@ -90,7 +90,7 @@ namespace ReleaseServer.WebApi
             }
         }
 
-        public List<ProductInformation> GetInfosByProductName(string productName)
+        public List<DeploymentInformation> GetInfosByProductName(string productName)
         {
             var productInformation =
                 from productDir in artifactRootDir.EnumerateDirectories()
@@ -98,19 +98,12 @@ namespace ReleaseServer.WebApi
                 from osDir in productDir.EnumerateDirectories()
                 from hwArchDir in osDir.EnumerateDirectories()
                 from versionDir in hwArchDir.EnumerateDirectories()
-                select new ProductInformation
-                {
-                    Identifier = productDir.Name,
-                    Os = osDir.Name,
-                    Architecture = hwArchDir.Name,
-                    Version = new ProductVersion(versionDir.Name),
-                    ReleaseNotes = GetReleaseInfo(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name).ReleaseNotes
-                };
+                select GetDeploymentInformation(productDir.Name, osDir.Name, hwArchDir.Name, versionDir.Name);
 
             return productInformation.ToList();
         }
 
-        public ReleaseInformation GetReleaseInfo(string productName, string os, string architecture, string version)
+        public DeploymentInformation GetDeploymentInformation(string productName, string os, string architecture, string version)
         {
             try
             {
@@ -124,17 +117,19 @@ namespace ReleaseServer.WebApi
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
                     var releaseNotesFileName = Path.Combine(path, deploymentMetaInfo.ReleaseNotesFileName);
-                    
-                    return new ReleaseInformation
+
+                    return new DeploymentInformation
                     {
-                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName), 
-                        ReleaseDate = deploymentMetaInfo.ReleaseDate
+                        ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName),
+                        Architecture = architecture,
+                        Os = os,
+                        Version = new ProductVersion(version),
+                        Identifier = productName
                     };
                 }
 
                 //The artifact directory (thus the specified artifact) does not exist.
                 return null;
-
             }
             catch (Exception e)
             {
@@ -294,7 +289,7 @@ namespace ReleaseServer.WebApi
             return Path.Combine(artifactRootDir.ToString(), "temp", Guid.NewGuid().ToString());
         }
 
-        private DeploymentMetaInfo GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
+        private DeploymentMetaInformation GetDeploymentMetaInfo(IEnumerable<FileInfo> fileInfos)
         {
             var deploymentMetaName = fileInfos.FirstOrDefault(f => f.Name == "deployment.json");
 
@@ -302,7 +297,7 @@ namespace ReleaseServer.WebApi
                 throw new Exception("meta information of the specified product does not exist!");
 
             return
-                DeploymentMetaInfo.FromJsonFile(deploymentMetaName.FullName);
+                DeploymentMetaInformation.FromJsonFile(deploymentMetaName.FullName);
         }
         
         #endregion

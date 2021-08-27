@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-
+using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 using Newtonsoft.Json;
@@ -74,7 +76,7 @@ namespace ReleaseServer.WebApi
                 {
                     JsonConfiguration.Configure(options);
                 });
-            
+
             services.AddSwaggerGen(c =>
             {
                 
@@ -113,6 +115,19 @@ namespace ReleaseServer.WebApi
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
             
             services.AddFsReleaseArtifactService(Configuration);
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        .AllowAnyMethod()
+                        .SetIsOriginAllowed(_ => true)
+                        .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000));
+                });
+            });
+
+            services.AddProblemDetails();
         }
 
         /// <summary>
@@ -128,7 +143,10 @@ namespace ReleaseServer.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseProblemDetails();
+
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();

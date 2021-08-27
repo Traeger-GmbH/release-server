@@ -111,7 +111,7 @@ namespace ReleaseServer.WebApi.Test
                 file.CopyTo(Path.Combine(testProductPath, file.Name));
             }
 
-            var expectedProductInfo = new ProductInformation
+            var expectedProductInfo = new DeploymentInformation
             {
                 Identifier = "testproduct",
                 Os = "debian",
@@ -126,8 +126,8 @@ namespace ReleaseServer.WebApi.Test
                             {
                                 new ChangeSet
                                 {
-                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
-                                    Added = new List<string>{"added de 1"}
+                                    Platforms = new List<string> { "windows/any", "linux/rpi" },
+                                    Added = new List<string> { "added de 1" }
                                 }
                             }
                         },
@@ -136,12 +136,13 @@ namespace ReleaseServer.WebApi.Test
                             {
                                 new ChangeSet
                                 {
-                                    Platforms = new List<string>{"windows/any", "linux/rpi"},
-                                    Added = new List<string>{"added en 1"}
+                                    Platforms = new List<string> { "windows/any", "linux/rpi" },
+                                    Added = new List<string> { "added en 1" }
                                 }
                             }
                         }
-                    }
+                    },
+                    ReleaseDate = new DateTime(2020, 02, 1)
                 }
             };
 
@@ -205,21 +206,18 @@ namespace ReleaseServer.WebApi.Test
         }
 
         [Fact]
-        public void TestGetReleaseInfo()
+        public void TestGetDeploymentInformation()
         {
             //Setup 
-            ReleaseInformation expectedReleaseInfo;
-            
-            expectedReleaseInfo = new ReleaseInformation
+            var expectedReleaseInfo = new DeploymentInformation
             {
-                ReleaseDate = new DateTime(2020, 02, 10),
-                
                 ReleaseNotes = new ReleaseNotes
-                {
-                    
+                {    
+                    ReleaseDate = new DateTime(2020, 02, 10),
                     Changes = new Dictionary<CultureInfo, List<ChangeSet>>
                     {
-                        {new CultureInfo("de"), new List<ChangeSet>
+                        {
+                            new CultureInfo("de"), new List<ChangeSet>
                             {
                                 new ChangeSet
                                 {
@@ -231,7 +229,8 @@ namespace ReleaseServer.WebApi.Test
                                 }
                             }
                         },
-                        {new CultureInfo("en"), new List<ChangeSet>
+                        {
+                            new CultureInfo("en"), new List<ChangeSet>
                             {
                                 new ChangeSet
                                 {
@@ -252,11 +251,15 @@ namespace ReleaseServer.WebApi.Test
                             }
                         }
                     }
-                }
+                },
+                Identifier = "productx",
+                Os = "ubuntu",
+                Architecture = "amd64",
+                Version = new ProductVersion("1.1")
             };
             
             //Act
-            var testReleaseInfo = fsReleaseArtifactRepository.GetReleaseInfo("productx", "ubuntu",
+            var testReleaseInfo = fsReleaseArtifactRepository.GetDeploymentInformation("productx", "ubuntu",
                 "amd64", "1.1");
             
             //Assert 
@@ -267,7 +270,7 @@ namespace ReleaseServer.WebApi.Test
         public void TestGetReleaseInfo_Not_Found()
         {
             //Act
-            var testReleaseInfo = fsReleaseArtifactRepository.GetReleaseInfo("nonexistentProduct", "noOS", "noArch", "0");
+            var testReleaseInfo = fsReleaseArtifactRepository.GetDeploymentInformation("nonexistentProduct", "noOS", "noArch", "0");
             
             //Assert 
             Assert.Null(testReleaseInfo);

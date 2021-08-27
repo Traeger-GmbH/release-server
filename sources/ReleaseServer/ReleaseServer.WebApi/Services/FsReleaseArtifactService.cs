@@ -77,7 +77,7 @@ namespace ReleaseServer.WebApi
             
         }
 
-        public async Task<List<ProductInformation>> GetProductInfos(string productName)
+        public async Task<List<DeploymentInformation>> GetDeploymentInformations(string productName)
         {
             return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
         }
@@ -87,10 +87,10 @@ namespace ReleaseServer.WebApi
             return await Task.Run(() => fsReleaseArtifactRepository.GetPlatforms(productName, version));
         }
 
-        public async Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version)
+        public async Task<DeploymentInformation> GetDeploymentInformation(string productName, string os, string architecture, string version)
         {
             return await Task.Run(() =>
-                fsReleaseArtifactRepository.GetReleaseInfo(productName, os, architecture, version));
+                fsReleaseArtifactRepository.GetDeploymentInformation(productName, os, architecture, version));
         }
 
         public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
@@ -200,7 +200,7 @@ namespace ReleaseServer.WebApi
 
         public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
-            DeploymentMetaInfo deploymentMetaInfo;
+            DeploymentMetaInformation deploymentMetaInfo;
             
             logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
@@ -222,7 +222,7 @@ namespace ReleaseServer.WebApi
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    deploymentMetaInfo = (DeploymentMetaInfo) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInfo));
+                    deploymentMetaInfo = (DeploymentMetaInformation) serializer.Deserialize(deploymentInfoFile, typeof(DeploymentMetaInformation));
                 }
                 catch (Exception e)
                 {

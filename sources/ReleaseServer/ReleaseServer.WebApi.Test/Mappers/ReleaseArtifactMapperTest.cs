@@ -35,7 +35,7 @@ namespace ReleaseServer.WebApi.Test.Mappers
             
             var expectedArtifact = new ReleaseArtifact
             {
-                ProductInformation = new ProductInformation
+                ProductInformation = new DeploymentInformation
                 {
                     Identifier = "product",
                     Version = new ProductVersion("1.1"),

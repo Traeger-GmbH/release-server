@@ -123,6 +123,32 @@ namespace ReleaseServer.WebApi.Models
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static bool operator ==(
+            ProductVersion obj,
+            ProductVersion other)
+        {
+            return obj.Equals(other);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static bool operator !=(
+            ProductVersion obj,
+            ProductVersion other)
+        {
+            return !obj.Equals(other);
+        }
+
+        /// <summary>
         /// Determines the hash code of an instance of <see cref="ProductVersion"/>.
         /// </summary>
         /// <returns>The hash code of the instance.</returns>

@@ -84,7 +84,7 @@ namespace ReleaseServer.WebApi.Test
             //Act
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
-            Assert.True(validationResult.IsValid);
+            Assert.True(validationResult.IsValid, validationResult.ValidationError);
             Assert.Null(validationResult.ValidationError);
         }
 

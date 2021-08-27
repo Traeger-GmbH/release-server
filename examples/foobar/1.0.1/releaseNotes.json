@@ -1,0 +1,30 @@
+{
+  "changes": {
+    "de": [
+      {
+        "platforms": [
+          "windows/any"
+        ],
+        "added": [],
+        "fixed": [
+          "Sicherheitsupdate von Komponente E."
+        ],
+        "breaking": [],
+        "deprecated": []
+      }
+    ],
+    "en": [
+      {
+        "platforms": [
+          "windows/any"
+        ],
+        "added": [],
+        "fixed": [
+          "Security fix of component E."
+        ],
+        "breaking": [],
+        "deprecated": []
+      }
+    ]
+  }
+}

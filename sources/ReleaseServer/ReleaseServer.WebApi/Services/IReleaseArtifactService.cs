@@ -33,8 +33,8 @@ namespace ReleaseServer.WebApi
         /// Retrieves the product information of specific product name (asynchronously).
         /// </summary>
         /// <param name="productName">The name of the specific product.</param>
-        /// <returns>A <see cref="List{T}"/> of <see cref="ProductInformation"/> objects.</returns>
-        Task<List<ProductInformation>> GetProductInfos(string productName);
+        /// <returns>A <see cref="List{T}"/> of <see cref="DeploymentInformation"/> objects.</returns>
+        Task<List<DeploymentInformation>> GetDeploymentInformations(string productName);
         
         /// <summary>
         /// Retrieves all available platforms for a specific artifact (asynchronously).
@@ -45,14 +45,14 @@ namespace ReleaseServer.WebApi
         Task<List<string>> GetPlatforms(string productName, string version);
         
         /// <summary>
-        /// Retrieves the release information of a specific artifact (asynchronously).
+        /// Retrieves the deployment information of a specific artifact (asynchronously).
         /// </summary>
         /// <param name="productName">The product name of the release artifact.</param>
         /// <param name="os">The operating system of the release artifact.</param>
         /// <param name="architecture">The HW architecture of the release artifact.</param>
         /// <param name="version">The version of the release artifact</param>
-        /// <returns>The corresponding <see cref="ReleaseInformation"/>.</returns>
-        Task<ReleaseInformation> GetReleaseInfo(string productName, string os, string architecture, string version);
+        /// <returns>The corresponding <see cref="DeploymentInformation"/>.</returns>
+        Task<DeploymentInformation> GetDeploymentInformation(string productName, string os, string architecture, string version);
         
         /// <summary>
         /// Retrieves a list of all available versions of the specified artifact (asynchronously).

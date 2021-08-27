@@ -33,6 +33,13 @@ bin/
 *.pidb
 *.svclog
 *.scc
+*.csproj.user
+
+# Visual Studio directories
+.vs/
+
+# VS Code directories
+.vscode/
 
 # JetBrains Rider
 .idea/

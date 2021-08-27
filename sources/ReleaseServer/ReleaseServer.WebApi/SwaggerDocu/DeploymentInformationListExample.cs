@@ -1,8 +1,9 @@
 //--------------------------------------------------------------------------------------------------
-// <copyright file="ProductInformationListResponseExample.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+// <copyright file="DeploymentInformationListExample.cs" company="Traeger Industry Components GmbH">
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
+// <author>Fabian Traeger</author>
 //--------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -11,12 +12,12 @@ using System.Globalization;
 using ReleaseServer.WebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-internal class ProductInformationListExample : IExamplesProvider<ProductInformationList>
+internal class DeploymentInformationListExample : IExamplesProvider<DeploymentInformationList>
 {
-    public ProductInformationList GetExamples()
+    public DeploymentInformationList GetExamples()
     {
-        var example = new ProductInformationList(new List<ProductInformation>(new[] {
-                    new ProductInformation
+        var example = new DeploymentInformationList(new List<DeploymentInformation>(new[] {
+                    new DeploymentInformation
                     {
                         Identifier = "softwareX",
                         Version = new ProductVersion("1.0"),
@@ -63,7 +64,7 @@ internal class ProductInformationListExample : IExamplesProvider<ProductInformat
                             }
                         }
                     },
-                    new ProductInformation
+                    new DeploymentInformation
                     {
                         Identifier = "softwareX",
                         Version = new ProductVersion("1.1-beta"),

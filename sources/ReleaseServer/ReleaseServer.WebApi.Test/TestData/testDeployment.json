@@ -1,5 +1,4 @@
 {
-    "ReleaseNotesFileName": "releaseNotes.json",
-    "ArtifactFileName": "artifact.zip",
-    "ReleaseDate": "2020-02-01"
+    "releaseNotesFileName": "releaseNotes.json",
+    "artifactFileName": "artifact.zip"
 }
