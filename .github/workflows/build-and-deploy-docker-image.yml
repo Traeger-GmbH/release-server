@@ -1,0 +1,58 @@
+name: Docker Image CI
+
+on:
+  release:
+    types:
+      - published
+  
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    -
+      name: Get Docker Image Tag version from Git tag
+      id: docker-tags
+      run: |
+        TAG=$(echo "$GITHUB_REF" | cut -d '/' -f3 | sed -e 's/^v//g')
+        if [ "${TAG}" = "master" ];
+        then
+          TAG="latest";
+        fi
+        echo ::set-output name=tags::$(echo "ghcr.io/traeger-gmbh/release-server:${TAG}%0Atraeger/release-server:${TAG}") 
+
+    -
+      name: Log in to Docker Hub
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    -
+      name: Log in to GitHub
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: ghcr.io
+        username: ${{ secrets.PACKAGES_GITHUB_USER }}
+        password: ${{ secrets.PACKAGES_GITHUB_TOKEN }}
+
+    -
+      name: Build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.docker-tags.outputs.tags }}
