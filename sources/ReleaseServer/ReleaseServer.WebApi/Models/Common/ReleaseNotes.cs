@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 namespace ReleaseServer.WebApi.Models
 {
     /// <summary>
-    /// Provides the the release notes with all the changes.
+    /// Provides the release notes of a release.
     /// </summary>
     public class ReleaseNotes : JsonSerializable<ReleaseNotes>
     {
@@ -24,7 +24,7 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         /// <value>The changes of the code / product within a release. This is required field.</value>
         [JsonRequired]
-        public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set;}
+        public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set; }
 
         /// <summary>
         /// Gets or sets the release date (required).
