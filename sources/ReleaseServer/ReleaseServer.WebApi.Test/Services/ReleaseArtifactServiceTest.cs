@@ -281,7 +281,7 @@ namespace ReleaseServer.WebApi.Test
                 fileName: "test_payload_invalid_release_notes_structure.zip");
 
             var expectedValidationError = "the release notes file \"releaseNotes.json\" is an invalid json file!" +
-                                          " Error: Required property 'Changes' not found in JSON. Path '', line 3, position 1.";
+                                          " Error: Required property 'Changes' not found in JSON. Path '', line 4, position 1.";
 
             //Act
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);

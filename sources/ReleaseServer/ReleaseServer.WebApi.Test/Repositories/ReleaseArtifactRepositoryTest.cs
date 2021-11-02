@@ -86,7 +86,6 @@ namespace ReleaseServer.WebApi.Test
             Assert.True(Directory.Exists(testPath));
             Assert.True(File.Exists(Path.Combine(testPath, "releaseNotes_update.json")));
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
-            Assert.True(File.Exists(Path.Combine(testPath, "deployment_update.json")));
 
             //Cleanup
             //Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
