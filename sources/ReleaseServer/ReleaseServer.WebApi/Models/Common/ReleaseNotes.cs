@@ -24,7 +24,7 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         /// <value>The release date of the artifact (is a required field).</value>
         [JsonRequired]
-        public DateTime Date { get; set; }
+        public DateTime ReleaseDate { get; set; }
 
         /// <summary>
         /// 

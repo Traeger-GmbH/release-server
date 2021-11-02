@@ -28,7 +28,13 @@ namespace ReleaseServer.WebApi
         /// <param name="version">The version of the release artifact</param>
         /// <param name="payload">The provided payload with the release artifact in form of an <see cref="IFormFile"/>.</param>
         Task StoreArtifact(string productName, string os, string architecture, string version, IFormFile payload);
-        
+
+        /// <summary>
+        /// Stores the provided payload asynchronously as package.
+        /// </summary>
+        /// <param name="payload">The provided payload with the package in form of an <see cref="IFormFile"/>.</param>
+        Task<ValidationResult> StorePackage(IFormFile payload);
+
         /// <summary>
         /// Retrieves the product information of specific product name (asynchronously).
         /// </summary>

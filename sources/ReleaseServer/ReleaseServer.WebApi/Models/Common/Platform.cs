@@ -5,6 +5,8 @@
 // <author>Fabian Traeger</author>
 //--------------------------------------------------------------------------------------------------
 
+using System;
+
 namespace ReleaseServer.WebApi.Models
 {
     /// <summary>
@@ -63,6 +65,20 @@ namespace ReleaseServer.WebApi.Models
             else {
                 result = null;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Parses a platform from a string
+        /// </summary>
+        /// <returns></returns>
+        public static Platform Parse(string s)
+        {
+            if (TryParse(s, out var result)) {
+                return result;
+            }
+            else {
+                throw new FormatException("Invalid Platform format.");
             }
         }
 

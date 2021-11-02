@@ -22,7 +22,7 @@ namespace ReleaseServer.WebApi
         /// </summary>
         /// <param name="artifact">The release artifact that will be stored.</param>
         void StoreArtifact(ReleaseArtifact artifact);
-        
+
         /// <summary>
         /// Retrieves the product information of specific product name.
         /// </summary>

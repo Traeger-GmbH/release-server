@@ -15,6 +15,8 @@ namespace ReleaseServer.WebApi.Models
     /// </summary>
     public class DeploymentMetaInformation : JsonSerializable<DeploymentMetaInformation>
     {
+        #region ---------- Public properties ----------
+
         /// <summary>
         /// Gets or sets the filename of the release notes (required).
         /// </summary>
@@ -28,5 +30,7 @@ namespace ReleaseServer.WebApi.Models
         /// <value>The name of the artifact file (is a required field).</value>
         [JsonRequired]
         public string ArtifactFileName { get; set; }
+
+        #endregion
     }
 }

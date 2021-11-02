@@ -52,6 +52,7 @@ namespace ReleaseServer.WebApi
         public static void Configure(JsonSerializerSettings settings)
         {
             settings.Converters.Add(new ProductVersionConverter());
+            settings.Converters.Add(new PlatformConverter());
             settings.Converters.Add(new StringEnumConverter(namingStrategy: NamingStrategy, allowIntegerValues: false));
         }
         

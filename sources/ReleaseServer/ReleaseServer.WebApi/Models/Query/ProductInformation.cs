@@ -20,8 +20,9 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductInformation"/> class.
         /// </summary>
-        public ProductInformation(IEnumerable<ReleaseInformation> releases, int limit, int offset)
+        public ProductInformation(string identifier, IEnumerable<ReleaseInformation> releases, int limit, int offset)
         {
+            this.Identifier = identifier;
             this.Releases = releases.Skip(offset).Take(limit);
             this.TotalReleaseCount = releases.Count();
             this.NextOffset = null;
@@ -33,9 +34,10 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="identifier"></param>
         /// <param name="releases"></param>
-        public ProductInformation(IEnumerable<ReleaseInformation> releases)
-            : this(releases, releases.Count(), 0)
+        public ProductInformation(string identifier, IEnumerable<ReleaseInformation> releases)
+            : this(identifier, releases, releases.Count(), 0)
         { }
 
         #endregion

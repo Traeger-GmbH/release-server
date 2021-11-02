@@ -22,7 +22,7 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         public ReleaseInformation(ProductVersion version, ReleaseNotes releaseNotes, IEnumerable<Platform> platforms)
         {
-            this.Date = releaseNotes.Date;
+            this.ReleaseDate = releaseNotes.ReleaseDate;
             this.Changes = releaseNotes.Changes;
             this.IsPreviewRelease = releaseNotes.IsPreviewRelease;
             this.IsSecurityPatch = releaseNotes.IsSecurityPatch;

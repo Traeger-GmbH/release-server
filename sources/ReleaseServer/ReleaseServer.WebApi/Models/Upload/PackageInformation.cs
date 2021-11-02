@@ -24,6 +24,12 @@ namespace ReleaseServer.WebApi.Models
         public string Identifier { get; set; }
 
         /// <summary>
+        /// Gets or sets the version of this release.
+        /// </summary>
+        [JsonRequired]
+        public ProductVersion Version { get; set; }
+
+        /// <summary>
         /// Gets or sets the release notes of this package.
         /// </summary>
         [JsonRequired]

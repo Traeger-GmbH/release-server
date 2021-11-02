@@ -22,7 +22,8 @@ namespace ReleaseServer.WebApi
         public override ProductVersion ReadJson(JsonReader reader, Type objectType, ProductVersion existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            throw new NotImplementedException("this functionality is not implemented yet");
+            var value = (string)reader.Value;
+            return new ProductVersion(value);
         }
     }
 }

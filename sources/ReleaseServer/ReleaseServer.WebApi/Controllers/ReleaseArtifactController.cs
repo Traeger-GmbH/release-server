@@ -67,6 +67,11 @@ namespace ReleaseServer.WebApi
             return x.Version.CompareTo(y.Version);
         }
 
+        private static int CompareByVersion(ReleaseInformation x, ReleaseInformation y)
+        {
+            return x.Version.CompareTo(y.Version);
+        }
+
         #endregion
     }
 }

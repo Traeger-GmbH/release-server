@@ -85,9 +85,13 @@ namespace ReleaseServer.WebApi
                     "There is no release of \"{product}\" that matches the specified filter criteria.");
                 }
 
-                var releases = ReleaseInformationMapper.Map(deployments);
+                var releases = ReleaseInformationMapper.Map(deployments).ToList();
+                releases.Sort(CompareByVersion);
+                if (sortOrder == SortOrder.Descending) {
+                    releases.Reverse();
+                }
 
-                return new ProductInformation(releases, limit, offset);
+                return new ProductInformation(product, releases, limit, offset);
             }
             else
             {

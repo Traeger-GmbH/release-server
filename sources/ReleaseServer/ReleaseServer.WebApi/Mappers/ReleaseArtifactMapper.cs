@@ -1,10 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactMapper.cs" company="Traeger Industry Components GmbH">
-//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
+//     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
 // <author>Timo Walter</author>
+// <author>Fabian Träger</author>
 //--------------------------------------------------------------------------------------------------
 
+using System.IO;
 using System.IO.Compression;
 using ReleaseServer.WebApi.Models;
 
@@ -15,6 +17,14 @@ namespace ReleaseServer.WebApi
     /// </summary>
     public static class ReleaseArtifactMapper
     {
+        #region ---------- Private constants ----------
+
+        private const string DeploymentMetaInformationFileName = "deployment.json";
+
+        #endregion
+
+        #region ---------- Public static methods ----------
+
         /// <summary>
         /// Converts meta information and a <see cref="ZipArchive"/> to a <see cref="ReleaseArtifact"/>.
         /// </summary>
@@ -27,17 +37,35 @@ namespace ReleaseServer.WebApi
         public static ReleaseArtifact ConvertToReleaseArtifact(string product, string os, string architecture,
             string version, ZipArchive payload)
         {
-            return new ReleaseArtifact
-            {
-                DeploymentInformation = new DeploymentInformation
-                {
+            var deploymentMetaInformation = DeploymentMetaInformation.FromJsonFile(payload.GetEntry(DeploymentMetaInformationFileName));
+            var releaseNotes = ReleaseNotes.FromJsonFile(payload.GetEntry(deploymentMetaInformation.ReleaseNotesFileName));
+
+            return new ReleaseArtifact {
+                DeploymentInformation = new DeploymentInformation {
                     Identifier = product,
                     Os = os,
                     Architecture = architecture,
-                    Version = new ProductVersion(version)
+                    Version = new ProductVersion(version),
+                    ReleaseNotes = releaseNotes
                 },
-                Payload = payload
+                DeploymentMetaInformation = deploymentMetaInformation,
+                Content = payload.GetEntry(deploymentMetaInformation.ArtifactFileName).Open()
             };
         }
+
+        /// <summary>
+        /// Converts meta information and a <see cref="Stream"/> to a <see cref="ReleaseArtifact"/>.
+        /// </summary>
+        /// <returns>The created <see cref="ReleaseArtifact"/>.</returns>
+        public static ReleaseArtifact ConvertToReleaseArtifact(DeploymentInformation deploymentInformation, DeploymentMetaInformation metaInformation, Stream content)
+        {
+            return new ReleaseArtifact {
+                DeploymentInformation = deploymentInformation,
+                DeploymentMetaInformation = metaInformation,
+                Content = content
+            };
+        }
+
+        #endregion
     }
 }

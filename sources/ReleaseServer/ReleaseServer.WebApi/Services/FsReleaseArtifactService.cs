@@ -48,10 +48,48 @@ namespace ReleaseServer.WebApi
             this.logger = logger;
             directoryLock = new SemaphoreSlim(1, 1);
         }
-        
+
         #endregion
 
         #region ---------- Public methods (by IReleaseArtifactService) ----------
+
+        public async Task<ValidationResult> StorePackage(IFormFile payload)
+        {
+            logger.LogDebug("Convert the uploaded payload to package");
+            using var package = new Package(payload);
+
+            if (package.ValidationResult.IsValid) {
+                await directoryLock.WaitAsync();
+
+                foreach (var (platform, deployment) in package.Deployments) {
+                    var metaInformation = new DeploymentMetaInformation {
+                        ArtifactFileName = deployment.Name,
+                        ReleaseNotesFileName = "releaseNotes.json"
+                    };
+
+                    using var artifact = new ReleaseArtifact() {
+                        DeploymentInformation = new DeploymentInformation {
+                            Identifier = package.Identifier,
+                            Version = package.Version,
+                            ReleaseNotes = package.ReleaseNotes,
+                            Architecture = platform.Architecture,
+                            Os = platform.OperatingSystem
+                        },
+                        DeploymentMetaInformation = metaInformation,
+                        Content = deployment.Open()
+                    };
+
+                    await Task.Run(() => fsReleaseArtifactRepository.StoreArtifact(artifact));
+                }
+            }
+            else {
+                foreach (var error in package.ValidationResult.ValidationErrors) {
+                    logger.LogError(error);
+                }
+
+            }
+            return package.ValidationResult;
+        }
 
         public async Task StoreArtifact(string productName, string os, string architecture, string version,
             IFormFile payload)
@@ -213,7 +251,7 @@ namespace ReleaseServer.WebApi
             {
                 var validationError = "the deployment.json does not exist in the uploaded payload!";
                 logger.LogError(validationError);
-                return new ValidationResult {IsValid = false, ValidationError = validationError};
+                return new ValidationResult(false, validationError);
             }
 
             //Open the deployment.json and extract the DeploymentMetaInfo of it
@@ -229,7 +267,7 @@ namespace ReleaseServer.WebApi
                     var validationError = "the deployment meta information (deployment.json) is invalid! "
                                           + "Error: " + e.Message;
                     logger.LogError(validationError);
-                    return new ValidationResult { IsValid = false, ValidationError = validationError };
+                    return new ValidationResult(false, validationError);
                 }
             }
 
@@ -239,7 +277,7 @@ namespace ReleaseServer.WebApi
                 var validationError = "the expected artifact" + " \"" + deploymentMetaInfo.ArtifactFileName +
                                       "\"" + " does not exist in the uploaded payload!";
                 logger.LogError(validationError);
-                return new ValidationResult {IsValid = false, ValidationError = validationError};
+                return new ValidationResult(false, validationError);
             }
 
             if (payloadZipArchive.GetEntry(deploymentMetaInfo.ReleaseNotesFileName) == null)
@@ -247,7 +285,7 @@ namespace ReleaseServer.WebApi
                 var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                       "\"" +  " does not exist in the uploaded payload!";
                 logger.LogError(validationError);
-                return new ValidationResult {IsValid = false, ValidationError = validationError};
+                return new ValidationResult(false, validationError);
             }
             
             //Check if the uploaded payload contains the release notes file
@@ -258,7 +296,7 @@ namespace ReleaseServer.WebApi
                 var validationError = "the expected release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                       "\"" +  " does not exist in the uploaded payload!";
                 logger.LogError(validationError);
-                return new ValidationResult {IsValid = false, ValidationError = validationError};
+                return new ValidationResult(false, validationError);
             }
             
             //Try to Deserialize the release notes and check if it is valid
@@ -273,12 +311,12 @@ namespace ReleaseServer.WebApi
                 {
                     var validationError = "the release notes file" + " \"" +  deploymentMetaInfo.ReleaseNotesFileName +
                                           "\" is an invalid json file! " + "Error: " + e.Message;;
-                    return new ValidationResult { IsValid = false, ValidationError = validationError };
+                    return new ValidationResult(false, validationError);
                 }
             }
             
             //The uploaded payload is valid
-            return new ValidationResult {IsValid = true};
+            return new ValidationResult(true);
         }
         
         #endregion
