@@ -79,7 +79,7 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// Uploads a specific release artifact.
         /// </summary>
-        /// <param name="payload"></param>
+        /// <param name="package"></param>
         /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
         /// if the payload is invalid.</returns>
         /// <response code="200">Upload of the artifact was successful.</response>
@@ -89,22 +89,22 @@ namespace ReleaseServer.WebApi
         [HttpPut("")]
         //Max. 1024 MB
         [RequestSizeLimit(1073741824)]
-        public async Task<IActionResult> UploadPackage([Required] IFormFile payload)
+        public async Task<IActionResult> UploadPackage([Required] IFormFile package)
         {
-            if (payload == null) {
+            if (package == null) {
                 return BadRequestResponseFactory.Create(
                     HttpContext,
                     "Bad request",
                     "The required upload body is missing.");
             }
-            else if (payload.ContentType != "application/zip") {
+            else if (package.ContentType != "application/zip") {
                 return BadRequestResponseFactory.Create(
                     HttpContext,
                     "Bad request",
                     "The required upload body is not a .zip file.");
             }
             else {
-                var validationResult = await releaseArtifactService.StorePackage(payload);
+                var validationResult = await releaseArtifactService.StorePackage(package);
 
                 if (validationResult.IsValid) {
                     return Ok();
