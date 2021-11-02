@@ -37,14 +37,13 @@ namespace ReleaseServer.WebApi
             backupRootDir = backupDirectory;
             this.logger = logger;
         }
-        
+
         #endregion
-        
+
         #region ---------- Public methods (by IReleaseArtifactRepository) ----------
 
         public void StoreArtifact(ReleaseArtifact artifact)
         {
-
             var artifactPath = GenerateArtifactPath(
                 artifact.DeploymentInformation.Identifier,
                 artifact.DeploymentInformation.Os,
@@ -60,7 +59,13 @@ namespace ReleaseServer.WebApi
                     tmpDir.Create();
 
                 //Extract the payload to the temporary directory
-                artifact.Payload.ExtractToDirectory(tmpDir.ToString());
+
+                using (var outputStream = new FileStream(Path.Combine(tmpDir.ToString(), artifact.DeploymentMetaInformation.ArtifactFileName), FileMode.CreateNew)) {
+                    artifact.Content.CopyTo(outputStream);
+                }
+                artifact.DeploymentMetaInformation.ToJsonFile(Path.Combine(tmpDir.ToString(), "deployment.json"));
+                artifact.DeploymentInformation.ReleaseNotes
+                    .ToJsonFile(Path.Combine(tmpDir.ToString(), artifact.DeploymentMetaInformation.ReleaseNotesFileName));
                 logger.LogDebug("The Artifact was successfully unpacked & stored to the temp directory");
 
                 var artifactDirectory = new DirectoryInfo(artifactPath);
@@ -282,6 +287,11 @@ namespace ReleaseServer.WebApi
         private string GenerateArtifactPath(string product, string os, string architecture, string version)
         {
             return Path.Combine(artifactRootDir.ToString(), product, os, architecture, version);
+        }
+
+        private string GenerateTemporaryArtifactPath(DirectoryInfo temporaryDirectory, string product, string os, string architecture, string version)
+        {
+            return Path.Combine(temporaryDirectory.ToString(), product, os, architecture, version);
         }
 
         private string GenerateTemporaryPath()

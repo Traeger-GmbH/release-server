@@ -60,9 +60,19 @@ You can find an example artifact payload in form of a zip file here: [Example ar
 
 __`PUT` request to upload an artifact__:
 
-`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'artifact=@/path/to/the/artifactPayload;type=application/zip'`
+`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'artifact=@<path/to/artifact-zipFile>;type=application/zip'`
 
-> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>`). The value inside the authorization header (`<username:password>`) has to be base64 encoded.
+> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>`, `<username:password>`, `<path/to/artifact-zipFile>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
+
+__Example response:__
+
+Status: `200 OK`
+
+__`PUT` request to upload a package__:
+
+`curl -k -X PUT http://localhost:5000/artifacts/ -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'package=@<path/to/package-zipFile>;type=application/zip'`
+
+> __Note:__ You have replace the placeholders in the `PUT` request (`<username:password>` and `<path/to/artifact-zipFile>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
 
 __Example response:__
 
@@ -74,7 +84,6 @@ __`GET` request to list the deployments__:
 
 `curl -k -X GET http://localhost:5000/artifacts/<product_name>/info`
 
-> __Note:__ You have replace the placeholder in the PUT request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>` and `<username:password>` which has to be base64 encoded)
 
 __Example response:__
 
@@ -84,48 +93,109 @@ Body:
 
 ```json
 {
-  "productInformation": [
-    {
-      "identifier": "softwareX",
-      "version": "1.0",
-      "os": "ubuntu",
-      "architecture": "arm64",
-      "releaseNotes": {
-        "changes": {
-          "de": [
+  "identifier": "softwareX",
+  "releases": [{
+      "version": "2.0.0-preview-2",
+      "platforms": [
+        "linux/arm32",
+        "linux/arm64",
+        "linux/x64",
+        "windows/arm64",
+        "windows/x64",
+        "windows/x86"
+      ],
+      "releaseDate": "2021-10-28",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
           {
-              "platforms": [
-                "windows/any",
-                "linux/rpi"
-              ],
-              "added": [
-                "added de 1"
-              ],
-              "fixed": null,
-              "breaking": null,
-              "deprecated": null
-            }
-          ],
-          "en": [
-            {
-              "platforms": [
-                "windows/any",
-                "linux/rpi"
-              ],
-              "added": [
-                "added en 1"
-              ],
-              "fixed": null,
-              "breaking": null,
-              "deprecated": null
-            }
-          ]
-        },
-        "releaseDate": "2021-07-25T00:00:00",
-        "isSecurityPatch": false,
-        "isPreviewRelease": false
-      },
-    }
-  ]
+            "platforms": null,
+            "added": [
+              
+            ],
+            "fixed": [
+              
+            ],
+            "breaking": [
+              
+            ],
+            "deprecated": [
+              
+            ]
+          }
+        ],
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              
+            ],
+            "fixed": [
+              
+            ],
+            "breaking": [
+              
+            ],
+            "deprecated": [
+              
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "version": "2.0.0",
+      "platforms": [
+        "linux/arm32",
+        "linux/arm64",
+        "linux/x64",
+        "windows/arm64",
+        "windows/x64",
+        "windows/x86"
+      ],
+      "releaseDate": "2021-11-28",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
+          {
+            "platforms": null,
+            "added": [
+              
+            ],
+            "fixed": [
+              
+            ],
+            "breaking": [
+              
+            ],
+            "deprecated": [
+              
+            ]
+          }
+        ],
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              
+            ],
+            "fixed": [
+              
+            ],
+            "breaking": [
+              
+            ],
+            "deprecated": [
+              
+            ]
+          }
+        ]
+      }
+    },
+  ],
+  "totalReleaseCount": 2,
+  "nextOffset": null
 }
 ```

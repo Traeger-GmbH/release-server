@@ -41,10 +41,10 @@ namespace ReleaseServer.WebApi
         /// <response code="200">A product with the specified product name exists.</response>
         /// <response code="404">The specified product does not exist.</response>
         [AllowAnonymous]
-        [ProducesResponseType(typeof(DeploymentInformationList), 200)]
+        [ProducesResponseType(typeof(ProductInformation), 200)]
         [SeparatedQueryString]
         [HttpGet("{product}/info")]
-        public async Task<ActionResult<DeploymentInformationList>> GetProduct(
+        public async Task<ActionResult<ProductInformation>> GetProduct(
             [Required] string product,
             [FromQuery] List<string> architectures,
             [FromQuery] List<string> operatingSystems,
@@ -54,11 +54,11 @@ namespace ReleaseServer.WebApi
             [FromQuery] string version = null
             )
         {
-            var productInfos = (await releaseArtifactService.GetDeploymentInformations(product));
+            var deployments = (await releaseArtifactService.GetDeploymentInformations(product));
 
-            if (!productInfos.IsNullOrEmpty())
+            if (!deployments.IsNullOrEmpty())
             {
-                productInfos = productInfos
+                deployments = deployments
                     .Where((release) => {
                         var match = true;
                         if (architectures.Count > 0)
@@ -77,7 +77,7 @@ namespace ReleaseServer.WebApi
                     })
                     .ToList();
 
-                if (productInfos.IsNullOrEmpty())
+                if (deployments.IsNullOrEmpty())
                 {
                     return NotFoundResponseFactory.Create(
                     HttpContext,
@@ -85,13 +85,13 @@ namespace ReleaseServer.WebApi
                     "There is no release of \"{product}\" that matches the specified filter criteria.");
                 }
 
-                productInfos.Sort(CompareByVersion);
-                if (sortOrder == SortOrder.Descending)
-                {
-                    productInfos.Reverse();
+                var releases = ReleaseInformationMapper.Map(deployments).ToList();
+                releases.Sort(CompareByVersion);
+                if (sortOrder == SortOrder.Descending) {
+                    releases.Reverse();
                 }
 
-                return new DeploymentInformationList(productInfos, limit, offset);
+                return new ProductInformation(product, releases, limit, offset);
             }
             else
             {

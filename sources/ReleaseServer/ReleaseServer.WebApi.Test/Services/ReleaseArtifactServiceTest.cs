@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -84,8 +84,8 @@ namespace ReleaseServer.WebApi.Test
             //Act
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
-            Assert.True(validationResult.IsValid, validationResult.ValidationError);
-            Assert.Null(validationResult.ValidationError);
+            Assert.True(validationResult.IsValid);
+            Assert.Null(validationResult.ValidationErrors);
         }
 
         [Fact]
@@ -112,7 +112,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -139,7 +139,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -169,7 +169,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -200,7 +200,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -227,7 +227,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -257,7 +257,7 @@ namespace ReleaseServer.WebApi.Test
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
         
         [Fact]
@@ -281,13 +281,13 @@ namespace ReleaseServer.WebApi.Test
                 fileName: "test_payload_invalid_release_notes_structure.zip");
 
             var expectedValidationError = "the release notes file \"releaseNotes.json\" is an invalid json file!" +
-                                          " Error: Required property 'Changes' not found in JSON. Path '', line 3, position 1.";
+                                          " Error: Required property 'Changes' not found in JSON. Path '', line 4, position 1.";
 
             //Act
             var validationResult = fsReleaseArtifactService.ValidateUploadPayload(testFormFile);
 
             Assert.False(validationResult.IsValid);
-            Assert.Equal(expectedValidationError, validationResult.ValidationError);
+            Assert.Equal(expectedValidationError, validationResult.ValidationErrors.First());
         }
     }
 }

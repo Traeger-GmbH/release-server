@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------------------
 
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -59,17 +60,69 @@ namespace ReleaseServer.WebApi
 
                 if (!validationResult.IsValid)
                 {
+                    var builder = new StringBuilder();
+                    foreach (var error in validationResult.ValidationErrors) {
+                        builder.Append(error);
+                        builder.Append(' ');
+                    }
                     return BadRequestResponseFactory.Create(
                         HttpContext,
                         "Bad request",
-                        validationResult.ValidationError);
+                        builder.ToString());
                 }
             
                 await releaseArtifactService.StoreArtifact(product, os, architecture, version, artifact);
                 return Ok();
             }
         }
-       
+
+        /// <summary>
+        /// Uploads a specific release artifact.
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
+        /// if the payload is invalid.</returns>
+        /// <response code="200">Upload of the artifact was successful.</response>
+        /// <response code="400">No or invalid body provided (must be a Zip file).</response>
+        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
+        /// <response code="500">Internal error.</response>
+        [HttpPut("")]
+        //Max. 1024 MB
+        [RequestSizeLimit(1073741824)]
+        public async Task<IActionResult> UploadPackage([Required] IFormFile package)
+        {
+            if (package == null) {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "The required upload body is missing.");
+            }
+            else if (package.ContentType != "application/zip") {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "The required upload body is not a .zip file.");
+            }
+            else {
+                var validationResult = await releaseArtifactService.StorePackage(package);
+
+                if (validationResult.IsValid) {
+                    return Ok();
+                }
+                else {
+                    var builder = new StringBuilder();
+                    foreach (var error in validationResult.ValidationErrors) {
+                        builder.Append(error);
+                        builder.Append(' ');
+                    }
+                    return BadRequestResponseFactory.Create(
+                        HttpContext,
+                        "Bad request",
+                        builder.ToString());
+                }
+            }
+        }
+
         #endregion
     }
 }

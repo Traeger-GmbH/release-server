@@ -15,17 +15,10 @@ using Newtonsoft.Json;
 namespace ReleaseServer.WebApi.Models
 {
     /// <summary>
-    /// Provides the the release notes with all the changes.
+    /// Provides the release notes of a release.
     /// </summary>
     public class ReleaseNotes : JsonSerializable<ReleaseNotes>
     {
-        /// <summary>
-        /// Gets or sets the code / product changes with this release (required).
-        /// </summary>
-        /// <value>The changes of the code / product within a release. This is required field.</value>
-        [JsonRequired]
-        public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set;}
-
         /// <summary>
         /// Gets or sets the release date (required).
         /// </summary>
@@ -36,11 +29,18 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// 
         /// </summary>
-        public bool IsSecurityPatch { get; set; } = false;
+        public bool IsPreviewRelease { get; set; } = false;
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsPreviewRelease { get; set; } = false;
+        public bool IsSecurityPatch { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the code / product changes with this release (required).
+        /// </summary>
+        /// <value>The changes of the code / product within a release. This is required field.</value>
+        [JsonRequired]
+        public Dictionary<CultureInfo, List<ChangeSet>> Changes { get; set; }
     }
 }

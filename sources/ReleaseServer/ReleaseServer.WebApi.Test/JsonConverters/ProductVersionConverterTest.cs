@@ -30,14 +30,5 @@ namespace ReleaseServer.WebApi.Test.JsonConverters
             //Assert
             Assert.Equal("\"1.8-rc2\"", productVersionValue);
         }
-
-        [Fact]
-        public void TestReadJson_NotImplementedException()
-        {
-            //Setup
-            var emptyTestJson = "{}";
-
-           Assert.Throws<NotImplementedException>(() => JsonConvert.DeserializeObject<ProductVersion>(emptyTestJson, JsonConfiguration.Settings));
-        }
     }
 }
