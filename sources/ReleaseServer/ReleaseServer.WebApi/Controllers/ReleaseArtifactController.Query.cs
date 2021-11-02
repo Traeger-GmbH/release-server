@@ -85,7 +85,7 @@ namespace ReleaseServer.WebApi
                     "There is no release of \"{product}\" that matches the specified filter criteria.");
                 }
 
-                var releases = ReleaseInformationMapper.Convert(deployments);
+                var releases = ReleaseInformationMapper.Map(deployments);
 
                 return new ProductInformation(releases, limit, offset);
             }

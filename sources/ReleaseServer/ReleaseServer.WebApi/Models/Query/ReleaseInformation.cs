@@ -20,14 +20,14 @@ namespace ReleaseServer.WebApi.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseInformation"/> class.
         /// </summary>
-        public ReleaseInformation(ProductVersion version, ReleaseNotes releaseNotes)
+        public ReleaseInformation(ProductVersion version, ReleaseNotes releaseNotes, IEnumerable<Platform> platforms)
         {
             this.Date = releaseNotes.Date;
             this.Changes = releaseNotes.Changes;
             this.IsPreviewRelease = releaseNotes.IsPreviewRelease;
             this.IsSecurityPatch = releaseNotes.IsSecurityPatch;
             this.Version = version;
-            this.Platforms = new List<Platform>();
+            this.Platforms = platforms;
         }
 
         #endregion
@@ -44,7 +44,7 @@ namespace ReleaseServer.WebApi.Models
         /// Gets or sets the platforms this release is available for.
         /// </summary>
         [JsonRequired]
-        public List<Platform> Platforms { get; set; }
+        public IEnumerable<Platform> Platforms { get; set; }
 
         #endregion
     }

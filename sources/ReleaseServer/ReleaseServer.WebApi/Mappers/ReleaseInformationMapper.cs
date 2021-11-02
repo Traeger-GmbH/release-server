@@ -19,18 +19,20 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// 
         /// </summary>
-        public static IEnumerable<ReleaseInformation> Convert(IEnumerable<DeploymentInformation> deployments)
+        public static IEnumerable<ReleaseInformation> Map(IEnumerable<DeploymentInformation> deployments)
         {
             var releases = new List<ReleaseInformation>();
 
             var deploymentsByVersion = GetDeploymentsMappedByVersion(deployments);
 
             foreach (var (version, deploymentList) in deploymentsByVersion) {
-                var release = new ReleaseInformation(version, deploymentList.First().ReleaseNotes);
+                var platforms = new List<Platform>();
                 foreach (var deployment in deploymentList) {
-                    release.Platforms.Add(new Platform(deployment.Os, deployment.Architecture));
+                    platforms.Add(new Platform(deployment.Os, deployment.Architecture));
                 }
-                releases.Add(release);
+
+                // Note: We assume here that every deployment has equivalent release notes. This will be fixed in a ReleaseArtifactService/ReleaseArtifactRepository rework.
+                releases.Add(new ReleaseInformation(version, deploymentList.First().ReleaseNotes, platforms));
             }
 
             return releases;
