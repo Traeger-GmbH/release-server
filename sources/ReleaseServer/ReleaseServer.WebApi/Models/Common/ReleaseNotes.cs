@@ -20,12 +20,6 @@ namespace ReleaseServer.WebApi.Models
     public class ReleaseNotes : JsonSerializable<ReleaseNotes>
     {
         /// <summary>
-        /// Gets or sets the version of this release.
-        /// </summary>
-        [JsonRequired]
-        public ProductVersion Version { get; set; }
-
-        /// <summary>
         /// Gets or sets the release date (required).
         /// </summary>
         /// <value>The release date of the artifact (is a required field).</value>
@@ -41,12 +35,6 @@ namespace ReleaseServer.WebApi.Models
         /// 
         /// </summary>
         public bool IsSecurityPatch { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the platforms this release is available for.
-        /// </summary>
-        [JsonRequired]
-        public List<string> Platforms { get; set; }
 
         /// <summary>
         /// Gets or sets the code / product changes with this release (required).
