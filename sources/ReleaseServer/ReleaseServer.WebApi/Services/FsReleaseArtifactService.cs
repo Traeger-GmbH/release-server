@@ -59,27 +59,32 @@ namespace ReleaseServer.WebApi
             using var package = new Package(payload);
 
             if (package.ValidationResult.IsValid) {
-                await directoryLock.WaitAsync();
+                try {
+                    await directoryLock.WaitAsync();
 
-                foreach (var (platform, deployment) in package.Deployments) {
-                    var metaInformation = new DeploymentMetaInformation {
-                        ArtifactFileName = deployment.Name,
-                        ReleaseNotesFileName = "releaseNotes.json"
-                    };
+                    foreach (var (platform, deployment) in package.Deployments) {
+                        var metaInformation = new DeploymentMetaInformation {
+                            ArtifactFileName = deployment.Name,
+                            ReleaseNotesFileName = "releaseNotes.json"
+                        };
 
-                    using var artifact = new ReleaseArtifact() {
-                        DeploymentInformation = new DeploymentInformation {
-                            Identifier = package.Identifier,
-                            Version = package.Version,
-                            ReleaseNotes = package.ReleaseNotes,
-                            Architecture = platform.Architecture,
-                            Os = platform.OperatingSystem
-                        },
-                        DeploymentMetaInformation = metaInformation,
-                        Content = deployment.Open()
-                    };
+                        using var artifact = new ReleaseArtifact() {
+                            DeploymentInformation = new DeploymentInformation {
+                                Identifier = package.Identifier,
+                                Version = package.Version,
+                                ReleaseNotes = package.ReleaseNotes,
+                                Architecture = platform.Architecture,
+                                Os = platform.OperatingSystem
+                            },
+                            DeploymentMetaInformation = metaInformation,
+                            Content = deployment.Open()
+                        };
 
-                    await Task.Run(() => fsReleaseArtifactRepository.StoreArtifact(artifact));
+                        await Task.Run(() => fsReleaseArtifactRepository.StoreArtifact(artifact));
+                    }
+                }
+                finally {
+                    directoryLock.Release();
                 }
             }
             else {
