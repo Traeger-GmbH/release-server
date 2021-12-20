@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-5xl;
+    @apply leading-none;
+    @apply font-bold;
+  }
+
+  h2 {
+    @apply text-4xl;
+    @apply font-bold;
+    @apply leading-none;
+  }
+
+  h3 {
+    @apply text-2xl;
+    @apply font-bold;
+    @apply leading-none;
+  }
+
+  h4 {
+    @apply text-xl;
+    @apply font-normal;
+    @apply leading-none;
+  }
+
+  h5 {
+    @apply text-base;
+    @apply leading-none;
+  }
+
+  h6 {
+    @apply text-sm;
+    @apply leading-none;
+  }
+
+  code {
+    @apply text-base;
+    /* @apply font-normal; */
+  }
+/* 
+  body {
+    @apply font-sans;
+    @apply font-light;
+    @apply text-base;
+  }
+
+  body::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  body::-webkit-scrollbar-track {
+    @apply bg-white;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    @apply bg-orange;
+  }
+
+  a:not(.nav-link):not(.footer-link):not(.btn):not(.navbar-logo) {
+    @apply underline;
+    @apply whitespace-nowrap;
+    @apply inline-block transform transition duration-500 ease-in-out hover:-translate-y-1;
+  }
+
+  a.footer-link, .footer-link {
+    @apply font-normal;
+    @apply text-orange hover:text-orange-100;
+  } */
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+}
