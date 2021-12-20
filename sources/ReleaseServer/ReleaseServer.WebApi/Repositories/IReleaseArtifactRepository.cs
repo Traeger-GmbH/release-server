@@ -24,6 +24,30 @@ namespace ReleaseServer.WebApi
         void StoreArtifact(ReleaseArtifact artifact);
 
         /// <summary>
+        /// Gets a list of all stored products.
+        /// </summary>
+        /// <returns></returns>
+        List<string> GetProductList();
+
+        /// <summary>
+        /// Gets the disk usage of the repository.
+        /// </summary>
+        /// <returns></returns>
+        DiskUsage GetDiskUsage();
+
+        /// <summary>
+        /// Gets the number of stored products.
+        /// </summary>
+        /// <returns></returns>
+        int GetNumberOfProducts();
+
+        /// <summary>
+        /// Gets the number of stored artifacts.
+        /// </summary>
+        /// <returns></returns>
+        int GetNumberOfArtifacts();
+
+        /// <summary>
         /// Retrieves the product information of specific product name.
         /// </summary>
         /// <param name="productName">The name of the specific product.</param>

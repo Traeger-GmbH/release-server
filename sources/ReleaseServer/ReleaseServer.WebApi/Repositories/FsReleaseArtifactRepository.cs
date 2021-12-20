@@ -309,7 +309,44 @@ namespace ReleaseServer.WebApi
             return
                 DeploymentMetaInformation.FromJsonFile(deploymentMetaName.FullName);
         }
-        
+
+        public List<string> GetProductList()
+        {
+            var productList = this.artifactRootDir
+                .EnumerateDirectories()
+                .Select( directoryInfo => directoryInfo.Name )
+                .ToList();
+            return productList;
+        }
+
+        public DiskUsage GetDiskUsage()
+        {
+            var driveName = Path.GetPathRoot(this.artifactRootDir.FullName);
+            var drive = DriveInfo.GetDrives().Where(driveInfo => driveInfo.Name == driveName).First();
+            var usedDiskSpace = this.artifactRootDir.GetDiskUsage();
+            return new DiskUsage() {
+                TotalSize = (int)(drive.TotalSize / (1024 * 1024)),
+                AvailableFreeSpace = (int)(drive.AvailableFreeSpace / (1024 * 1024)),
+                UsedDiskSpace = (int)(this.artifactRootDir.GetDiskUsage() / (1024 * 1024)),
+            };
+        }
+
+        public int GetNumberOfProducts()
+        {
+            return this.artifactRootDir.EnumerateDirectories().Count();
+        }
+
+        public int GetNumberOfArtifacts()
+        {
+            var artifacts =
+                from productDir in artifactRootDir.EnumerateDirectories()
+                from osDir in productDir.EnumerateDirectories()
+                from hwArchDir in osDir.EnumerateDirectories()
+                from versionDir in hwArchDir.EnumerateDirectories()
+                select versionDir;
+            return artifacts.Count();
+        }
+
         #endregion
     }
 }

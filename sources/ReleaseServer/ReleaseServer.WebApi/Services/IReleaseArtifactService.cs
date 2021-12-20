@@ -20,6 +20,18 @@ namespace ReleaseServer.WebApi
     public interface IReleaseArtifactService
     {
         /// <summary>
+        /// Gets a list of all uploaded products.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<string>> GetProductList();
+
+        /// <summary>
+        /// Gets the runtime statistics of the server.
+        /// </summary>
+        /// <returns></returns>
+        Task<Statistics> GetStatistics();
+
+        /// <summary>
         /// Stores the provided payload asynchronously based on the given arguments (productName, os, architecture and version).
         /// </summary>
         /// <param name="productName">The product name of the release artifact.</param>

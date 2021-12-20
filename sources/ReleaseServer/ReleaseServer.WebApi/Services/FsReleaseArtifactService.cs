@@ -323,7 +323,27 @@ namespace ReleaseServer.WebApi
             //The uploaded payload is valid
             return new ValidationResult(true);
         }
-        
+
+        public async Task<List<string>> GetProductList()
+        {
+            return await Task.Run(() =>
+                fsReleaseArtifactRepository.GetProductList());
+        }
+
+        public async Task<Statistics> GetStatistics()
+        {
+            return await Task.Run(() => {
+                var diskUsage = this.fsReleaseArtifactRepository.GetDiskUsage();
+                var numberOfProducts = this.fsReleaseArtifactRepository.GetNumberOfProducts();
+                var numberOfArtifacts= this.fsReleaseArtifactRepository.GetNumberOfArtifacts();
+                return new Statistics() {
+                    Disk = diskUsage,
+                    NumberOfProducts = numberOfProducts,
+                    NumberOfArtifacts = numberOfArtifacts
+                };
+            });
+        }
+
         #endregion
     }
 }

@@ -102,6 +102,20 @@ namespace ReleaseServer.WebApi
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of all products stored in the server.
+        /// </summary>
+        /// <response code="200">List of all products.</response>
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ProductList), 200)]
+        [SeparatedQueryString]
+        [HttpGet("")]
+        public async Task<ActionResult<ProductList>> GetProductList()
+        {
+            var products = (await this.releaseArtifactService.GetProductList());
+            return new ProductList(products);
+        }
+
         ///// <summary>
         ///// Retrieves a list of all available versions of the specified artifact.
         ///// </summary>
@@ -191,7 +205,7 @@ namespace ReleaseServer.WebApi
         //            "The specified deployment does not exist.");
         //    }
         //}
-        
+
         ///// <summary>
         ///// Retrieves all available versions that are fitting to a specific product name / platform (HW architecture + OS).
         ///// </summary>
@@ -221,7 +235,7 @@ namespace ReleaseServer.WebApi
         //            "No versions for the specified platform exist.");
         //    }
         //}
-        
+
         ///// <summary>
         ///// Retrieves the latest version of a specific artifact.
         ///// </summary>

@@ -97,7 +97,7 @@ namespace ReleaseServer.WebApi
                     "Bad request",
                     "The required upload body is missing.");
             }
-            else if (package.ContentType != "application/zip") {
+            else if (package.ContentType != "application/zip" && package.ContentType != "application/x-zip-compressed") {
                 return BadRequestResponseFactory.Create(
                     HttpContext,
                     "Bad request",

@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
+using ReleaseServer.WebApi.Models;
+
 namespace ReleaseServer.WebApi
 {
     /// <summary>
@@ -77,7 +79,17 @@ namespace ReleaseServer.WebApi
             }            
 
         }
-       
+
+        /// <summary>
+        /// Gets statistics of the server like disk usage, number of products and artifacts.
+        /// </summary>
+        /// <response code="200">The restore process was successful.</response>
+        [HttpGet("statistics")]
+        public async Task<ActionResult<Statistics>> GetStatistics()
+        {
+            return await this.releaseArtifactService.GetStatistics();
+        }
+
         #endregion
     }
 }

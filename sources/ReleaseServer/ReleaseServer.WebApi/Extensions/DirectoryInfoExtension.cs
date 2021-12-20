@@ -87,7 +87,24 @@ namespace ReleaseServer.WebApi
                 throw new UnauthorizedAccessException($"Unable to write to the directory {directory.FullName}. Please check your permissions!");
             }
         }
-        
+
+        /// <summary>
+        /// Calculates the disk space used by the directory in Bytes.
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <returns></returns>
+        public static long GetDiskUsage(this DirectoryInfo directory)
+        {
+            long diskUsage = 0;
+            foreach(var file in directory.EnumerateFiles()) {
+                diskUsage += file.Length;
+            }
+            foreach(var dir in directory.EnumerateDirectories()) {
+                diskUsage += dir.GetDiskUsage();
+            }
+            return diskUsage;
+        }
+
         private static bool IsWritable(this DirectoryInfo directory)
         {
             bool writable = false;
