@@ -4,10 +4,16 @@
       <div class="px-2 text-2xl font-semibold tabular-nums">
         v{{ release.version }} ({{ new Date(release.releaseDate).toLocaleDateString() }})
       </div>
-      <div v-if="release.isPreviewRelease" class="bg-blue-500 rounded-full py-1 px-2 font-semibold text-white text-xs">
+      <div
+        v-if="release.isPreviewRelease"
+        class="bg-blue-500 rounded-full py-1 px-2 font-semibold text-white text-xs text-center"
+      >
         preview
       </div>
-      <div v-if="release.isSecurityPatch" class="bg-red-500 rounded-full py-1 px-2 font-semibold text-white text-xs">
+      <div
+        v-if="release.isSecurityPatch"
+        class="bg-red-500 rounded-full py-1 px-2 font-semibold text-white text-xs text-center"
+      >
         security patch
       </div>
     </div>
