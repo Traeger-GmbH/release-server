@@ -15,7 +15,7 @@
       <div class="p-2 my-1 text-xl">
         Platforms
       </div>
-      <div class="p-2 my-1 flex gap-1 justify-start">
+      <div class="p-2 my-1 flex flex-wrap gap-1 justify-start">
         <div
           v-for="platform in release.platforms"
           :key="platform"
