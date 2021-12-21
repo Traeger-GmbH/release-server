@@ -3,7 +3,7 @@
     <div class="flex flex-row w-full gap-2">
       <div class="flex w-full flex-col gap-2">
         <div
-          v-if="!file"
+          v-if="!packageFile"
           class="p-12 bg-white h-36 text-center border-2 border-dashed border-gray-300 rounded"
           @dragover="dragover"
           @dragleave="dragleave"
@@ -17,17 +17,17 @@
           </label>
         </div>
         <UiPane
-          v-if="file"
+          v-if="packageFile"
           class="bg-white h-36 flex flex-col justify-center items-center gap-2"
         >
           <div>
-            {{ file.name }}
+            {{ packageFile.name }}
           </div>
           <button
-            class="p-1 px-3 bg-green-500 text-white font-bold rounded hover:bg-green-700"
+            class="btn btn-green"
             type="button"
             title="Remove file"
-            @click="file = null"
+            @click="packageFile = null"
           >
             remove
           </button>
@@ -67,7 +67,7 @@
         </UiPane>
         <div class="w-full flex justify-end">
           <button
-            class="py-1 px-2 bg-green-500 text-white hover:bg-green-700 rounded"
+            class="btn btn-green"
             type="button"
             title="Upload package"
             :disable="isUploading"
@@ -88,7 +88,7 @@ export default {
       username: 'TestUser',
       password: 'SomePassword',
       isUploading: false,
-      file: null,
+      packageFile: null,
       error: null,
       successMessage: null
     };
@@ -109,14 +109,14 @@ export default {
     },
     drop (event) {
       event.preventDefault();
-      this.file = event.dataTransfer.files[0];
+      this.packageFile = event.dataTransfer.files[0];
       // Clean up
       event.currentTarget.classList.add('bg-gray-100');
       event.currentTarget.classList.remove('bg-green-300');
     },
     async upload () {
       this.successMessage = null;
-      if (!this.file) {
+      if (!this.packageFile) {
         this.error = 'Please select a package file you want to upload!';
         return;
       }
@@ -132,10 +132,11 @@ export default {
       try {
         this.isUploading = true;
         await this.$api.uploadPackage(
-          this.file,
+          this.packageFile,
           { username: this.username, password: this.password }
         );
-        this.successMessage = `Successfully uploaded "${this.file.name}".`;
+        this.successMessage = `Successfully uploaded "${this.packageFile.name}".`;
+        this.packageFile = null;
       } catch (error) {
         const responseData = error.response.data;
         // build error message:

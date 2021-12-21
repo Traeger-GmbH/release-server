@@ -2,7 +2,11 @@
   <div class="">
     <div class="flex items-center mb-5">
       <h1 class="mx-5">{{title}}</h1>
-      <NuxtLink v-if="backLink" :to="backLink" class="p-2 bg-green-500 rounded text-white">
+      <NuxtLink
+        v-if="backLink"
+        :to="backLink"
+        class="btn btn-green"
+      >
         go back
       </NuxtLink>
     </div>

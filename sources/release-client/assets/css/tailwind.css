@@ -41,35 +41,16 @@
     @apply text-base;
     /* @apply font-normal; */
   }
-/* 
-  body {
-    @apply font-sans;
-    @apply font-light;
-    @apply text-base;
+}
+
+@layer components {
+  .btn {
+    @apply py-1 px-3 font-bold rounded;
   }
 
-  body::-webkit-scrollbar {
-    @apply w-2;
+  .btn-green {
+    @apply text-white bg-green-500 hover:bg-green-700;
   }
-
-  body::-webkit-scrollbar-track {
-    @apply bg-white;
-  }
-
-  body::-webkit-scrollbar-thumb {
-    @apply bg-orange;
-  }
-
-  a:not(.nav-link):not(.footer-link):not(.btn):not(.navbar-logo) {
-    @apply underline;
-    @apply whitespace-nowrap;
-    @apply inline-block transform transition duration-500 ease-in-out hover:-translate-y-1;
-  }
-
-  a.footer-link, .footer-link {
-    @apply font-normal;
-    @apply text-orange hover:text-orange-100;
-  } */
 }
 
 .page-enter-active,
