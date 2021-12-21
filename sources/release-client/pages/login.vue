@@ -1,36 +1,35 @@
 <template>
-  <Page title="Login" back-link="/">
-    <div class="max-w-sm mx-auto mt-5">
-      <FormInput
-        id="username"
-        v-model="username"
-        title="Username"
-        name="username"
-        type="text"
-      />
-      <FormInput
-        id="password"
-        v-model="password"
-        title="Password"
-        name="username"
-        type="password"
-      />
-      <div class="w-full flex justify-end">
-        <button
-          class="btn btn-green"
-          type="button"
-          title="Login"
-          @click="login()"
-        >
-          login
-        </button>
-      </div>
+  <div class="max-w-sm mx-auto mt-5">
+    <FormInput
+      id="username"
+      v-model="username"
+      title="Username"
+      name="username"
+      type="text"
+    />
+    <FormInput
+      id="password"
+      v-model="password"
+      title="Password"
+      name="username"
+      type="password"
+    />
+    <div class="w-full flex justify-end">
+      <button
+        class="btn btn-green"
+        type="button"
+        title="Login"
+        @click="login()"
+      >
+        login
+      </button>
     </div>
-  </Page>
+  </div>
 </template>
 
 <script>
 export default {
+  layout: 'login',
   data () {
     return {
       username: 'TestUser',

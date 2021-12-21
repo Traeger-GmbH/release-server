@@ -23,7 +23,7 @@ class Api {
       return data;
     };
 
-    this.uploadPackage = async function (packageToUpload, { username, password }) {
+    this.uploadPackage = async function (packageToUpload) {
       const formData = new FormData();
       formData.append(
         'package',
@@ -33,7 +33,7 @@ class Api {
       await this.axios.put(
         '/',
         formData,
-        { auth: { username, password } }
+        { auth: store.state.auth }
       );
     };
 

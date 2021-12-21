@@ -32,45 +32,24 @@
             remove
           </button>
         </UiPane>
-        <UiPane class="bg-white ">
-          <div class="max-w-sm mx-auto">
-            <p class="my-5">
-              Please enter your credentials:
-            </p>
-            <FormInput
-              id="username"
-              v-model="username"
-              title="Username"
-              name="username"
-              type="text"
-            />
-            <FormInput
-              id="password"
-              v-model="password"
-              title="Password"
-              name="username"
-              type="password"
-            />
-          </div>
-        </UiPane>
         <UiPane
           v-if="error"
           class="w-full flex justify-center text-red-500 font-bold"
         >
           {{ error }}
         </UiPane>
-        <UiPane
-          v-if="successMessage"
-          class="w-full flex justify-center text-green-500 font-bold"
-        >
-          {{ successMessage }}
-        </UiPane>
-        <div class="w-full flex justify-end">
+        <div class="w-full flex items-center">
+          <div
+            v-if="successMessage"
+            class="w-full flex justify-center text-green-500 font-bold"
+          >
+            {{ successMessage }}
+          </div>
           <button
-            class="btn btn-green"
+            class="btn btn-green ml-auto"
             type="button"
             title="Upload package"
-            :disable="isUploading"
+            :disable="isUploading || this.file == null"
             @click="upload()"
           >
             upload
@@ -85,8 +64,6 @@
 export default {
   data () {
     return {
-      username: 'TestUser',
-      password: 'SomePassword',
       isUploading: false,
       packageFile: null,
       error: null,
@@ -120,21 +97,10 @@ export default {
         this.error = 'Please select a package file you want to upload!';
         return;
       }
-      if (!this.username) {
-        this.error = 'Please enter a username!';
-        return;
-      }
-      if (!this.password) {
-        this.error = 'Please enter a password!';
-        return;
-      }
       this.error = null;
       try {
         this.isUploading = true;
-        await this.$api.uploadPackage(
-          this.packageFile,
-          { username: this.username, password: this.password }
-        );
+        await this.$api.uploadPackage(this.packageFile);
         this.successMessage = `Successfully uploaded "${this.packageFile.name}".`;
         this.packageFile = null;
       } catch (error) {
