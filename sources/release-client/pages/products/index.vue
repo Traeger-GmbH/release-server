@@ -1,5 +1,5 @@
 <template>
-  <Page title="Explore" backLink="/">
+  <Page title="Explore" back-link="/">
     <ProductList
       class="mx-auto"
       :products="products"

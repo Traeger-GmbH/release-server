@@ -1,9 +1,11 @@
 <template>
-  <Page title="Maintain" backLink="/">
+  <Page title="Maintain" back-link="/">
     <UiCard title="Statistics">
       <div class="flex flex-wrap gap-4">
         <div>
-          <div class="text-xl font-semibold mb-2">Disk Usage</div>
+          <div class="text-xl font-semibold mb-2">
+            Disk Usage
+          </div>
           <table class="table-auto">
             <tr>
               <td class="font-semibold">
@@ -35,7 +37,9 @@
           </table>
         </div>
         <div>
-          <div class="text-xl font-semibold mb-2">Artifacts</div>
+          <div class="text-xl font-semibold mb-2">
+            Artifacts
+          </div>
           <table class="table-auto">
             <tr>
               <td class="font-semibold">

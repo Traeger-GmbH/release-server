@@ -1,5 +1,5 @@
 <template>
-  <Page :title="product.identifier" backLink="/products">
+  <Page :title="product.identifier" back-link="/products">
     <div class="flex gap-2">
       <div class="flex flex-col gap-2 w-1/3">
         <UiCard
@@ -16,7 +16,10 @@
         </UiCard>
       </div>
       <div class="flex flex-col gap-2 w-2/3">
-        <UiPane class="bg-white" v-if="hasSelection">
+        <UiPane
+          v-if="hasSelection"
+          class="bg-white"
+        >
           <ReleaseInformation :release="selectedRelease" />
         </UiPane>
       </div>
@@ -35,20 +38,21 @@ export default {
       selectedRelease: null
     };
   },
+  computed: {
+    hasSelection () {
+      return this.selectedRelease !== null;
+    }
+  },
+  beforeMount () {
+    this.select(this.product.releases[0]);
+  },
   methods: {
     select (release) {
-      console.log('select');
       this.selectedRelease = release;
-      console.log(this.selectedRelease);
     },
     isSelected (release) {
       return release === this.selectedRelease;
     }
   },
-  computed: {
-    hasSelection () {
-      return this.selectedRelease !== null;
-    }
-  }
 };
 </script>

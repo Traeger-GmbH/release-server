@@ -1,16 +1,11 @@
 <template>
   <div class="flex flex-col gap-2">
-    <!-- <UiPane class="bg-white w-1/4 flex flex-col gap-2"> -->
-      <!-- <h2 class="mb-2">Products</h2> -->
-      <LinkCard
-        :title="product"
-        :link="'/products/' + product"
-        v-for="product in products"
-        :key="product"
-      >
-        {{ product }}
-      </LinkCard>
-    <!-- </UiPane> -->
+    <LinkCard
+      v-for="product in products"
+      :key="product"
+      :title="product"
+      :link="'/products/' + product"
+    />
   </div>
 </template>
 

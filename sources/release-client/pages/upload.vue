@@ -17,8 +17,8 @@
           </label>
         </div>
         <UiPane
-          class="bg-white h-36 flex flex-col justify-center items-center gap-2"
           v-if="file"
+          class="bg-white h-36 flex flex-col justify-center items-center gap-2"
         >
           <div>
             {{ file.name }}
@@ -38,18 +38,18 @@
               Please enter your credentials:
             </p>
             <FormInput
-              title="Username"
               id="username"
+              v-model="username"
+              title="Username"
               name="username"
               type="text"
-              v-model="username"
             />
             <FormInput
-              title="Password"
               id="password"
+              v-model="password"
+              title="Password"
               name="username"
               type="password"
-              v-model="password"
             />
           </div>
         </UiPane>
@@ -70,8 +70,8 @@
             class="py-1 px-2 bg-green-500 text-white hover:bg-green-700 rounded"
             type="button"
             title="Upload package"
-            @click="upload()"
             :disable="isUploading"
+            @click="upload()"
           >
             upload
           </button>
