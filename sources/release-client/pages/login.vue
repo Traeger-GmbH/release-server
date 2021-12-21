@@ -38,9 +38,12 @@ export default {
     };
   },
   methods: {
-    login () {
-      this.$api.login(this.username, this.password);
-      this.$router.push({ path: '/' });
+    async login () {
+      await this.$api.login(this.username, this.password);
+      const path = this.$route.query.afterLogin ?? '/';
+      console.log('new path');
+      console.log(path);
+      this.$router.push({ path });
     }
   }
 };

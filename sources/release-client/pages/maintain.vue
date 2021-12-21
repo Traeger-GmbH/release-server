@@ -66,6 +66,7 @@
 
 <script>
 export default {
+  middleware: 'authentication',
   async asyncData ({ $api }) {
     const statistics = await $api.getStatistics();
     return { statistics };

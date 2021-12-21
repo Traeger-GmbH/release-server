@@ -17,7 +17,9 @@ class Api {
 
     this.getStatistics = async function () {
       console.log(this.axios.defaults);
-      const data = (await this.axios.get('/statistics')).data;
+      const data = (await this.axios.get('/statistics', {
+        auth: store.state.auth
+      })).data;
       return data;
     };
 
@@ -37,7 +39,6 @@ class Api {
 
     this.login = async function (username, password) {
       try {
-        console.log('Logging in...');
         await this.axios.get('/statistics', {
           auth: {
             username,
