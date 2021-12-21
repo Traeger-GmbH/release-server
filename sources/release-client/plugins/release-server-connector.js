@@ -1,3 +1,17 @@
+const getFileNameFromHeaders = function (headers) {
+  const contentDisposition = headers['content-disposition'];
+  const values = contentDisposition.replace(/\s+/g, '').split(';');
+  const filenameEntry = values.find((element) => {
+    const keyValuePair = element.split('=');
+    if (keyValuePair.length === 2 && keyValuePair[0] === 'filename') {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return filenameEntry.split('=')[1];
+};
+
 class Api {
   constructor ($axios, store) {
     this.axios = $axios.create({
@@ -59,6 +73,19 @@ class Api {
     this.logout = function () {
       store.commit('auth/logout');
       this.axios.defaults.auth = null;
+    };
+
+    this.createBackup = async function () {
+      const response = await this.axios.get(
+        '/backup',
+        {
+          auth: store.state.auth,
+          responseType: 'blob'
+        }
+      );
+      const blob = new Blob([response.data]);
+      const filename = getFileNameFromHeaders(response.headers);
+      return { blob, filename };
     };
   }
 }

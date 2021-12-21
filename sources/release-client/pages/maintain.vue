@@ -1,5 +1,7 @@
 <template>
   <Page title="Maintain" back-link="/">
+    <div class="flex flex-col gap-4">
+
     <UiCard title="Statistics">
       <div class="flex flex-wrap gap-4">
         <div>
@@ -61,6 +63,17 @@
         </div>
       </div>
     </UiCard>
+    <UiCard
+      class="max-w-sm h-32 cursor-pointer"
+      title="Create Backup"
+      @click.native="createBackup()"
+    />
+    <a
+      class="hidden"
+      id="downloadBackup"
+      ref="download"
+    />
+    </div>
   </Page>
 </template>
 
@@ -69,6 +82,17 @@ export default {
   async asyncData ({ $api }) {
     const statistics = await $api.getStatistics();
     return { statistics };
+  },
+  methods: {
+    async createBackup () {
+      const result = await this.$api.createBackup();
+      const url = URL.createObjectURL(result.blob);
+      const a = this.$refs.download;
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   }
 };
 </script>
