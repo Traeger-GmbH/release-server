@@ -1,8 +1,6 @@
-import axios from 'axios';
-
 class Api {
-  constructor ($axios) {
-    this.axios = axios.create({
+  constructor ($axios, store) {
+    this.axios = $axios.create({
       baseURL: '/artifacts/'
     });
 
@@ -18,6 +16,7 @@ class Api {
     };
 
     this.getStatistics = async function () {
+      console.log(this.axios.defaults);
       const data = (await this.axios.get('/statistics')).data;
       return data;
     };
@@ -35,9 +34,34 @@ class Api {
         { auth: { username, password } }
       );
     };
+
+    this.login = async function (username, password) {
+      try {
+        console.log('Logging in...');
+        await this.axios.get('/statistics', {
+          auth: {
+            username,
+            password
+          }
+        });
+        store.commit('auth/login', { username, password });
+        this.axios.defaults.auth = {
+          username,
+          password
+        };
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    };
+
+    this.logout = function () {
+      store.commit('auth/logout');
+      this.axios.defaults.auth = null;
+    };
   }
 }
 
-export default (context, inject) => {
-  inject('api', new Api(context.$axios));
+export default ({ $axios, store }, inject) => {
+  inject('api', new Api($axios, store));
 };
