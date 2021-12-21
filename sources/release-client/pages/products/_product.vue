@@ -12,9 +12,17 @@
           ]"
           @click="select(release)"
         >
-          <span>
+          <div class="flex items-center">
             v{{ release.version }}
-          </span>
+            <div
+              class="ml-2 w-2 h-2 rounded-xl"
+              :class="release.isPreviewRelease ? 'bg-blue-500' : ''"
+            />
+            <div
+              class="ml-2 w-2 h-2 rounded-xl"
+              :class="release.isSecurityPatch ? 'bg-red-500' : ''"
+            />
+          </div>
           <span>
             [{{ new Date(release.releaseDate).toLocaleDateString() }}]
           </span>
