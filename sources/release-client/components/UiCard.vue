@@ -4,7 +4,7 @@
       <div class="w-full text-xl mb-3 pb-2 border-b-2 border-gray-700 border-green-500 text-green-500 font-semibold">
         {{ title }}
       </div>
-      <div class="w-full text-normal text-gray-700 group-hover:text-gray-400">
+      <div class="w-full text-normal text-gray-700">
         <slot />
       </div>
     </div>
