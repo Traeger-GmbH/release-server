@@ -71,6 +71,13 @@ export default {
   },
 
   tailwindcss: {
-    cssPath: '~/assets/css/tailwind.css'
+    cssPath: '~/assets/css/tailwind.css',
+    config: {
+      variants: {
+        extend: {
+          opacity: ['disabled']
+        }
+      }
+    }
   }
 }

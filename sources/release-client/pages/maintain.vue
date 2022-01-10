@@ -144,6 +144,7 @@
               <button
                 class="btn btn-green w-1/3"
                 @click="restoreBackup()"
+                :disabled="!this.restoreFile"
               >
                 Restore
               </button>

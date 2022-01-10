@@ -49,7 +49,7 @@
             class="btn btn-green ml-auto"
             type="button"
             title="Upload package"
-            :disable="isUploading || this.file == null"
+            :disabled="isUploading || this.file == null"
             @click="upload()"
           >
             upload
