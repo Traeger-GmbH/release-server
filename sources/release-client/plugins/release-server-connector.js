@@ -51,6 +51,20 @@ class Api {
       );
     };
 
+    this.restoreBackup = async function (backupToRestore) {
+      const formData = new FormData();
+      formData.append(
+        'backupFile',
+        backupToRestore,
+        { type: 'application/octet-stream' }
+      );
+      await this.axios.put(
+        '/restore',
+        formData,
+        { auth: store.state.auth }
+      );
+    };
+
     this.login = async function (username, password) {
       try {
         await this.axios.get('/statistics', {
