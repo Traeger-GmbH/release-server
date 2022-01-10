@@ -2,7 +2,7 @@
   <Page title="Maintain" back-link="/">
     <div class="flex flex-col gap-4">
 
-      <UiCard title="Statistics">
+      <UiCard title="Statistics" v-if="statistics">
         <div class="flex flex-wrap gap-4">
           <div>
             <div class="text-xl font-semibold mb-2">
@@ -90,64 +90,114 @@
             :showing="showRestoreDialog"
             @close="closeRestoreDialog()"
           >
-            <div
-              v-if="!restoreFile"
-              class="p-12 bg-white h-36 text-center border-2 border-dashed border-gray-300 rounded"
-              @dragover="dragover"
-              @dragleave="dragleave"
-              @drop="drop"
-            >
-              <label for="assetsFieldHandle" class="block cursor-pointer">
-                <div>
-                  Drop your backup file here
-                  or <span class="underline">click here</span> to open the file browser.
-                </div>
-              </label>
-            </div>
-            <UiPane
-              v-if="restoreFile"
-              class="bg-white h-36 flex flex-col justify-center items-center gap-2"
-            >
-              <div>
-                {{ restoreFile.name }}
-              </div>
-              <button
-                class="btn btn-green"
-                type="button"
-                title="Remove file"
-                @click="restoreFile = null"
+            <div>
+              <form-wizard
+                ref="restoreWizard"
+                title="Restore backup"
+                subtitle="Restore a previously created backup."
+                color="#10b981"
               >
-                remove
-              </button>
-            </UiPane>
-            <UiPane
-              v-if="error"
-              class="w-full flex justify-center text-red-500 font-bold"
-            >
-              {{ error }}
-            </UiPane>
-            <div
-              v-if="restoreSuccessMessage"
-              class="w-full flex justify-center text-green-500 font-bold"
-            >
-              {{ restoreSuccessMessage }}
-            </div>
-            <div
-              class="mt-4 flex justify-between"
-            >
-              <button
-                class="btn btn-green-outline w-1/3"
-                @click="closeRestoreDialog()"
-              >
-                Cancel
-              </button>
-              <button
-                class="btn btn-green w-1/3"
-                @click="restoreBackup()"
-                :disabled="!this.restoreFile"
-              >
-                Restore
-              </button>
+                <tab-content
+                  title="Choose backup file"
+                >
+                  <div
+                    v-if="!restoreFile"
+                    class="p-12 bg-white h-36 text-center border-2 border-dashed border-gray-300 rounded"
+                    @dragover="dragover"
+                    @dragleave="dragleave"
+                    @drop="drop"
+                  >
+                    <label for="assetsFieldHandle" class="block cursor-pointer">
+                      <div>
+                        Drop your backup file here
+                        or <span class="underline">click here</span> to open the file browser.
+                      </div>
+                    </label>
+                  </div>
+                  <div
+                    v-if="restoreFile"
+                    class="bg-white h-36 flex flex-col justify-center items-center gap-2"
+                  >
+                    <div>
+                      {{ restoreFile.name }}
+                    </div>
+                    <button
+                      class="btn btn-green-outline"
+                      type="button"
+                      title="Remove file"
+                      @click="restoreFile = null"
+                    >
+                      remove
+                    </button>
+                  </div>
+                </tab-content>
+                <tab-content title="Restore">
+                  <div
+                    class="flex justify-center"
+                  >
+                    <template
+                      v-if="isUploading"
+                    >
+                      <div>
+                        <VueSpinner size="medium" line-fg-color="#10b981" />
+                        Restoring...
+                      </div>
+                    </template>
+                    <template
+                      v-else-if="error"
+                    >
+                      <span
+                        class="text-red-500 font-semibold"
+                      >
+                        {{ error }}
+                      </span>
+                    </template>
+                    <template
+                      v-else
+                    >
+                      <span
+                        class="text-green-500 font-semibold"
+                      >
+                        {{ restoreSuccessMessage }}
+                      </span>
+                    </template>
+                  </div>
+                </tab-content>
+                <template slot="footer" slot-scope="props">
+                  <div class="flex justify-around">
+                    <button
+                      v-if="!props.isLastStep"
+                      @click="closeRestoreDialog()"
+                      class="btn btn-green-outline"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      v-else-if="error"
+                      @click="props.prevTab()"
+                      class="btn btn-green-outline"
+                    >
+                      Back
+                    </button>
+                    <button
+                      v-if="!props.isLastStep"
+                      @click="restoreBackup() && props.nextTab()"
+                      class="btn btn-green"
+                      :disabled="!restoreFile"
+                    >
+                      Restore
+                    </button>
+                    <button
+                      v-if="props.isLastStep"
+                      @click="closeRestoreDialog()"
+                      class="btn btn-green"
+                      :disabled="error"
+                    >
+                      Finish
+                    </button>
+                  </div>
+                </template>
+              </form-wizard>
             </div>
           </CardModal>
         </div>
@@ -157,14 +207,35 @@
 </template>
 
 <script>
+import { FormWizard, TabContent } from 'vue-form-wizard';
+import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+import VueSpinner from 'vue-simple-spinner';
+
 export default {
+  components: {
+    FormWizard,
+    TabContent,
+    VueSpinner
+  },
   data () {
     return {
       showRestoreDialog: false,
       restoreFile: null,
       isUploading: false,
       restoreSuccessMessage: null,
-      error: null
+      error: null,
+      steps: [
+        {
+          name: 'choose',
+          title: 'Backup file',
+          subtitle: 'Choose the backup file to restore'
+        },
+        {
+          name: 'upload',
+          title: 'Backup file',
+          subtitle: 'Choose the backup file to restore'
+        },
+      ]
     };
   },
   async asyncData ({ $api }) {
@@ -186,6 +257,10 @@ export default {
     },
     closeRestoreDialog () {
       this.showRestoreDialog = false;
+      this.resetRestoreFile();
+    },
+    resetRestoreFile () {
+      this.restoreFile = null;
     },
     async restoreBackup () {
       this.restoreSuccessMessage = null;
@@ -197,18 +272,21 @@ export default {
       try {
         this.isUploading = true;
         await this.$api.restoreBackup(this.restoreFile);
-        this.restoreSuccessMessage = `Successfully uploaded "${this.restoreFile.name}".`;
+        this.restoreSuccessMessage = `Successfully restored "${this.restoreFile.name}".`;
         this.restoreFile = null;
       } catch (error) {
         let message;
-        if (error.response) {
+        if (error.response && error.response.data) {
           const responseData = error.response.data;
           // build error message:
-          message = responseData.title;
+          if (responseData.title) {
+            message = responseData.title;
+          }
           if (responseData.detail) {
             message += `: ${responseData.detail}`;
           }
-        } else {
+        }
+        if (!message) {
           message = error;
         }
         this.error = message;
@@ -235,7 +313,7 @@ export default {
       // Clean up
       event.currentTarget.classList.add('bg-gray-100');
       event.currentTarget.classList.remove('bg-green-300');
-    },
+    }
   }
 };
 </script>
