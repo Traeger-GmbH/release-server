@@ -67,7 +67,7 @@
         title="Backup"
       >
         <div
-          class="flex flex-wrap gap-2 justify-start"
+          class="flex flex-wrap gap-2 justify-around"
         >
           <button
             class="btn btn-green w-48"
