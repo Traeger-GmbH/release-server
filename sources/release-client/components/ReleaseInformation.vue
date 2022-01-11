@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex w-full">
+    <div class="flex w-full items-center">
       <div class="px-2 text-2xl font-semibold tabular-nums">
         v{{ release.version }} ({{ new Date(release.releaseDate).toLocaleDateString() }})
       </div>
@@ -16,6 +16,12 @@
       >
         security patch
       </div>
+      <button
+        class="btn btn-red-outline ml-auto"
+        @click="openDeleteDialog"
+      >
+        delete release
+      </button>
     </div>
     <div class="w-full">
       <div class="p-2 my-1 text-xl">
@@ -107,6 +113,13 @@
         </UiPane>
       </div>
     </div>
+    <DeleteReleaseDialog
+      :productIdentifier="productIdentifier"
+      :version="release.version"
+      :showing="showDeleteDialog"
+      @close="closeDeleteDialog"
+      @deleted="onDeleted"
+    />
   </div>
 </template>
 
@@ -116,6 +129,27 @@ export default {
     release: {
       type: Object,
       required: true
+    },
+    productIdentifier: {
+      type: String,
+      required: true
+    }
+  },
+  data () {
+    return {
+      confirmVersionName: null,
+      showDeleteDialog: false
+    };
+  },
+  methods: {
+    openDeleteDialog () {
+      this.showDeleteDialog = true;
+    },
+    closeDeleteDialog () {
+      this.showDeleteDialog = false;
+    },
+    onDeleted () {
+      this.$emit('deleted');
     }
   }
 };

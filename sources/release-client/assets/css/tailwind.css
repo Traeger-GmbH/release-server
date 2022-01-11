@@ -55,6 +55,10 @@
   .btn-green-outline {
     @apply text-green-500 border border-green-500 hover:bg-green-700 hover:border-green-700 hover:text-white;
   }
+
+  .btn-red-outline {
+    @apply text-red-500 border border-red-500 hover:bg-red-700 hover:border-red-700 hover:text-white;
+  }
 }
 
 .page-enter-active,

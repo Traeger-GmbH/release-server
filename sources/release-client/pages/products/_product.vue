@@ -33,7 +33,11 @@
           v-if="hasSelection"
           class="bg-white"
         >
-          <ReleaseInformation :release="selectedRelease" />
+          <ReleaseInformation
+            :release="selectedRelease"
+            :productIdentifier="product.identifier"
+            @deleted="removeSelectedRelease()"
+          />
         </UiPane>
       </div>
     </div>
@@ -65,6 +69,12 @@ export default {
     },
     isSelected (release) {
       return release === this.selectedRelease;
+    },
+    removeSelectedRelease () {
+      const index = this.product.releases.findIndex(element => element === this.selectedRelease);
+      this.selectedRelease = null;
+      this.product.releases.splice(index, 1);
+      this.select(this.product.releases[0]);
     }
   },
 };

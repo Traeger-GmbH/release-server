@@ -51,6 +51,21 @@ class Api {
       );
     };
 
+    this.deleteSpecificArtifact = async function (product, platform, version) {
+      await this.axios.delete(
+        `/${product}/${platform}/${version}`,
+        { auth: store.state.auth }
+      );
+    };
+
+    this.deleteSpecificRelease = async function (product, version) {
+      const data = (await this.axios.get(`${product}/info`, { params: { version } })).data;
+      const platforms = data.releases[0].platforms;
+      for (const platform of platforms) {
+        await this.deleteSpecificArtifact(product, platform, version);
+      }
+    };
+
     this.restoreBackup = async function (backupToRestore) {
       const formData = new FormData();
       formData.append(
