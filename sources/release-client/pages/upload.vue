@@ -1,20 +1,20 @@
 <template>
   <Page title="Upload" back-link="/">
-    <div class="flex flex-row w-full gap-2">
-      <div class="flex w-full flex-col gap-2">
+    <UiCard title="Upload package" class="flex flex-row w-full gap-2">
+      <div class="flex w-full flex-col gap-2 max-w-2xl mx-auto">
         <FileSelector v-model="packageFile" accept=".zip" />
-        <UiPane
-          v-if="error"
-          class="w-full flex justify-center text-red-500 font-bold"
-        >
-          {{ error }}
-        </UiPane>
         <div class="w-full flex items-center">
           <div
             v-if="successMessage"
             class="w-full flex justify-center text-green-500 font-bold"
           >
             {{ successMessage }}
+          </div>
+          <div
+            v-if="error"
+            class="w-full flex justify-center text-red-500 font-bold"
+          >
+            {{ error }}
           </div>
           <button
             class="btn btn-green ml-auto"
@@ -27,7 +27,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </UiCard>
   </Page>
 </template>
 
