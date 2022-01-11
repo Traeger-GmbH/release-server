@@ -82,7 +82,7 @@ namespace ReleaseServer.WebApi
                     return NotFoundResponseFactory.Create(
                     HttpContext,
                     "Resource not found.",
-                    "There is no release of \"{product}\" that matches the specified filter criteria.");
+                    $"There is no release of \"{product}\" that matches the specified filter criteria.");
                 }
 
                 var releases = ReleaseInformationMapper.Map(deployments).ToList();
