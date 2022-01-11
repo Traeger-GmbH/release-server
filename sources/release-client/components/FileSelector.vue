@@ -62,6 +62,7 @@ export default {
     },
     remove () {
       this.file = null;
+      this.$emit('input', this.file);
     },
     dragover (event) {
       event.preventDefault();
