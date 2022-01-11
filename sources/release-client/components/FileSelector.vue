@@ -4,7 +4,7 @@
     id="app"
   >
     <div
-      class="p-12 bg-gray-100 border border-gray-300 w-full"
+      class="p-12 bg-white h-36 text-center rounded w-full border-2 border-dashed border-gray-300"
       @dragover="dragover"
       @dragleave="dragleave"
       @drop="drop"
@@ -27,12 +27,14 @@
         </div>
       </label>
       <div v-if="file">
-        {{ file.name }} <button
+        {{ file.name }}
+        <button
+          class="bg-green-500 text-white px-2 py-1 inline-block rounded"
           type="button"
           @click="remove"
           title="Remove file"
         >
-          x
+          ×
         </button>
       </div>
     </div>
@@ -76,8 +78,7 @@ export default {
     },
     drop (event) {
       event.preventDefault();
-      this.$refs.file.files = [];
-      this.$refs.file.files[0] = event.dataTransfer.files[0];
+      this.$refs.file.files = event.dataTransfer.files;
       this.onChange(); // Trigger the onChange event manually
       // Clean up
       event.currentTarget.classList.add('bg-gray-100');
