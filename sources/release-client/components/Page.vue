@@ -5,14 +5,12 @@
       <NuxtLink
         v-if="backLink"
         :to="backLink"
-        class="btn btn-green"
+        class="btn btn-green flex justify-center"
       >
         go back
       </NuxtLink>
     </div>
-    <UiPane class="">
-      <slot />
-    </UiPane>
+    <slot />
   </div>
 </template>
 
