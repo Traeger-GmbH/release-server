@@ -100,36 +100,7 @@
                 <tab-content
                   title="Choose backup file"
                 >
-                  <div
-                    v-if="!restoreFile"
-                    class="p-12 bg-white h-36 text-center border-2 border-dashed border-gray-300 rounded"
-                    @dragover="dragover"
-                    @dragleave="dragleave"
-                    @drop="drop"
-                  >
-                    <label for="assetsFieldHandle" class="block cursor-pointer">
-                      <div>
-                        Drop your backup file here
-                        or <span class="underline">click here</span> to open the file browser.
-                      </div>
-                    </label>
-                  </div>
-                  <div
-                    v-if="restoreFile"
-                    class="bg-white h-36 flex flex-col justify-center items-center gap-2"
-                  >
-                    <div>
-                      {{ restoreFile.name }}
-                    </div>
-                    <button
-                      class="btn btn-green-outline"
-                      type="button"
-                      title="Remove file"
-                      @click="restoreFile = null"
-                    >
-                      remove
-                    </button>
-                  </div>
+                  <FileSelector v-model="restoreFile"  accept=".zip" />
                 </tab-content>
                 <tab-content title="Restore">
                   <div
@@ -293,26 +264,6 @@ export default {
       } finally {
         this.isUploading = false;
       }
-    },
-    dragover (event) {
-      event.preventDefault();
-      // Add some visual fluff to show the user can drop its files
-      if (!event.currentTarget.classList.contains('bg-green-300')) {
-        event.currentTarget.classList.remove('bg-gray-100');
-        event.currentTarget.classList.add('bg-green-300');
-      }
-    },
-    dragleave (event) {
-      // Clean up
-      event.currentTarget.classList.add('bg-gray-100');
-      event.currentTarget.classList.remove('bg-green-300');
-    },
-    drop (event) {
-      event.preventDefault();
-      this.restoreFile = event.dataTransfer.files[0];
-      // Clean up
-      event.currentTarget.classList.add('bg-gray-100');
-      event.currentTarget.classList.remove('bg-green-300');
     }
   }
 };
