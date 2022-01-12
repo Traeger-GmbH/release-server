@@ -48,12 +48,20 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    value: {
+      type: File
     }
   },
   data () {
     return {
       file: null,
     };
+  },
+  watch: {
+    value (value) {
+      this.file = value;
+    }
   },
   methods: {
     onChange () {
