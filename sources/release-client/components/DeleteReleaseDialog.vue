@@ -81,7 +81,7 @@
             v-if="props.isLastStep"
             @click="onClose()"
             class="btn btn-green"
-            :disabled="error"
+            :disabled="isDeleting || error"
           >
             Finish
           </button>
