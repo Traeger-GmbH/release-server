@@ -9,6 +9,9 @@
       >
         go back
       </NuxtLink>
+      <div class="flex w-full">
+        <slot name="header"></slot>
+      </div>
     </div>
     <slot />
   </div>

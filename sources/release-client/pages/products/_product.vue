@@ -1,5 +1,12 @@
 <template>
   <Page :title="product.identifier" back-link="/products">
+    <!-- <template v-slot:header>
+      <button
+        class="btn btn-red-outline ml-auto"
+      >
+        delete product
+      </button>
+    </template> -->
     <div class="flex gap-2">
       <UiPane class="flex flex-col gap-2 w-1/3 overflow-y-auto">
         <div
