@@ -37,17 +37,20 @@ class Api {
       return data;
     };
 
-    this.uploadPackage = async function (packageToUpload) {
+    this.uploadPackage = async function (packageToUpload, force = false) {
       const formData = new FormData();
       formData.append(
         'package',
         packageToUpload,
-        { type: 'application/json' }
+        { type: 'application/json' },
       );
       await this.axios.put(
         '/',
         formData,
-        { auth: store.state.auth }
+        {
+          auth: store.state.auth,
+          params: { force }
+        }
       );
     };
 

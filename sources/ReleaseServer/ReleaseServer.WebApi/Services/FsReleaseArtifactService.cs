@@ -53,47 +53,57 @@ namespace ReleaseServer.WebApi
 
         #region ---------- Public methods (by IReleaseArtifactService) ----------
 
-        public async Task<ValidationResult> StorePackage(IFormFile payload)
+        public async Task<ServiceActionResult> StorePackage(IFormFile payload, bool force = false)
         {
             logger.LogDebug("Convert the uploaded payload to package");
             using var package = new Package(payload);
-
+            ServiceActionResult result;
+            
             if (package.ValidationResult.IsValid) {
-                try {
-                    await directoryLock.WaitAsync();
+                var existingPackage = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier);
 
-                    foreach (var (platform, deployment) in package.Deployments) {
-                        var metaInformation = new DeploymentMetaInformation {
-                            ArtifactFileName = deployment.Name,
-                            ReleaseNotesFileName = "releaseNotes.json"
-                        };
+                if (!existingPackage.IsNullOrEmpty() && !force) {
+                    var errorMessage = $"This package ({package.Identifier}-v{package.Version}) already exists." +
+                        $"Set the parameter \"force = true\" in order to overwrite the existing package.";
+                    result = new ServiceActionResult(System.Net.HttpStatusCode.Conflict, new string[] { errorMessage });
+                } else {
+                    try {
+                        await directoryLock.WaitAsync();
 
-                        using var artifact = new ReleaseArtifact() {
-                            DeploymentInformation = new DeploymentInformation {
-                                Identifier = package.Identifier,
-                                Version = package.Version,
-                                ReleaseNotes = package.ReleaseNotes,
-                                Architecture = platform.Architecture,
-                                Os = platform.OperatingSystem
-                            },
-                            DeploymentMetaInformation = metaInformation,
-                            Content = deployment.Open()
-                        };
+                        foreach (var (platform, deployment) in package.Deployments) {
+                            var metaInformation = new DeploymentMetaInformation {
+                                ArtifactFileName = deployment.Name,
+                                ReleaseNotesFileName = "releaseNotes.json"
+                            };
 
-                        await Task.Run(() => fsReleaseArtifactRepository.StoreArtifact(artifact));
+                            using var artifact = new ReleaseArtifact() {
+                                DeploymentInformation = new DeploymentInformation {
+                                    Identifier = package.Identifier,
+                                    Version = package.Version,
+                                    ReleaseNotes = package.ReleaseNotes,
+                                    Architecture = platform.Architecture,
+                                    Os = platform.OperatingSystem
+                                },
+                                DeploymentMetaInformation = metaInformation,
+                                Content = deployment.Open()
+                            };
+                        
+                            this.fsReleaseArtifactRepository.StoreArtifact(artifact);
+                        }
                     }
-                }
-                finally {
-                    directoryLock.Release();
+                    finally {
+                        directoryLock.Release();
+                    }
+                    result = new ServiceActionResult(System.Net.HttpStatusCode.OK);
                 }
             }
             else {
                 foreach (var error in package.ValidationResult.ValidationErrors) {
                     logger.LogError(error);
                 }
-
+                result = new ServiceActionResult(System.Net.HttpStatusCode.BadRequest, package.ValidationResult.ValidationErrors);
             }
-            return package.ValidationResult;
+            return result;
         }
 
         public async Task StoreArtifact(string productName, string os, string architecture, string version,

@@ -45,7 +45,8 @@ namespace ReleaseServer.WebApi
         /// Stores the provided payload asynchronously as package.
         /// </summary>
         /// <param name="payload">The provided payload with the package in form of an <see cref="IFormFile"/>.</param>
-        Task<ValidationResult> StorePackage(IFormFile payload);
+        /// <param name="force">Specifies if a package shall be overwritten when it already exists.</param>
+        Task<ServiceActionResult> StorePackage(IFormFile payload, bool force = false);
 
         /// <summary>
         /// Retrieves the product information of specific product name (asynchronously).

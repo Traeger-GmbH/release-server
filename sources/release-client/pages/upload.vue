@@ -4,17 +4,11 @@
       <div class="flex w-full flex-col gap-2 max-w-2xl mx-auto">
         <FileSelector v-model="packageFile" accept=".zip" />
         <div class="w-full flex items-center">
-          <div
-            v-if="successMessage"
-            class="w-full flex justify-center text-green-500 font-bold"
-          >
-            {{ successMessage }}
-          </div>
-          <div
-            v-if="error"
-            class="w-full flex justify-center text-red-500 font-bold"
-          >
-            {{ error }}
+          <div class="flex flex-row items-center gap-2">
+            <input type="checkbox" id="forceOverwrite" v-model="forceOverwrite" />
+            <label for="forceOverwrite">
+              overwrite existing package
+            </label>
           </div>
           <button
             class="btn btn-green ml-auto"
@@ -25,6 +19,18 @@
           >
             upload
           </button>
+        </div>
+        <div
+          v-if="successMessage"
+          class="w-full flex justify-center text-green-500 font-bold"
+        >
+          {{ successMessage }}
+        </div>
+        <div
+          v-if="error"
+          class="w-full flex justify-center text-red-500 font-bold"
+        >
+          {{ error }}
         </div>
       </div>
     </UiCard>
@@ -38,7 +44,8 @@ export default {
       isUploading: false,
       packageFile: null,
       error: null,
-      successMessage: null
+      successMessage: null,
+      forceOverwrite: false
     };
   },
   methods: {
@@ -51,7 +58,7 @@ export default {
       this.error = null;
       try {
         this.isUploading = true;
-        await this.$api.uploadPackage(this.packageFile);
+        await this.$api.uploadPackage(this.packageFile, this.forceOverwrite);
         this.successMessage = `Successfully uploaded "${this.packageFile.name}".`;
         this.packageFile = null;
       } catch (error) {

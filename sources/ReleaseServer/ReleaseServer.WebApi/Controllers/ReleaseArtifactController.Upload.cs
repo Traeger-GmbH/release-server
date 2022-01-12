@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------------------
 
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -80,6 +81,7 @@ namespace ReleaseServer.WebApi
         /// Uploads a specific release artifact.
         /// </summary>
         /// <param name="package"></param>
+        /// <param name="force"></param>
         /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
         /// if the payload is invalid.</returns>
         /// <response code="200">Upload of the artifact was successful.</response>
@@ -89,7 +91,7 @@ namespace ReleaseServer.WebApi
         [HttpPut("")]
         //Max. 1024 MB
         [RequestSizeLimit(1073741824)]
-        public async Task<IActionResult> UploadPackage([Required] IFormFile package)
+        public async Task<IActionResult> UploadPackage([Required] IFormFile package, [FromQuery] bool force = false)
         {
             if (package == null) {
                 return BadRequestResponseFactory.Create(
@@ -104,20 +106,28 @@ namespace ReleaseServer.WebApi
                     "The required upload body is not a .zip file.");
             }
             else {
-                var validationResult = await releaseArtifactService.StorePackage(package);
+                var result = await this.releaseArtifactService.StorePackage(package, force);
 
-                if (validationResult.IsValid) {
+                if (result.Status == HttpStatusCode.OK) {
                     return Ok();
                 }
                 else {
+                    string title;
+                    if (result.Status == HttpStatusCode.Conflict) {
+                        title = "Conflict";
+                    } else {
+                        title = "Bad request";
+                    }
+
                     var builder = new StringBuilder();
-                    foreach (var error in validationResult.ValidationErrors) {
+                    foreach (var error in result.Errors) {
                         builder.Append(error);
                         builder.Append(' ');
                     }
+
                     return BadRequestResponseFactory.Create(
                         HttpContext,
-                        "Bad request",
+                        title,
                         builder.ToString());
                 }
             }
