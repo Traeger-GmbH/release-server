@@ -35,12 +35,28 @@
         message="Loading products..."
         :show="isLoading"
       />
-      <div
-        v-if="!isLoading"
-        class="text-xl"
+      <template
+        v-if="!isLoading && error"
       >
-        No products found.
-      </div>
+        <div
+          v-if="!isLoading && error.statusCode === 404"
+          class="text-xl"
+        >
+          No products found.
+        </div>
+        <div
+          v-else-if="!isLoading"
+          class="text-xl flex flex-col gap-4"
+        >
+          {{ error }}
+          <button
+            class="btn btn-green self-center"
+            @click="$fetch()"
+          >
+            retry
+          </button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -52,13 +68,16 @@ export default {
       selectedProduct: null,
       products: null,
       isLoading: false,
-      filter: null
+      filter: null,
+      error: null
     };
   },
   async fetch () {
     try {
       this.isLoading = true;
       this.products = await this.$api.getProductList();
+    } catch (error) {
+      this.error = error;
     } finally {
       this.isLoading = false;
     }
