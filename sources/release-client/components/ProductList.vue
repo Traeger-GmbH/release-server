@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-2 min-h-0">
+  <div class="flex flex-col gap-2 min-h-0 flex-grow">
     <div
       v-if="products && products.length > 0"
       class="flex-shrink flex-grow flex flex-row min-h-0"
@@ -15,15 +15,15 @@
     </div>
     <div
       v-else
+      class="flex justify-center items-center flex-grow"
     >
+      <LoadingSpinner
+        message="Loading products..."
+        :show="isLoading"
+      />
       <div
-        v-if="isLoading"
-      >
-        <VueSpinner />
-        loading products...
-      </div>
-      <div
-        v-else
+        v-if="!isLoading"
+        class="text-xl"
       >
         No products found.
       </div>
@@ -32,15 +32,7 @@
 </template>
 
 <script>
-import VueSpinner from 'vue-simple-spinner';
-function sleep (milliseconds) {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
-}
-
 export default {
-  components: {
-    VueSpinner
-  },
   data () {
     return {
       selectedProduct: null,
@@ -49,26 +41,9 @@ export default {
     };
   },
   async fetch () {
-    console.log('fetch()...');
     try {
       this.isLoading = true;
-      while (true) {
-        try {
-          console.log('fetching products...');
-          this.products = await this.$api.getProductList();
-          return;
-        } catch (error) {
-          console.log('catching error...');
-          console.log(error.response.status);
-          if (error.response.status === 504) {
-            console.log('waiting to retry...');
-            sleep(2000);
-            console.log('retrying...');
-          } else {
-            throw error;
-          }
-        }
-      }
+      this.products = await this.$api.getProductList();
     } finally {
       this.isLoading = false;
     }
