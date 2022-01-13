@@ -5,16 +5,16 @@
       class="flex-shrink flex-grow flex flex-col min-h-0"
     >
       <div class="flex flex-col w-1/3 flex-grow">
-        <div class="pb-2 flex flex-row items-center gap-2 font-semibold">
-          <input
-            id="filter"
-            class="bg-gray-100 rounded px-3 py-2 flex-grow"
-            type="text"
-            v-model="filter"
-            placeholder="Filter products"
-          />
-        </div>
         <UiPane class="overflow-auto min-h-0 gap-2 flex flex-col flex-grow">
+          <div class="rounded flex flex-row items-center gap-2 font-semibold -mt-4 -mx-4 px-4 py-4 bg-gray-500 mb-2">
+            <input
+              id="filter"
+              class="rounded px-3 py-2 flex-grow focus:outline-none focus:ring ring-green-500"
+              type="text"
+              v-model="filter"
+              placeholder="Filter products"
+            />
+          </div>
           <NuxtLink
             v-for="product in filteredProducts"
             :key="product"
