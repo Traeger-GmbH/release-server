@@ -1,6 +1,6 @@
 <template>
-  <div class="">
-    <div class="flex items-center mb-5">
+  <div class="flex flex-col flex-grow flex-shrink min-h-0">
+    <div class="flex items-center flex-grow-0 flex-shrink py-5">
       <h1 class="mx-5">{{title}}</h1>
       <NuxtLink
         v-if="backLink"
@@ -13,7 +13,9 @@
         <slot name="header"></slot>
       </div>
     </div>
-    <slot />
+    <div class="flex-grow flex-shrink min-h-0 flex flex-col">
+      <slot />
+    </div>
   </div>
 </template>
 

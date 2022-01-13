@@ -7,7 +7,7 @@
         delete product
       </button>
     </template> -->
-    <div class="flex gap-2">
+    <div class="flex flex-grow flex-shrink gap-2 min-h-0 py-2">
       <UiPane class="flex flex-col gap-2 w-1/3 overflow-y-auto">
         <div
           v-for="release in product.releases"
@@ -35,18 +35,16 @@
           </span>
         </div>
       </UiPane>
-      <div class="flex flex-col gap-2 w-2/3">
-        <UiPane
-          v-if="hasSelection"
-          class="bg-white"
-        >
-          <ReleaseInformation
-            :release="selectedRelease"
-            :productIdentifier="product.identifier"
-            @deleted="removeSelectedRelease()"
-          />
-        </UiPane>
-      </div>
+      <UiPane
+        v-if="hasSelection"
+        class="bg-white flex flex-col overflow-y-auto gap-2 w-2/3"
+      >
+        <ReleaseInformation
+          :release="selectedRelease"
+          :productIdentifier="product.identifier"
+          @deleted="removeSelectedRelease()"
+        />
+      </UiPane>
     </div>
   </Page>
 </template>

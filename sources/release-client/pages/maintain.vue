@@ -1,6 +1,6 @@
 <template>
   <Page title="Maintain" back-link="/">
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 py-2">
 
       <UiCard title="Statistics" v-if="statistics">
         <div class="flex flex-wrap gap-4">

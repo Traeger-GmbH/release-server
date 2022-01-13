@@ -1,7 +1,7 @@
 <template>
-  <div class="h-screen mx-2">
-    <Navigation class="mb-10" />
-    <div class="container mx-auto">
+  <div class="h-screen mx-2 flex flex-col">
+    <Navigation class="flex-grow-0 flex-shrink" />
+    <div class="container mx-auto flex-grow flex-shrink flex flex-col min-h-0">
       <Nuxt />
     </div>
   </div>
