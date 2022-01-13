@@ -114,7 +114,7 @@
       </div>
     </div>
     <DeleteReleaseDialog
-      :productIdentifier="productIdentifier"
+      :product-identifier="productIdentifier"
       :version="release.version"
       :showing="showDeleteDialog"
       @close="closeDeleteDialog"
