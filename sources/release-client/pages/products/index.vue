@@ -1,7 +1,7 @@
 <template>
   <Page title="Explore" back-link="/">
     <ProductList
-      class="mx-auto"
+      class=""
     />
   </Page>
 </template>

@@ -13,7 +13,7 @@
         <slot name="header"></slot>
       </div>
     </div>
-    <div class="flex-grow flex-shrink min-h-0 flex flex-col">
+    <div class="flex-grow flex-shrink min-h-0 flex flex-col pb-2">
       <slot />
     </div>
   </div>

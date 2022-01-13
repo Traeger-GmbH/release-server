@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-grow flex-shrink gap-2 min-h-0 py-2">
+  <div class="flex flex-grow flex-shrink gap-2 min-h-0">
     <UiPane class="flex flex-col gap-2 w-1/3 overflow-y-auto">
       <template v-if="product">
         <div

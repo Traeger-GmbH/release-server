@@ -4,14 +4,14 @@
       v-if="products && products.length > 0"
       class="flex-shrink flex-grow flex flex-row min-h-0"
     >
-      <div class="flex-shrink-0 flex-grow-0 overflow-auto min-h-0 gap-2 flex flex-col">
+      <UiPane class="overflow-auto min-h-0 gap-2 flex flex-col w-1/3">
         <LinkCard
           v-for="product in products"
           :key="product"
           :title="product"
           :link="'/products/' + product"
         />
-      </div>
+      </UiPane>
     </div>
     <div
       v-else
