@@ -66,7 +66,7 @@ export default {
   },
 
   proxy: {
-    '/artifacts/': 'http://localhost:5000/'
+    '/artifacts/': process.env.RELEASE_SERVER_URL || 'http://localhost:5000/'
   },
 
   pageTransition: {
