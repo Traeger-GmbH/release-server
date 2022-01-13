@@ -55,9 +55,9 @@
         </div>
         <div
           v-else-if="!isLoading"
-          class="text-xl flex flex-col gap-4"
+          class="flex flex-col gap-4"
         >
-          {{ error }}
+          <span class="text-xl">{{ error }}</span>
           <button
             class="btn btn-green self-center"
             @click="$fetch()"

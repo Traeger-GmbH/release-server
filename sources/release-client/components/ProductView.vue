@@ -48,13 +48,32 @@
       </template>
       <template v-else>
         <div class="flex-grow flex items-center justify-center">
-          <LoadingSpinner :message="`Loading product...`" :show="isLoading" />
-          <div
-            v-if="!isLoading"
-            class="text-xl self-start"
+          <LoadingSpinner
+            :message="`Loading releases...`"
+            :show="isLoading"
+          />
+          <template
+            v-if="!isLoading && error"
           >
-            No releases found for this product.
-          </div>
+            <div
+              v-if="!isLoading && error.statusCode === 404"
+              class="text-xl"
+            >
+              No releases found for this product.
+            </div>
+            <div
+              v-else-if="!isLoading"
+              class="flex flex-col gap-4"
+            >
+              <span class="text-xl">{{ error }}</span>
+              <button
+                class="btn btn-green self-center"
+                @click="$fetch()"
+              >
+                retry
+              </button>
+            </div>
+          </template>
         </div>
       </template>
     </UiPane>
@@ -84,7 +103,8 @@ export default {
       isLoading: false,
       product: null,
       selectedRelease: null,
-      filter: null
+      filter: null,
+      error: null
     };
   },
   async fetch () {
@@ -92,6 +112,8 @@ export default {
       this.isLoading = true;
       this.product = await this.$api.getProductInfo(this.productIdentifier);
       this.select(this.product.releases[0]);
+    } catch (error) {
+      this.error = error;
     } finally {
       this.isLoading = false;
     }
