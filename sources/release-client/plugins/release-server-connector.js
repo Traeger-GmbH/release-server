@@ -65,8 +65,9 @@ class Api {
       const response = await this.axios.get(
         `/${product}/${platform}/${version}`
       );
-      response.data = { filename: getFileNameFromHeaders(response.headers) };
-      return response;
+      const blob = new Blob([response.data]);
+      const filename = getFileNameFromHeaders(response.headers);
+      return { blob, filename };
     };
 
     this.deleteSpecificRelease = async function (product, version) {

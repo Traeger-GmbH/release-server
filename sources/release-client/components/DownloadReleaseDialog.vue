@@ -68,8 +68,8 @@ export default {
       this.$emit('close');
       this.selectedPlatform = null;
     },
-    forceFileDownload (response, filename) {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+    forceFileDownload (blob, filename) {
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
@@ -77,12 +77,11 @@ export default {
       link.click();
     },
     async download () {
-      console.log('downloading: ' + this.productIdentifier + '/' + this.selectedPlatform + '/' + this.release.version);
       try {
         this.isLoading = true;
-        const response = await this.$api.downloadSpecificArtifact(this.productIdentifier, this.selectedPlatform, this.release.version);
+        const { blob, filename } = await this.$api.downloadSpecificArtifact(this.productIdentifier, this.selectedPlatform, this.release.version);
         this.onClose();
-        this.forceFileDownload(response, response.data.filename);
+        this.forceFileDownload(blob, filename);
       } catch (error) {
         let message;
         if (error.response && error.response.data) {
