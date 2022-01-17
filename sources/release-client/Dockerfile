@@ -10,7 +10,7 @@ RUN yarn install && \
 # Stage 2 - production
 FROM mhart/alpine-node:16 AS final
 
-COPY --from=builder /app /
+COPY --from=builder /app /app
 WORKDIR /app
 
 EXPOSE 3000

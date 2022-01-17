@@ -1,6 +1,11 @@
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
+  
+  server: {
+    port: 3000, // default: 3000
+    host: process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost', // default: localhost,
+  },
 
   // Target: https://go.nuxtjs.dev/config-target
   target: 'server',
