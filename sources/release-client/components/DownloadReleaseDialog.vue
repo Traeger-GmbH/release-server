@@ -5,11 +5,11 @@
     class="text-center"
   >
     <h4 class="font-light">Download
-      <span class="font-normal">{{ productIdentifier }}-v{{ release.version }}</span>
     </h4>
     <div class="font-light text-sm text-gray-500">
-      Please select the platform to download.
+      Please select the platform.
     </div>
+    <div class="text-center font-semibold p-1 rounded bg-green-200 grow-0 my-4">{{ releaseName }}</div>
     <div class="m-4">
       <button
         v-for="platform in release.platforms"
@@ -102,6 +102,11 @@ export default {
         this.isLoading = false;
       }
     },
+  },
+  computed: {
+    releaseName () {
+      return `${this.productIdentifier}-v${this.release.version}`;
+    }
   }
 };
 </script>
