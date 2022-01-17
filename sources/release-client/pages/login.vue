@@ -1,5 +1,8 @@
 <template>
-  <div class="max-w-sm mx-auto mt-5">
+  <div
+    class="max-w-sm mx-auto mt-5"
+    @keypress.enter="login"
+  >
     <FormInput
       id="username"
       v-model="username"
