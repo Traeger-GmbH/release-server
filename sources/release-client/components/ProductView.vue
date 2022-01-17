@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-grow flex-shrink gap-2 min-h-0">
-    <UiPane class="flex flex-col gap-2 w-1/3 overflow-y-auto">
+    <UiPane class="flex flex-col gap-2 w-2/6 overflow-y-auto">
       <template v-if="product">
         <div class="rounded flex flex-row items-center gap-2 font-semibold -mt-4 -mx-4 px-4 py-4 bg-gray-500 mb-2 relative">
           <input
@@ -20,30 +20,32 @@
             x
           </button>
         </div>
-        <div
-          v-for="release in filteredReleases"
-          :key="release.version"
-          :title="release.version"
-          class="rounded px-3 py-2 hover:bg-gray-700 hover:text-white cursor-pointer tabular-nums font-semibold flex justify-between"
-          :class="[
-            isSelected(release) ? 'bg-gray-700 text-white' : ''
-          ]"
-          @click="select(release)"
-        >
-          <div class="flex items-center">
-            v{{ release.version }}
-            <div
-              class="ml-2 w-2 h-2 rounded-xl"
-              :class="release.isPreviewRelease ? 'bg-blue-500' : ''"
-            />
-            <div
-              class="ml-2 w-2 h-2 rounded-xl"
-              :class="release.isSecurityPatch ? 'bg-red-500' : ''"
-            />
+        <div class="overflow-y-scroll flex flex-col gap-2 -mx-4 px-4 h-full -my-4 py-4">
+          <div
+            v-for="release in filteredReleases"
+            :key="release.version"
+            :title="release.version"
+            class="rounded px-3 py-2 hover:bg-gray-700 hover:text-white cursor-pointer tabular-nums font-semibold flex justify-between"
+            :class="[
+              isSelected(release) ? 'bg-gray-700 text-white' : ''
+            ]"
+            @click="select(release)"
+          >
+            <div class="flex items-center">
+              v{{ release.version }}
+              <div
+                class="ml-2 w-2 h-2 rounded-xl"
+                :class="release.isPreviewRelease ? 'bg-blue-500' : ''"
+              />
+              <div
+                class="ml-2 w-2 h-2 rounded-xl"
+                :class="release.isSecurityPatch ? 'bg-red-500' : ''"
+              />
+            </div>
+            <span>
+              [{{ new Date(release.releaseDate).toLocaleDateString() }}]
+            </span>
           </div>
-          <span>
-            [{{ new Date(release.releaseDate).toLocaleDateString() }}]
-          </span>
         </div>
       </template>
       <template v-else>
@@ -79,7 +81,7 @@
     </UiPane>
     <UiPane
       v-if="hasSelection"
-      class="bg-white flex flex-col overflow-y-auto gap-2 w-2/3"
+      class="bg-white flex flex-col flex-grow overflow-y-scroll gap-2 w-2/3"
     >
       <ReleaseInformation
         :release="selectedRelease"
@@ -108,14 +110,21 @@ export default {
     };
   },
   async fetch () {
-    try {
-      this.isLoading = true;
-      this.product = await this.$api.getProductInfo(this.productIdentifier);
-      this.select(this.product.releases[0]);
-    } catch (error) {
-      this.error = error;
-    } finally {
-      this.isLoading = false;
+    if (this.productIdentifier !== null) {
+      try {
+        this.isLoading = true;
+        this.product = await this.$api.getProductInfo(this.productIdentifier);
+        this.select(this.product.releases[0]);
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.isLoading = false;
+      }
+    }
+  },
+  watch: {
+    productIdentifier () {
+      this.$fetch();
     }
   },
   computed: {
