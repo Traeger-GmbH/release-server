@@ -84,7 +84,7 @@ export default {
   async fetch () {
     try {
       this.isLoading = true;
-      this.products = await this.$api.getProductList();
+      this.products = (await this.$api.getProductList()).sort();
     } catch (error) {
       this.error = error;
     } finally {
