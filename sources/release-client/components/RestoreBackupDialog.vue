@@ -50,7 +50,7 @@
         <div class="flex justify-around">
           <button
             v-if="!props.isLastStep"
-            @click="closeRestoreDialog()"
+            @click="onClose"
             class="btn btn-green-outline"
           >
             Cancel
