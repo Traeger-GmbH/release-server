@@ -10,30 +10,30 @@
             </div>
             <table class="table-auto">
               <tr>
-                <td class="font-semibold">
+                <td>
                   Total size:
                 </td>
-                <td>
+                <td class="font-semibold">
                   {{ statistics.disk.totalSize }} MB
                 </td>
               </tr>
               <tr>
-                <td class="font-semibold">
+                <td>
                   Used space:
                 </td>
-                <td>
+                <td class="font-semibold">
                   {{ statistics.disk.usedDiskSpace }} MB
                 </td>
               </tr>
               <tr>
-                <td class="font-semibold">
+                <td>
                   Avail. space:
                 </td>
-                <td>
+                <td class="font-semibold">
                   {{ statistics.disk.availableFreeSpace }} MB
                 </td>
                 <td>
-                  <span class="text-white bg-green-500 rounded px-2 py-1">{{ (statistics.disk.availableFreeSpace / statistics.disk.totalSize * 100).toFixed(2) }} %</span>
+                  = <span class="text-white bg-green-500 rounded px-2 py-1">{{ (statistics.disk.availableFreeSpace / statistics.disk.totalSize * 100).toFixed(2) }} %</span>
                 </td>
               </tr>
             </table>
@@ -44,18 +44,18 @@
             </div>
             <table class="table-auto">
               <tr>
-                <td class="font-semibold">
+                <td>
                   Number of stored products:
                 </td>
-                <td>
+                <td class="font-semibold">
                   {{ statistics.numberOfProducts }}
                 </td>
               </tr>
               <tr>
-                <td class="font-semibold">
+                <td>
                   Number of stored artifacts:
                 </td>
-                <td>
+                <td class="font-semibold">
                   {{ statistics.numberOfArtifacts }}
                 </td>
               </tr>
