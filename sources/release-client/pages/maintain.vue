@@ -14,7 +14,7 @@
                   Total size:
                 </td>
                 <td>
-                  {{ statistics.disk.totalSize }}
+                  {{ statistics.disk.totalSize }} MB
                 </td>
               </tr>
               <tr>
@@ -22,7 +22,7 @@
                   Used space:
                 </td>
                 <td>
-                  {{ statistics.disk.usedDiskSpace }}
+                  {{ statistics.disk.usedDiskSpace }} MB
                 </td>
               </tr>
               <tr>
@@ -30,7 +30,7 @@
                   Avail. space:
                 </td>
                 <td>
-                  {{ statistics.disk.availableFreeSpace }}
+                  {{ statistics.disk.availableFreeSpace }} MB
                 </td>
                 <td>
                   <span class="text-white bg-green-500 rounded px-2 py-1">{{ (statistics.disk.availableFreeSpace / statistics.disk.totalSize * 100).toFixed(2) }} %</span>
