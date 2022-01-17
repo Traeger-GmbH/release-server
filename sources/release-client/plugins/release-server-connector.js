@@ -61,6 +61,14 @@ class Api {
       );
     };
 
+    this.downloadSpecificArtifact = async function (product, platform, version) {
+      const response = await this.axios.get(
+        `/${product}/${platform}/${version}`
+      );
+      response.data = { filename: getFileNameFromHeaders(response.headers) };
+      return response;
+    };
+
     this.deleteSpecificRelease = async function (product, version) {
       const data = (await this.axios.get(`${product}/info`, { params: { version } })).data;
       const platforms = data.releases[0].platforms;

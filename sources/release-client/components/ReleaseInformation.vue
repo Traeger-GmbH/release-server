@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="flex w-full items-center">
-      <div class="px-2 text-2xl font-semibold tabular-nums">
+    <div class="flex flex-row w-full items-center max-w-full">
+      <div class="px-2 text-2xl font-semibold tabular-nums whitespace-nowrap">
         v{{ release.version }} ({{ new Date(release.releaseDate).toLocaleDateString() }})
       </div>
       <div
@@ -16,8 +16,16 @@
       >
         security patch
       </div>
+    </div>
+    <div class="flex flex-row flex-wrap w-full mt-4 gap-2 justify-between">
       <button
-        class="btn btn-red-outline ml-auto"
+        class="btn btn-green"
+        @click="openDownloadDialog"
+      >
+        download
+      </button>
+      <button
+        class="btn btn-red-outline"
         @click="openDeleteDialog"
       >
         delete release
@@ -120,6 +128,12 @@
       @close="closeDeleteDialog"
       @deleted="onDeleted"
     />
+    <DownloadReleaseDialog
+      :product-identifier="productIdentifier"
+      :release="release"
+      :showing="showDownloadDialog"
+      @close="closeDownloadDialog"
+    />
   </div>
 </template>
 
@@ -138,15 +152,22 @@ export default {
   data () {
     return {
       confirmVersionName: null,
-      showDeleteDialog: false
+      showDeleteDialog: false,
+      showDownloadDialog: false
     };
   },
   methods: {
     openDeleteDialog () {
       this.showDeleteDialog = true;
     },
+    openDownloadDialog () {
+      this.showDownloadDialog = true;
+    },
     closeDeleteDialog () {
       this.showDeleteDialog = false;
+    },
+    closeDownloadDialog () {
+      this.showDownloadDialog = false;
     },
     onDeleted () {
       this.$emit('deleted');

@@ -103,8 +103,7 @@
 export default {
   props: {
     productIdentifier: {
-      type: String,
-      required: true
+      type: String
     }
   },
   data () {
