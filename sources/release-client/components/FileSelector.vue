@@ -21,7 +21,7 @@
 
       <label v-if="!file" for="assetsFieldHandle" class="block cursor-pointer">
         <div>
-          Drop your backup file here
+          Drop your file here
           or <span class="underline">click here</span>
           to open the file browser.
         </div>
