@@ -3,7 +3,7 @@
     <UiPane class="flex flex-col gap-2 w-2/6 overflow-y-auto">
       <template v-if="productIdentifier">
         <template v-if="product">
-          <div class="rounded flex flex-row items-center gap-2 font-semibold -mt-4 -mx-4 px-4 py-4 bg-gray-500 mb-2 relative">
+          <div class="rounded flex items-center font-semibold -mt-4 -mx-4 px-4 py-4 bg-gray-500 mb-2 relative">
             <input
               id="filter"
               class="rounded px-3 py-2 flex-grow focus:outline-none focus:ring ring-green-500 font-medium"

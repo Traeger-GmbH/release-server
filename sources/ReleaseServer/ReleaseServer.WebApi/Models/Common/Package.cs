@@ -38,65 +38,71 @@ namespace ReleaseServer.WebApi.Models
             PackageInformation packageInformation;
             var validationErrors = new List<string>();
 
-            using var fileStream = packageFile.OpenReadStream();
-            this.ZipArchive = new ZipArchive(packageFile.OpenReadStream(), ZipArchiveMode.Read);
+            try {
 
-            var rootDirectoryName = "";
-            ZipArchiveEntry packageInformationEntry = null;
+                using var fileStream = packageFile.OpenReadStream();
+                this.ZipArchive = new ZipArchive(packageFile.OpenReadStream(), ZipArchiveMode.Read);
 
-            // Get root directory name and package.json entry
-            for (var i = 0; i < this.ZipArchive.Entries.Count; i++) {
-                var zipEntry = this.ZipArchive.Entries[i];
-                var fileName = Path.GetFileName(zipEntry.FullName);
+                var rootDirectoryName = "";
+                ZipArchiveEntry packageInformationEntry = null;
 
-                if (fileName != null && fileName == InformationFileName) {
-                    packageInformationEntry = zipEntry;
-                    rootDirectoryName = Path.GetDirectoryName(zipEntry.FullName);
+                // Get root directory name and package.json entry
+                for (var i = 0; i < this.ZipArchive.Entries.Count; i++) {
+                    var zipEntry = this.ZipArchive.Entries[i];
+                    var fileName = Path.GetFileName(zipEntry.FullName);
+
+                    if (fileName != null && fileName == InformationFileName) {
+                        packageInformationEntry = zipEntry;
+                        rootDirectoryName = Path.GetDirectoryName(zipEntry.FullName);
+                    }
                 }
-            }
 
-            if (packageInformationEntry != null) {
-                try {
-                    packageInformation = PackageInformation.FromJsonFile(packageInformationEntry);
-                    this.Deployments = new Dictionary<Platform, ZipArchiveEntry>();
+                if (packageInformationEntry != null) {
+                    try {
+                        packageInformation = PackageInformation.FromJsonFile(packageInformationEntry);
+                        this.Deployments = new Dictionary<Platform, ZipArchiveEntry>();
 
-                    foreach (var (platformString, filePath) in packageInformation.Deployments) {
-                        if (Platform.TryParse(platformString, out var platform)) {
-                            var deploymentEntryName = rootDirectoryName + "/" + filePath;
-                            if (this.ZipArchive.TryGetEntry(deploymentEntryName, out var deploymentEntry)) {
-                                this.Deployments.Add(platform, deploymentEntry);
+                        foreach (var (platformString, filePath) in packageInformation.Deployments) {
+                            if (Platform.TryParse(platformString, out var platform)) {
+                                var deploymentEntryName = rootDirectoryName + "/" + filePath;
+                                if (this.ZipArchive.TryGetEntry(deploymentEntryName, out var deploymentEntry)) {
+                                    this.Deployments.Add(platform, deploymentEntry);
+                                }
+                                else {
+                                    var error = $"Missing deployment file for platform \"{platform}\": {filePath}";
+                                    validationErrors.Add(error);
+                                }
                             }
                             else {
-                                var error = $"Missing deployment file for platform \"{platform}\": {filePath}";
+                                var error = $"Invalid platform in deployments: \"{platformString}\"";
                                 validationErrors.Add(error);
                             }
                         }
+
+                        if (validationErrors.Count == 0) {
+                            this.ValidationResult = new ValidationResult(true);
+                            this.Identifier = packageInformation.Identifier;
+                            this.ReleaseNotes = packageInformation.ReleaseNotes;
+                            this.Version = packageInformation.Version;
+                        }
                         else {
-                            var error = $"Invalid platform in deployments: \"{platformString}\"";
-                            validationErrors.Add(error);
+                            this.ValidationResult = new ValidationResult(false, validationErrors);
                         }
                     }
-
-                    if (validationErrors.Count == 0) {
-                        this.ValidationResult = new ValidationResult(true);
-                        this.Identifier = packageInformation.Identifier;
-                        this.ReleaseNotes = packageInformation.ReleaseNotes;
-                        this.Version = packageInformation.Version;
-                    }
-                    else {
+                    catch (Exception e) {
+                        var error = $"{Package.InformationFileName} is invalid: {e.Message}";
+                        validationErrors.Add(error);
                         this.ValidationResult = new ValidationResult(false, validationErrors);
                     }
                 }
-                catch (Exception e) {
-                    var error = $"{Package.InformationFileName} is invalid: {e.Message}";
+                else {
+                    var error = $"{Package.InformationFileName} is missing.";
                     validationErrors.Add(error);
                     this.ValidationResult = new ValidationResult(false, validationErrors);
                 }
             }
-            else {
-                var error = $"{Package.InformationFileName} is missing.";
-                validationErrors.Add(error);
-                this.ValidationResult = new ValidationResult(false, validationErrors);
+            catch (Exception e) {
+                this.ValidationResult = new ValidationResult(false, e.Message);
             }
         }
 

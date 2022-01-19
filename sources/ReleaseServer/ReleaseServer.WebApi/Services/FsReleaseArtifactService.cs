@@ -63,7 +63,7 @@ namespace ReleaseServer.WebApi
                 var existingPackage = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier);
 
                 if (!existingPackage.IsNullOrEmpty() && !force) {
-                    var errorMessage = $"This package ({package.Identifier}-v{package.Version}) already exists." +
+                    var errorMessage = $"This package ({package.Identifier}-v{package.Version}) already exists. " +
                         $"Set the parameter \"force = true\" in order to overwrite the existing package.";
                     result = new ServiceActionResult(System.Net.HttpStatusCode.Conflict, new string[] { errorMessage });
                 } else {
