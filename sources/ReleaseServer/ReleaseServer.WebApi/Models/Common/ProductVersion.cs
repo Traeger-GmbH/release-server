@@ -132,6 +132,10 @@ namespace ReleaseServer.WebApi.Models
             ProductVersion obj,
             ProductVersion other)
         {
+            if (obj is null) {
+                return other is null;
+            }
+
             return obj.Equals(other);
         }
 
@@ -145,6 +149,10 @@ namespace ReleaseServer.WebApi.Models
             ProductVersion obj,
             ProductVersion other)
         {
+            if (obj is null) {
+                return !(other is null);
+            }
+
             return !obj.Equals(other);
         }
 
