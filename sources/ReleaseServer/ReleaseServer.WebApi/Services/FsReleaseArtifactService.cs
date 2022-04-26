@@ -172,11 +172,13 @@ namespace ReleaseServer.WebApi
         {
             var latestVersion = await Task.Run(() => GetLatestVersion(productName, os, architecture));
 
-            if (latestVersion == null)
+            if (latestVersion == null) {
                 return null;
-
-            return await Task.Run(() =>
-                fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
+            }
+            else {
+                return await Task.Run(() =>
+                    fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
+            }
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
