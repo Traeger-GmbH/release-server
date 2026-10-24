@@ -1,0 +1,8 @@
+.git
+.github
+**/bin
+**/obj
+**/node_modules
+**/.nuxt
+**/dist
+sources/ReleaseServer/ReleaseServer.WebApi.Test
