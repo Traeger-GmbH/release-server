@@ -81,8 +81,16 @@ namespace ReleaseServer.WebApi
                 {
                     Title = "Release Server API",
                     Version = "v1",
-                    Description = "An application for managing your own release artifacts. " +
-                                  "The release server provides several REST endpoints for the following operations.",
+                    Description = "Download server for released software. " +
+                                  "Products are published as releases (version, release date, change log) for one or more platforms " +
+                                  "(operating system and architecture).\n\n" +
+                                  "**Public endpoints** (no authentication):\n" +
+                                  "- `GET /artifacts` lists all products\n" +
+                                  "- `GET /artifacts/{product}/info` lists the releases of a product (filter, sort and paging)\n" +
+                                  "- `GET /artifacts/{product}/{os}/{architecture}/{version}` downloads a release\n" +
+                                  "- `GET /artifacts/{product}/{os}/{architecture}/latest` downloads the latest release\n\n" +
+                                  "All other endpoints maintain the server and **require authentication** (HTTP Basic).\n\n" +
+                                  "Errors are returned as problem details (RFC 7807) with the fields title, status and detail.",
                     Contact = new OpenApiContact
                     {
                         Name = "Traeger Industry Components GmbH",
@@ -100,13 +108,14 @@ namespace ReleaseServer.WebApi
                     In = ParameterLocation.Header,
                 });
                 
-                c.OperationFilter<BasicAuthOperationsFilter>();
-                
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ReleaseServer.WebApi.xml"));
+
+                // Registered after the XML comments, so it can extend the summaries and descriptions
+                c.OperationFilter<BasicAuthOperationsFilter>();
                 c.ExampleFilters();
             });
             
-            services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
+            services.AddSwaggerExamplesFromAssemblies(typeof(Startup).Assembly);
 
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);

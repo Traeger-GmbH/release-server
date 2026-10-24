@@ -28,19 +28,38 @@ namespace ReleaseServer.WebApi
         #region ---------- Public methods ----------
 
         /// <summary>
-        /// Retrieves a list with deployment information objects of all available releases of a product that can be filtered, ordered and paginated.
+        /// Lists the releases of a product.
         /// </summary>
-        /// <param name="product">The name/identifier of the product to get.</param>
-        /// <param name="architectures">A comma separated list of architectures to filter for. If this parameter is not set no filter will be applied.</param>
-        /// <param name="operatingSystems">A comma separated list of operating systems to filter for. If this parameter is not set no filter will be applied.</param>
-        /// <param name="sortOrder">Defines how the results will be ordered by their version numbers.</param>
-        /// <param name="limit">Paging parameter: Maximum number of elements that will be returned.</param>
-        /// <param name="offset">Paging parameter: Offset of the first element to be returned.</param>
-        /// <param name="version">Can be used to select a specific version of the product (for e.g. obtaining the changelog of this version).</param>
-        /// <response code="200">A product with the specified product name exists.</response>
-        /// <response code="404">The specified product does not exist.</response>
+        /// <remarks>
+        /// Returns the releases of a product with version, release date, supported platforms and change log.
+        /// The releases can be filtered by platform and version, sorted by version and paged.
+        ///
+        /// A platform consists of an operating system and an architecture, e.g. "windows/x64" or "linux/arm64".
+        /// To download a release, use the version and one of its platforms:
+        /// `GET /artifacts/{product}/{os}/{architecture}/{version}`.
+        ///
+        /// Examples:
+        ///
+        ///     GET /artifacts/example-product/info
+        ///     GET /artifacts/example-product/info?operatingSystems=windows&amp;architectures=x64,any
+        ///     GET /artifacts/example-product/info?sortOrder=descending&amp;limit=1   (latest release)
+        ///     GET /artifacts/example-product/info?version=1.2.0                     (one release)
+        ///
+        /// Pre-releases have a version suffix (e.g. 2.0.0-beta) and "isPreviewRelease": true. A release without
+        /// suffix is newer than its pre-releases.
+        /// </remarks>
+        /// <param name="product">The identifier of the product (case-sensitive), as listed by GET /artifacts.</param>
+        /// <param name="architectures">Only releases for these architectures (comma separated or repeated parameter), e.g. "x64,arm64". Default: all.</param>
+        /// <param name="operatingSystems">Only releases for these operating systems (comma separated or repeated parameter), e.g. "windows,linux". Default: all.</param>
+        /// <param name="sortOrder">Order of the releases by version: "descending" (newest first, default) or "ascending".</param>
+        /// <param name="limit">Paging: maximum number of releases in the response (default 50).</param>
+        /// <param name="offset">Paging: number of releases to skip (default 0). The response contains "nextOffset" if more releases exist.</param>
+        /// <param name="version">Only the release with exactly this version, e.g. "1.2.0" or "2.0.0-beta".</param>
+        /// <response code="200">The releases of the product.</response>
+        /// <response code="404">The product does not exist or no release matches the filter.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductInformation), 200)]
+        [ProducesResponseType(typeof(ProblemDetails), 404)]
         [SeparatedQueryString]
         [HttpGet("{product}/info")]
         public async Task<ActionResult<ProductInformation>> GetProduct(
@@ -102,9 +121,13 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Retrieves a list of all products stored in the server.
+        /// Lists all products.
         /// </summary>
-        /// <response code="200">List of all products.</response>
+        /// <remarks>
+        /// Returns the identifiers of all products. Use an identifier with GET /artifacts/{product}/info to get
+        /// its releases.
+        /// </remarks>
+        /// <response code="200">The identifiers of all products.</response>
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductList), 200)]
         [SeparatedQueryString]
