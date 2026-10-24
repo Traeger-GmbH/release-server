@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactController.Upload.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
@@ -53,6 +53,14 @@ namespace ReleaseServer.WebApi
                     HttpContext,
                     "Bad request",
                     "The required upload body not a .zip file.");
+            }
+            else if (!StorageNames.IsValidSegment(product) || !StorageNames.IsValidSegment(os)
+                     || !StorageNames.IsValidSegment(architecture) || !StorageNames.IsValidVersion(version))
+            {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "Invalid product, operating system, architecture or version. Allowed are letters, digits, '-', '_' and '.' (starting with a letter or digit); the version has to be a valid version number like 1.2.3 or 1.2.3-beta.");
             }
             else
             {

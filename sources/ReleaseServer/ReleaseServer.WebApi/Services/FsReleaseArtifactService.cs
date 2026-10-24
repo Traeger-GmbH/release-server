@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="FsReleaseArtifactService.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -169,15 +169,26 @@ namespace ReleaseServer.WebApi
 
         public async Task<ArtifactDownload> GetLatestArtifact(string productName, string os, string architecture)
         {
-            var latestVersion = await Task.Run(() => GetLatestVersion(productName, os, architecture));
+            return await Task.Run(() =>
+            {
+                // Versions are ordered descending. Incomplete or broken artifact directories (e.g. of an
+                // interrupted upload) are skipped, so the latest complete version is delivered.
+                foreach (var version in fsReleaseArtifactRepository.GetVersions(productName, os, architecture))
+                {
+                    try
+                    {
+                        var artifact = fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version.ToString());
+                        if (artifact != null)
+                            return artifact;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogWarning("Skipping the broken artifact {0}/{1}/{2}/{3}: {4}", productName, os, architecture, version, e.Message);
+                    }
+                }
 
-            if (latestVersion == null) {
                 return null;
-            }
-            else {
-                return await Task.Run(() =>
-                    fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
-            }
+            });
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
@@ -285,6 +296,26 @@ namespace ReleaseServer.WebApi
                     logger.LogError(validationError);
                     return new ValidationResult(false, validationError);
                 }
+            }
+
+            if (deploymentMetaInfo == null)
+            {
+                var validationError = "the deployment meta information (deployment.json) is empty!";
+                logger.LogError(validationError);
+                return new ValidationResult(false, validationError);
+            }
+
+            //Check the file names, they are used as file names in the artifact directory
+            if (!StorageNames.IsValidFileName(deploymentMetaInfo.ArtifactFileName)
+                || !StorageNames.IsValidFileName(deploymentMetaInfo.ReleaseNotesFileName)
+                || deploymentMetaInfo.ArtifactFileName == StorageNames.DeploymentMetaFileName
+                || deploymentMetaInfo.ReleaseNotesFileName == StorageNames.DeploymentMetaFileName
+                || deploymentMetaInfo.ArtifactFileName == deploymentMetaInfo.ReleaseNotesFileName)
+            {
+                var validationError = "the file names in the deployment meta information (deployment.json) are invalid! "
+                                      + "They must be different plain file names without path separators.";
+                logger.LogError(validationError);
+                return new ValidationResult(false, validationError);
             }
 
             //Check if the uploaded payload contains the the artifact file
