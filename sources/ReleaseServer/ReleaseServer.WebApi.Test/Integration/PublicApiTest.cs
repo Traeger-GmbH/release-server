@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="PublicApiTest.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2026.
 // </copyright>
@@ -121,6 +121,41 @@ namespace ReleaseServer.WebApi.Test.Integration
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(LegacyStore.ArtifactContent(expectedContentKey), await response.Content.ReadAsByteArrayAsync());
             Golden.AssertText("download-" + fileName.Replace(' ', '_') + ".headers.txt", DescribeDownloadHeaders(response));
+        }
+
+        [Theory]
+        [InlineData("/artifacts/alpha/windows/x86/1.0")]
+        [InlineData("/artifacts/alpha/windows/x86/latest")]
+        public async Task GetArtifact_RangeRequest_ReturnsPartialContent(string url)
+        {
+            var content = LegacyStore.ArtifactContent("alpha/windows/x86/1.0");
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(5, 12);
+
+            var response = await client.SendAsync(request);
+
+            Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
+            Assert.Equal(content.Skip(5).Take(8).ToArray(), await response.Content.ReadAsByteArrayAsync());
+            Assert.Equal(content.Length, response.Content.Headers.ContentRange.Length);
+        }
+
+        [Fact]
+        public async Task GetArtifact_ContentLength_IsSet()
+        {
+            var response = await client.GetAsync("/artifacts/alpha/windows/x86/1.0");
+
+            Assert.Equal(LegacyStore.ArtifactContent("alpha/windows/x86/1.0").Length, response.Content.Headers.ContentLength);
+        }
+
+        [Fact]
+        public async Task GetArtifact_MissingArtifactFile_ReturnsServerErrorWithoutLeakingData()
+        {
+            System.IO.File.Delete(System.IO.Path.Combine(host.ArtifactDirectory, "alpha", "windows", "x86", "1.0", "alpha-setup.exe"));
+
+            var response = await client.GetAsync("/artifacts/alpha/windows/x86/1.0");
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.DoesNotContain(host.RootDirectory, await response.Content.ReadAsStringAsync());
         }
 
         [Theory]

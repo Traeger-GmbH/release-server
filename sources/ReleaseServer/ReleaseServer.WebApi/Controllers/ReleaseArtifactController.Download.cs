@@ -29,7 +29,7 @@ namespace ReleaseServer.WebApi
         /// <param name="os">The operating system of the specified artifact.</param>
         /// <param name="architecture">The hardware architecture of the specified artifact.</param>
         /// <param name="version">The version of the specified artifact.</param>
-        /// <returns>A <see cref="FileContentResult"/> with the specified artifact. A <see cref="NotFoundObjectResult"/>, if
+        /// <returns>A <see cref="PhysicalFileResult"/> with the specified artifact. A <see cref="NotFoundObjectResult"/>, if
         /// the specified artifact does not exist.</returns>
         /// <response code="200">There exists an artifact with the specified parameters.</response>
         /// <response code="404">There exists no artifact with the specified parameters.</response>
@@ -52,7 +52,8 @@ namespace ReleaseServer.WebApi
                 };
                 Response.Headers["Content-Disposition"] = cd.ToString();
 
-                return new FileContentResult(response.Payload, contentType);
+                // Stream the file from disk; range requests allow resuming interrupted downloads
+                return new PhysicalFileResult(response.FilePath, contentType) { EnableRangeProcessing = true };
             }
             else
             {
@@ -69,7 +70,7 @@ namespace ReleaseServer.WebApi
         /// <param name="product">The product name of the specified artifact.</param>
         /// <param name="os">The operating system of the specified artifact.</param>
         /// <param name="architecture">The hardware architecture of the specified artifact.</param>
-        /// <returns>A <see cref="FileContentResult"/> with the latest version of the artifact. A <see cref="NotFoundObjectResult"/>, if
+        /// <returns>A <see cref="PhysicalFileResult"/> with the latest version of the artifact. A <see cref="NotFoundObjectResult"/>, if
         /// the artifact is not available for the specified platform (OS + arch)</returns>
         /// <response code="200">The specified artifact exists (the ZIP file with the artifact will be retrieved)</response>
         /// <response code="404">The artifact is not available for the specified platform (OS + arch)</response>
@@ -92,7 +93,8 @@ namespace ReleaseServer.WebApi
                 };
                 Response.Headers["Content-Disposition"] = cd.ToString();
 
-                return new FileContentResult(response.Payload, contentType);
+                // Stream the file from disk; range requests allow resuming interrupted downloads
+                return new PhysicalFileResult(response.FilePath, contentType) { EnableRangeProcessing = true };
             }
             else
             {

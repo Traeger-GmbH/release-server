@@ -284,7 +284,7 @@ namespace ReleaseServer.WebApi.Test
                 FileName = Path.GetFileName(Path.Combine(projectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip")),
 
-                Payload = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "productx",
+                FilePath = Path.GetFullPath(Path.Combine(projectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip"))
             };
 

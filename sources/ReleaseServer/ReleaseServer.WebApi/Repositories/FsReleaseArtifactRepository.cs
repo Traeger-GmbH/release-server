@@ -196,9 +196,14 @@ namespace ReleaseServer.WebApi
 
                     var deploymentMetaInfo = GetDeploymentMetaInfo(files);
 
+                    var filePath = ResolveFileInDirectory(path, deploymentMetaInfo.ArtifactFileName);
+
+                    if (!File.Exists(filePath))
+                        throw new FileNotFoundException("The artifact file of the specified product does not exist!", deploymentMetaInfo.ArtifactFileName);
+
                     return new ArtifactDownload
                     {
-                        Payload = File.ReadAllBytes(ResolveFileInDirectory(path, deploymentMetaInfo.ArtifactFileName)),
+                        FilePath = filePath,
                         FileName = deploymentMetaInfo.ArtifactFileName,
                     };
                 }
