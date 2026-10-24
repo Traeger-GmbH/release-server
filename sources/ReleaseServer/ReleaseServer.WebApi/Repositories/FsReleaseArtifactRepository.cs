@@ -61,6 +61,12 @@ namespace ReleaseServer.WebApi
         
         #region ---------- Public constructors ----------
 
+        static FsReleaseArtifactRepository()
+        {
+            // Avoid skipped [JsonRequired] checks when the first files are read concurrently
+            JsonConfiguration.PrepareContracts();
+        }
+
         public FsReleaseArtifactRepository(
             ILogger<FsReleaseArtifactRepository> logger,
             DirectoryInfo artifactDirectory,

@@ -12,6 +12,7 @@ Server (now .NET 10, ASP.NET Core 10 runtime image):
 * [FIX] Restore accepts additional files and sub directories in release directories (e.g. macOS metadata extracted by old versions) and artifacts in sub directories, like previous versions
 * [CHANGE] Uploads ignore operating system metadata in ZIP files (macOS: __MACOSX/, ._*, .DS_Store; Windows: Thumbs.db, ehthumbs.db, desktop.ini, $RECYCLE.BIN/); existing data is not changed
 * [CHANGE] Deleting the last release of a platform or product removes the then empty directories; product directories without any release (e.g. left behind by previous versions) are no longer listed by GET /artifacts and not counted as products (their /info was and is 404)
+* [FIX] Concurrent first uploads after a start could skip the check of required properties in deployment.json (thread-safety issue of Newtonsoft.Json)
 * [FEATURE] Keep the newest backups (BackupRetentionCount, default 5) instead of only the latest one
 * [FEATURE] Downloads are streamed from disk and support range requests (resume)
 * [CHANGE] A package upload is only rejected if its version already exists (new versions no longer need force=true)

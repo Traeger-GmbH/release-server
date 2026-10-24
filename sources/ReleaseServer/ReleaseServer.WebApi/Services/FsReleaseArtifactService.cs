@@ -41,6 +41,12 @@ namespace ReleaseServer.WebApi
         
         #region ---------- Public constructors ----------
         
+        static FsReleaseArtifactService()
+        {
+            // Avoid skipped [JsonRequired] checks when the first uploads are validated concurrently
+            JsonConfiguration.PrepareContracts();
+        }
+
         public FsReleaseArtifactService(IReleaseArtifactRepository fsReleaseArtifactRepository,
             ILogger<FsReleaseArtifactService> logger)
         {

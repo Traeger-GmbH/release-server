@@ -6,10 +6,14 @@
 // <author>Timo Walter</author>
 //--------------------------------------------------------------------------------------------------
 
+using System.IO;
+
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+
+using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
@@ -29,6 +33,13 @@ namespace ReleaseServer.WebApi
 
         #endregion
 
+        #region ---------- Private static fields ----------
+
+        private static readonly object PrepareLock = new object();
+        private static bool contractsPrepared;
+
+        #endregion
+
         #region ---------- Private static properties ----------
 
         private static NamingStrategy NamingStrategy
@@ -43,6 +54,38 @@ namespace ReleaseServer.WebApi
         #endregion
 
         #region ---------- Public static methods ----------
+
+        /// <summary>
+        /// Deserializes every model type once. Newtonsoft.Json (13.0.3) initializes the check of required
+        /// properties lazily and not thread-safe: if the first deserializations of a type run concurrently,
+        /// one of them can skip the [JsonRequired] check. Calling this method once before concurrent use
+        /// prevents that.
+        /// </summary>
+        public static void PrepareContracts()
+        {
+            lock (PrepareLock)
+            {
+                if (contractsPrepared)
+                    return;
+
+                foreach (var type in new[] { typeof(DeploymentMetaInformation), typeof(ReleaseNotes), typeof(PackageInformation), typeof(ChangeSet) })
+                {
+                    foreach (var serializer in new[] { new JsonSerializer(), JsonSerializer.Create(Settings) })
+                    {
+                        try
+                        {
+                            serializer.Deserialize(new StringReader("{}"), type);
+                        }
+                        catch (JsonSerializationException)
+                        {
+                            // Expected: required properties are missing
+                        }
+                    }
+                }
+
+                contractsPrepared = true;
+            }
+        }
 
         public static void Configure(MvcNewtonsoftJsonOptions options)
         {
