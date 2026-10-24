@@ -1,4 +1,4 @@
-﻿//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // <copyright file="FsReleaseArtifactService.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -32,9 +32,10 @@ namespace ReleaseServer.WebApi
         
         #endregion
         
-        #region ---------- Private static fields ----------
+        #region ---------- Private synchronization fields ----------
         
-        private static SemaphoreSlim directoryLock;
+        // Serializes all write operations on the artifact directory (the service is a singleton).
+        private readonly SemaphoreSlim directoryLock = new SemaphoreSlim(1, 1);
 
         #endregion
         
@@ -45,7 +46,6 @@ namespace ReleaseServer.WebApi
         {
             this.fsReleaseArtifactRepository = fsReleaseArtifactRepository;
             this.logger = logger;
-            directoryLock = new SemaphoreSlim(1, 1);
         }
 
         #endregion
@@ -134,22 +134,6 @@ namespace ReleaseServer.WebApi
         public async Task<List<DeploymentInformation>> GetDeploymentInformations(string productName)
         {
             return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
-        }
-
-        public async Task<List<string>> GetPlatforms(string productName, string version)
-        {
-            return await Task.Run(() => fsReleaseArtifactRepository.GetPlatforms(productName, version));
-        }
-
-        public async Task<DeploymentInformation> GetDeploymentInformation(string productName, string os, string architecture, string version)
-        {
-            return await Task.Run(() =>
-                fsReleaseArtifactRepository.GetDeploymentInformation(productName, os, architecture, version));
-        }
-
-        public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
-        {
-            return await Task.Run(() => fsReleaseArtifactRepository.GetVersions(productName, os, architecture));
         }
 
         public async Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture)

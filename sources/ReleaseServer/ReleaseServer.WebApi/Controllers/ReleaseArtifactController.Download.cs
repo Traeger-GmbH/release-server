@@ -1,4 +1,4 @@
-﻿//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactController.Download.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>

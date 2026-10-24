@@ -1,4 +1,4 @@
-﻿//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactRepositoryTest.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -153,30 +153,6 @@ namespace ReleaseServer.WebApi.Test
 
             //Cleanup
             Directory.Delete(Path.Combine(projectDirectory, "TestData", "testproduct"), true);
-        }
-        
-        [Fact]
-        public void TestGetPlatforms()
-        {
-            //Setup
-            List<string> expectedPlatforms1 = new List<string>()
-                {"ubuntu-amd64", "ubuntu-arm64"};
-            
-            List<string> expectedPlatforms2 = new List<string>()
-                {"debian-amd64", "ubuntu-amd64"};
-            
-            List<string> expectedPlatforms3 = new List<string>()
-                {"debian-amd64"};
-
-            //Act
-            var testPlatforms1 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.0");
-            var testPlatforms2 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.1");
-            var testPlatforms3 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.2-beta");
-
-            //Assert
-            Assert.Equal(expectedPlatforms1, testPlatforms1);
-            Assert.Equal(expectedPlatforms2, testPlatforms2);
-            Assert.Equal(expectedPlatforms3, testPlatforms3);
         }
         
         [Fact]

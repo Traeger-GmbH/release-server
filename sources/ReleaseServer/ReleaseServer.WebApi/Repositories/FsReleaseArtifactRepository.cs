@@ -1,4 +1,4 @@
-﻿//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // <copyright file="FsReleaseArtifactRepository.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -257,20 +257,6 @@ namespace ReleaseServer.WebApi
 
             // Directories that are not named like a version are skipped.
             return versions.Where(v => v != null).OrderByDescending(v => v).ToList();
-        }
-
-        public List<string> GetPlatforms(string productName, string version)
-        {
-            var platforms =
-                from productDir in EnumerateProductDirectories()
-                where productDir.Name == productName
-                from osDir in productDir.EnumerateDirectories()
-                from hwArchDir in osDir.EnumerateDirectories()
-                from versionDir in hwArchDir.EnumerateDirectories()
-                where versionDir.Name == version
-                select osDir.Name + "-" + hwArchDir.Name;
-
-            return platforms.OrderBy(p => p).ToList();
         }
 
         public BackupInformation RunBackup()
