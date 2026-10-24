@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 using ReleaseServer.WebApi.Models;
@@ -32,6 +33,7 @@ namespace ReleaseServer.WebApi
         /// <response code="200">The artifact directory backup was successful.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpGet("backup")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<FileStreamResult> Backup()
         {
 
@@ -58,6 +60,7 @@ namespace ReleaseServer.WebApi
         /// <response code="400">No body provided.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpPut("restore")]
+        [EnableCors(CorsPolicies.Authenticated)]
         // Backups contain all artifacts and can be large; the endpoint requires authentication.
         [DisableRequestSizeLimit]
         [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
@@ -93,6 +96,7 @@ namespace ReleaseServer.WebApi
         /// </summary>
         /// <response code="200">The restore process was successful.</response>
         [HttpGet("statistics")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<ActionResult<Statistics>> GetStatistics()
         {
             return await this.releaseArtifactService.GetStatistics();

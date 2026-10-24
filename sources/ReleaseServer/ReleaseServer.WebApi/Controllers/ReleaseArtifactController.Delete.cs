@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactController.Delete.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
@@ -9,6 +9,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReleaseServer.WebApi
@@ -33,6 +34,7 @@ namespace ReleaseServer.WebApi
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="404">There exists no artifact with the specified parameters.</response>
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var artifactFound = await releaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
@@ -59,6 +61,7 @@ namespace ReleaseServer.WebApi
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="404">There exists no artifact with the specified product name.</response>
         [HttpDelete("{product}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
             var productFound = await releaseArtifactService.DeleteProductIfExists(product);

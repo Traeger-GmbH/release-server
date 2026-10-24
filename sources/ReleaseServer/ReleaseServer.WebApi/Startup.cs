@@ -113,16 +113,7 @@ namespace ReleaseServer.WebApi
             
             services.AddFsReleaseArtifactService(Configuration);
 
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder
-                        .AllowAnyMethod()
-                        .SetIsOriginAllowed(_ => true)
-                        .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000));
-                });
-            });
+            services.AddCors(options => CorsPolicies.Configure(options, Configuration));
 
             // Explicitly use the Hellang middleware: the response format is part of the public API.
             ProblemDetailsExtensions.AddProblemDetails(services, LegacyProblemDetails.Configure);

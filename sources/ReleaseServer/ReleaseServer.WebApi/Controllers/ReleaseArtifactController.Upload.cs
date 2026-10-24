@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReleaseServer.WebApi
@@ -35,6 +36,7 @@ namespace ReleaseServer.WebApi
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("{product}/{os}/{architecture}/{version}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
@@ -98,6 +100,7 @@ namespace ReleaseServer.WebApi
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("")]
+        [EnableCors(CorsPolicies.Authenticated)]
         //Max. 1024 MB
         [RequestSizeLimit(1073741824)]
         [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
