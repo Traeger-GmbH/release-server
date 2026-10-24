@@ -63,7 +63,23 @@
             ]
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "linux/x64",
+          "fileName": "alpha.tar.gz",
+          "size": 39,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/linux/x64/1.0"
+        },
+        {
+          "platform": "windows/x64",
+          "fileName": "alpha-setup.exe",
+          "size": 41,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/x64/1.0"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 1,

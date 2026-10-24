@@ -170,7 +170,10 @@ function normalize (value, key) {
     return (key === 'platforms' || key === 'products') && items.every(item => typeof item === 'string') ? items.sort() : items;
   }
   if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, k === 'traceId' ? '<traceId>' : normalize(v, k)]));
+    // "artifacts" was added in version 1.1 (additive) and is checked separately (checkArtifacts)
+    return Object.fromEntries(Object.entries(value)
+      .filter(([k]) => k !== 'artifacts')
+      .map(([k, v]) => [k, k === 'traceId' ? '<traceId>' : normalize(v, k)]));
   }
   return value;
 }
@@ -247,6 +250,32 @@ function compareSnapshots (name, expected, actual) {
   }
 }
 
+// Version 1.1+: every release lists its files with size and SHA-256. The checksums of existing data are
+// added in the background after the start; wait for them and compare them with the downloaded files.
+async function checkArtifacts (name) {
+  const products = (await fetch(`${baseUrl}/artifacts/`).then(r => r.json())).products;
+  let artifacts = [];
+  for (let attempt = 0; attempt < 120; attempt++) {
+    artifacts = [];
+    for (const product of products) {
+      const info = await fetch(`${baseUrl}/artifacts/${encodeURIComponent(product)}/info?limit=1000`).then(r => r.ok ? r.json() : { releases: [] });
+      artifacts.push(...info.releases.flatMap(release => release.artifacts ?? []));
+    }
+    if (artifacts.every(artifact => artifact.sha256)) {
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  let mismatches = 0;
+  for (const artifact of artifacts) {
+    const body = Buffer.from(await (await fetch(baseUrl + artifact.downloadUrl)).arrayBuffer());
+    if (artifact.sha256 !== createHash('sha256').update(body).digest('hex') || artifact.size !== body.length) {
+      mismatches++;
+    }
+  }
+  check(`${name}: ${artifacts.length} artifacts with matching size and SHA-256`, 0, mismatches + artifacts.filter(a => !a.sha256).length);
+}
+
 async function backup () {
   const response = await fetch(`${baseUrl}/artifacts/backup`, { headers: { Authorization: authHeader } });
   check('backup status', 200, response.status);
@@ -272,6 +301,7 @@ async function main () {
   // 2. New server on the same volumes.
   await startServer(args.new, `${prefix}-new`);
   compareSnapshots('new reads old data', oldSnapshot, await snapshot());
+  await checkArtifacts('new adds checksums to old data');
 
   // 3. Restore of an old backup and of an own backup.
   check('new: restore old backup', 200, await upload('/artifacts/restore', 'backupFile', oldBackup));

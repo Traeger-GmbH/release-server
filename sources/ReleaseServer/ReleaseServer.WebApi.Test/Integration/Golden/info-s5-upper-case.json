@@ -24,7 +24,16 @@
           }
         ],
         "en": []
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "Windows/X86",
+          "fileName": "Setup S5 LAN.exe",
+          "size": 61,
+          "sha256": null,
+          "downloadUrl": "/artifacts/s5-lan-3964R-lan-manager/Windows/X86/1.36"
+        }
+      ]
     },
     {
       "version": "1.7",
@@ -47,7 +56,16 @@
           }
         ],
         "en": []
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows-xp/any",
+          "fileName": "s5lan-1.7.zip",
+          "size": 63,
+          "sha256": null,
+          "downloadUrl": "/artifacts/s5-lan-3964R-lan-manager/windows-xp/any/1.7"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 2,

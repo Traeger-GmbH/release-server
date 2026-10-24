@@ -47,6 +47,10 @@ namespace ReleaseServer.WebApi
         ///
         /// Pre-releases have a version suffix (e.g. 2.0.0-beta) and "isPreviewRelease": true. A release without
         /// suffix is newer than its pre-releases.
+        ///
+        /// "artifacts" lists the downloadable file of every platform with file name, size in bytes, SHA-256
+        /// checksum (lower case hex) and download URL. The checksum of files uploaded before version 1.1 is
+        /// calculated by the server in the background and is null until then.
         /// </remarks>
         /// <param name="product">The identifier of the product (case-sensitive), as listed by GET /artifacts.</param>
         /// <param name="architectures">Only releases for these architectures (comma separated or repeated parameter), e.g. "x64,arm64". Default: all.</param>

@@ -1,4 +1,5 @@
 {
   "ReleaseNotesFileName": "releaseNotes.json",
-  "ArtifactFileName": "foobar_win-x64.exe"
+  "ArtifactFileName": "foobar_win-x64.exe",
+  "Sha256": "836345f45021a349b572c59e6bcd624af3c2323b65f67c12b723f8ad56004e0e"
 }

@@ -21,7 +21,16 @@
             "deprecated": null
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows/any",
+          "fileName": "alpha-1.10-beta.zip",
+          "size": 47,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/any/1.10-beta"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 1,

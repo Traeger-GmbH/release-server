@@ -23,6 +23,8 @@ namespace ReleaseServer.WebApi.Test
 {
     public class ReleaseArtifactRepositoryTest
     {
+        private static readonly string[] ArtifactDetails = { "VersionDirectoryName", "ArtifactFileName", "ArtifactFilePath", "ArtifactSize", "Sha256" };
+
         private IReleaseArtifactRepository fsReleaseArtifactRepository;
         private readonly string projectDirectory;
         public ReleaseArtifactRepositoryTest()
@@ -149,7 +151,8 @@ namespace ReleaseServer.WebApi.Test
             var testProductInfo = fsReleaseArtifactRepository.GetInfosByProductName("testproduct");
             
             //Assert
-            testProductInfo.Should().BeEquivalentTo(new[] { expectedProductInfo });
+            //The artifact file details (added in version 1.1) are covered by the integration tests
+            testProductInfo.Should().BeEquivalentTo(new[] { expectedProductInfo }, options => options.Excluding(member => ArtifactDetails.Contains(member.Name)));
 
             //Cleanup
             Directory.Delete(Path.Combine(projectDirectory, "TestData", "testproduct"), true);
@@ -238,7 +241,7 @@ namespace ReleaseServer.WebApi.Test
                 "amd64", "1.1");
             
             //Assert 
-            testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo);
+            testReleaseInfo.Should().BeEquivalentTo(expectedReleaseInfo, options => options.Excluding(member => ArtifactDetails.Contains(member.Name)));
         }
         
         [Fact]

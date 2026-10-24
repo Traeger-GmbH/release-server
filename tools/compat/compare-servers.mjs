@@ -7,6 +7,7 @@
 // Compared: product list, /info of every product (several query variants) and the 404 responses.
 // With --downloads, every artifact is downloaded from both servers and compared by SHA-256 (this
 // transfers all files twice). No authentication is used and nothing is changed on either server.
+// The field "artifacts" (version 1.1) is only compared with --compare-artifacts.
 
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
@@ -30,7 +31,10 @@ function normalize (value, key) {
     return (key === 'platforms' || key === 'products') && items.every(item => typeof item === 'string') ? items.sort() : items;
   }
   if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, k === 'traceId' ? '<traceId>' : normalize(v, k)]));
+    // "artifacts" was added in version 1.1 (additive); it is not compared, so older servers can be compared
+    return Object.fromEntries(Object.entries(value)
+      .filter(([k]) => k !== 'artifacts' || args['compare-artifacts'])
+      .map(([k, v]) => [k, k === 'traceId' ? '<traceId>' : normalize(v, k)]));
   }
   return value;
 }

@@ -469,7 +469,7 @@
           "ReleaseArtifact"
         ],
         "summary": "Lists the releases of a product.",
-        "description": "Returns the releases of a product with version, release date, supported platforms and change log.\nThe releases can be filtered by platform and version, sorted by version and paged.\n            \nA platform consists of an operating system and an architecture, e.g. \"windows/x64\" or \"linux/arm64\".\nTo download a release, use the version and one of its platforms:\n`GET /artifacts/{product}/{os}/{architecture}/{version}`.\n            \nExamples:\n            \n    GET /artifacts/example-product/info\n    GET /artifacts/example-product/info?operatingSystems=windows&architectures=x64,any\n    GET /artifacts/example-product/info?sortOrder=descending&limit=1   (latest release)\n    GET /artifacts/example-product/info?version=1.2.0                     (one release)\n            \nPre-releases have a version suffix (e.g. 2.0.0-beta) and \"isPreviewRelease\": true. A release without\nsuffix is newer than its pre-releases.",
+        "description": "Returns the releases of a product with version, release date, supported platforms and change log.\nThe releases can be filtered by platform and version, sorted by version and paged.\n            \nA platform consists of an operating system and an architecture, e.g. \"windows/x64\" or \"linux/arm64\".\nTo download a release, use the version and one of its platforms:\n`GET /artifacts/{product}/{os}/{architecture}/{version}`.\n            \nExamples:\n            \n    GET /artifacts/example-product/info\n    GET /artifacts/example-product/info?operatingSystems=windows&architectures=x64,any\n    GET /artifacts/example-product/info?sortOrder=descending&limit=1   (latest release)\n    GET /artifacts/example-product/info?version=1.2.0                     (one release)\n            \nPre-releases have a version suffix (e.g. 2.0.0-beta) and \"isPreviewRelease\": true. A release without\nsuffix is newer than its pre-releases.\n            \n\"artifacts\" lists the downloadable file of every platform with file name, size in bytes, SHA-256\nchecksum (lower case hex) and download URL. The checksum of files uploaded before version 1.1 is\ncalculated by the server in the background and is null until then.",
         "parameters": [
           {
             "name": "product",
@@ -571,7 +571,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     },
                     {
                       "version": "1.2.0",
@@ -607,7 +608,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     }
                   ],
                   "totalReleaseCount": 2,
@@ -642,7 +644,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     },
                     {
                       "version": "1.2.0",
@@ -678,7 +681,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     }
                   ],
                   "totalReleaseCount": 2,
@@ -713,7 +717,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     },
                     {
                       "version": "1.2.0",
@@ -749,7 +754,8 @@
                             "deprecated": null
                           }
                         ]
-                      }
+                      },
+                      "artifacts": []
                     }
                   ],
                   "totalReleaseCount": 2,
@@ -894,6 +900,37 @@
   },
   "components": {
     "schemas": {
+      "ArtifactInformation": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "$ref": "#/components/schemas/Platform"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Gets or sets the file name of the download.",
+            "nullable": true
+          },
+          "size": {
+            "type": "integer",
+            "description": "Gets or sets the size of the file in bytes.",
+            "format": "int64",
+            "nullable": true
+          },
+          "sha256": {
+            "type": "string",
+            "description": "Gets or sets the SHA-256 checksum of the file as lower case hex string. It is null for existing\nfiles until the server has calculated it (shortly after the start).",
+            "nullable": true
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "Gets or sets the relative URL to download the file.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The downloadable file of a release for one platform."
+      },
       "ChangeSet": {
         "type": "object",
         "properties": {
@@ -1109,6 +1146,14 @@
               "$ref": "#/components/schemas/Platform"
             },
             "description": "Gets or sets the platforms this release is available for.",
+            "nullable": true
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactInformation"
+            },
+            "description": "Gets or sets the downloadable files of the release (one per platform, same order as Platforms).\nAdded in version 1.1; it is serialized last, so the existing properties keep their order.",
             "nullable": true
           }
         },

@@ -21,6 +21,15 @@ namespace ReleaseServer.WebApi.Models
         /// Initializes a new instance of the <see cref="ReleaseInformation"/> class.
         /// </summary>
         public ReleaseInformation(ProductVersion version, ReleaseNotes releaseNotes, IEnumerable<Platform> platforms)
+            : this(version, releaseNotes, platforms, new List<ArtifactInformation>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReleaseInformation"/> class with the downloadable files.
+        /// </summary>
+        public ReleaseInformation(ProductVersion version, ReleaseNotes releaseNotes, IEnumerable<Platform> platforms,
+            IEnumerable<ArtifactInformation> artifacts)
         {
             this.ReleaseDate = releaseNotes.ReleaseDate;
             this.Changes = releaseNotes.Changes;
@@ -28,6 +37,7 @@ namespace ReleaseServer.WebApi.Models
             this.IsSecurityPatch = releaseNotes.IsSecurityPatch;
             this.Version = version;
             this.Platforms = platforms;
+            this.Artifacts = artifacts;
         }
 
         #endregion
@@ -45,6 +55,13 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         [JsonRequired]
         public IEnumerable<Platform> Platforms { get; set; }
+
+        /// <summary>
+        /// Gets or sets the downloadable files of the release (one per platform, same order as Platforms).
+        /// Added in version 1.1; it is serialized last, so the existing properties keep their order.
+        /// </summary>
+        [JsonProperty(Order = 1)]
+        public IEnumerable<ArtifactInformation> Artifacts { get; set; }
 
         #endregion
     }

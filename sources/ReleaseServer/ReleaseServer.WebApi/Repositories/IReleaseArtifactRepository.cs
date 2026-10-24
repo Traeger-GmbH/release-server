@@ -115,5 +115,21 @@ namespace ReleaseServer.WebApi
         /// </summary>
         /// <param name="backupPayload">The backup payload in form of a <see cref="ZipArchive"/></param>
         void RestoreBackup(ZipArchive backupPayload);
+
+        /// <summary>
+        /// Finds the release directories whose deployment.json has no SHA-256 checksum of the artifact yet.
+        /// </summary>
+        List<string> FindReleaseDirectoriesWithoutHash();
+
+        /// <summary>
+        /// Calculates the SHA-256 checksum of the artifact of a release directory (without changing anything).
+        /// </summary>
+        ArtifactHash CalculateArtifactHash(string releaseDirectory);
+
+        /// <summary>
+        /// Adds a calculated checksum to deployment.json, if it is still missing and the artifact did not
+        /// change in the meantime. All other content of deployment.json is kept.
+        /// </summary>
+        bool StoreArtifactHash(ArtifactHash hash);
     }
 }

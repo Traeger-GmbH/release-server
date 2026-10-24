@@ -31,6 +31,13 @@ namespace ReleaseServer.WebApi.Models
         [JsonRequired]
         public string ArtifactFileName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the SHA-256 checksum of the artifact file (lower case hex). Written since version 1.1;
+        /// older data gets it added by the server. Previous versions ignore it.
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string Sha256 { get; set; }
+
         #endregion
     }
 }

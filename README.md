@@ -60,6 +60,8 @@ writable.
 | `ArtifactRootDirectory` | Directory of the artifacts | `./artifacts` |
 | `BackupRootDirectory` | Directory of the backups | `./backups` |
 | `BackupRetentionCount` | Number of backups kept in the backup directory | `5` |
+| `AddMissingArtifactHashes` | Calculate the SHA-256 checksums of artifacts uploaded before version 1.1 in the background | `true` |
+| `PublicBaseUrl` | Public address used for the URLs of the NuGet feed; empty: taken from the request (X-Forwarded-Proto/Host) | empty |
 | `Cors__WriteOrigins__0`, `__1`, ... | Origins that may call the authenticated endpoints from a browser (CORS). The public endpoints can be read by any website. | none |
 
 The settings are read from `/app/appsettings.json` and can be overridden by environment variables.
@@ -134,6 +136,20 @@ curl -X PUT http://localhost:5000/artifacts/<product>/<os>/<architecture>/<versi
 
 Names of products, operating systems and architectures may contain letters, digits, `-`, `_` and `.`.
 Use `any` for platform independent files (e.g. `any/any`).
+
+### NuGet feed
+
+All artifacts that are NuGet packages (`.nupkg`) are also available in a read-only NuGet v3 feed, without
+authentication. Package ID and version come from the `.nuspec` inside the package, not from the product name.
+
+```bash
+dotnet add package <PackageId> --version <version> --source http://localhost:5000/nuget/v3/index.json
+```
+
+In Visual Studio, add `http(s)://<server>/nuget/v3/index.json` as package source. Prerelease versions are
+only shown with "Include prerelease". Packages are uploaded like all other artifacts (not via `nuget push`).
+Behind a reverse proxy, the feed uses the forwarded protocol and host for its URLs; alternatively set
+`PublicBaseUrl` (e.g. `https://releases.example.com`).
 
 ### Backup and restore
 

@@ -27,15 +27,31 @@ namespace ReleaseServer.WebApi
 
             foreach (var (version, deploymentList) in deploymentsByVersion) {
                 var platforms = new List<Platform>();
+                var artifacts = new List<ArtifactInformation>();
                 foreach (var deployment in deploymentList) {
-                    platforms.Add(new Platform(deployment.Os, deployment.Architecture));
+                    var platform = new Platform(deployment.Os, deployment.Architecture);
+                    platforms.Add(platform);
+                    artifacts.Add(new ArtifactInformation {
+                        Platform = platform,
+                        FileName = deployment.ArtifactFileName,
+                        Size = deployment.ArtifactSize,
+                        Sha256 = deployment.Sha256,
+                        DownloadUrl = CreateDownloadUrl(deployment)
+                    });
                 }
 
                 // Note: We assume here that every deployment has equivalent release notes. This will be fixed in a ReleaseArtifactService/ReleaseArtifactRepository rework.
-                releases.Add(new ReleaseInformation(version, deploymentList.First().ReleaseNotes, platforms));
+                releases.Add(new ReleaseInformation(version, deploymentList.First().ReleaseNotes, platforms, artifacts));
             }
 
             return releases;
+        }
+
+        private static string CreateDownloadUrl(DeploymentInformation deployment)
+        {
+            // The version directory name is used, so the URL also works if it differs from the normalized version
+            var segments = new[] { deployment.Identifier, deployment.Os, deployment.Architecture, deployment.VersionDirectoryName ?? deployment.Version.ToString() };
+            return "/artifacts/" + string.Join("/", segments.Select(System.Uri.EscapeDataString));
         }
 
         private static Dictionary<ProductVersion, List<DeploymentInformation>> GetDeploymentsMappedByVersion(IEnumerable<DeploymentInformation> deployments)

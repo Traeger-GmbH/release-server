@@ -1,4 +1,5 @@
 {
   "ReleaseNotesFileName": "releaseNotes.json",
-  "ArtifactFileName": "new-setup.exe"
+  "ArtifactFileName": "new-setup.exe",
+  "Sha256": "ce59a877c98d548305dbcf07b6d61ecfe4ec595f8fcafef8b8947a3dd33ceab3"
 }
