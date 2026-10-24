@@ -59,9 +59,11 @@ namespace ReleaseServer.WebApi
             ServiceActionResult result;
             
             if (package.ValidationResult.IsValid) {
-                var existingPackage = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier);
+                // Only the same version of the product is a conflict; new versions can be added without "force".
+                var versionExists = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier)
+                    .Any(deployment => deployment.Version == package.Version);
 
-                if (!existingPackage.IsNullOrEmpty() && !force) {
+                if (versionExists && !force) {
                     var errorMessage = $"This package ({package.Identifier}-v{package.Version}) already exists. " +
                         $"Set the parameter \"force = true\" in order to overwrite the existing package.";
                     result = new ServiceActionResult(System.Net.HttpStatusCode.Conflict, new string[] { errorMessage });

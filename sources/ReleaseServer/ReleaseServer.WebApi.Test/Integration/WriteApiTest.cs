@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="WriteApiTest.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2026.
 // </copyright>
@@ -237,6 +237,33 @@ namespace ReleaseServer.WebApi.Test.Integration
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Golden.AssertJson("package-conflict", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task UploadPackage_NewVersionOfExistingProduct_IsAcceptedWithoutForce()
+        {
+            using var client = host.CreateAuthenticatedClient();
+            var first = Zip.CreatePackagePayload("foobar", "1.0", new Dictionary<string, string> { ["windows/x64"] = "a.exe" });
+            var second = Zip.CreatePackagePayload("foobar", "1.1", new Dictionary<string, string> { ["windows/x64"] = "b.exe" });
+            await client.PutAsync("/artifacts", Zip.CreateFormContent("package", first, "package.zip"));
+
+            var response = await client.PutAsync("/artifacts", Zip.CreateFormContent("package", second, "package.zip"));
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(Directory.Exists(Path.Combine(host.ArtifactDirectory, "foobar", "windows", "x64", "1.0")));
+            Assert.True(Directory.Exists(Path.Combine(host.ArtifactDirectory, "foobar", "windows", "x64", "1.1")));
+        }
+
+        [Fact]
+        public async Task UploadPackage_ExistingVersionOfLegacyProduct_IsRejectedWithoutForce()
+        {
+            using var client = host.CreateAuthenticatedClient();
+            var payload = Zip.CreatePackagePayload("alpha", "1.10", new Dictionary<string, string> { ["linux/arm64"] = "a.tar.gz" });
+
+            var response = await client.PutAsync("/artifacts", Zip.CreateFormContent("package", payload, "package.zip"));
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.False(Directory.Exists(Path.Combine(host.ArtifactDirectory, "alpha", "linux", "arm64")));
         }
 
         [Fact]
