@@ -469,26 +469,23 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Verifies the structure of an extracted backup: product/os/architecture/version directories,
-        /// readable deployment.json and release notes and existing artifact files.
+        /// Verifies an extracted backup. Every artifact directory (product/os/architecture/version) needs a
+        /// readable deployment.json whose files exist inside the directory and readable release notes.
+        /// Everything else is allowed, because previous versions stored more (e.g. complete extracted upload
+        /// archives with sub directories like __MACOSX): unknown content is accepted unless it is unsafe.
         /// </summary>
         private static List<string> ValidateBackupContent(DirectoryInfo stagingDir, out int artifactCount)
         {
             var errors = new List<string>();
             artifactCount = 0;
 
-            foreach (var file in stagingDir.EnumerateFiles())
-            {
-                errors.Add($"Unexpected file \"{file.Name}\" in the root directory of the backup.");
-            }
-
             foreach (var productDir in stagingDir.EnumerateDirectories())
             {
-                foreach (var osDir in EnumerateLevel(productDir, errors))
+                foreach (var osDir in productDir.EnumerateDirectories())
                 {
-                    foreach (var architectureDir in EnumerateLevel(osDir, errors))
+                    foreach (var architectureDir in osDir.EnumerateDirectories())
                     {
-                        foreach (var versionDir in EnumerateLevel(architectureDir, errors))
+                        foreach (var versionDir in architectureDir.EnumerateDirectories())
                         {
                             var path = $"{productDir.Name}/{osDir.Name}/{architectureDir.Name}/{versionDir.Name}";
 
@@ -509,29 +506,9 @@ namespace ReleaseServer.WebApi
             return errors;
         }
 
-        private static IEnumerable<DirectoryInfo> EnumerateLevel(DirectoryInfo directory, List<string> errors)
-        {
-            foreach (var file in directory.EnumerateFiles())
-            {
-                errors.Add($"Unexpected file \"{file.Name}\" in \"{directory.Name}\".");
-            }
-
-            return directory.EnumerateDirectories().ToList();
-        }
-
         private static bool ValidateArtifactDirectory(DirectoryInfo versionDir, string path, List<string> errors)
         {
             var errorCount = errors.Count;
-
-            if (!StorageNames.TryParseVersion(versionDir.Name, out _))
-            {
-                errors.Add($"\"{path}\": the directory name is not a valid version.");
-            }
-
-            if (versionDir.EnumerateDirectories().Any())
-            {
-                errors.Add($"\"{path}\": unexpected sub directories.");
-            }
 
             var metaFile = Path.Combine(versionDir.FullName, StorageNames.DeploymentMetaFileName);
             if (!File.Exists(metaFile))
@@ -551,13 +528,14 @@ namespace ReleaseServer.WebApi
                 return false;
             }
 
-            if (meta == null || !StorageNames.IsValidFileName(meta.ArtifactFileName) || !StorageNames.IsValidFileName(meta.ReleaseNotesFileName))
+            if (meta == null
+                || !TryResolveFileInDirectory(versionDir.FullName, meta.ArtifactFileName, out var artifactFile)
+                || !TryResolveFileInDirectory(versionDir.FullName, meta.ReleaseNotesFileName, out var releaseNotesFile))
             {
-                errors.Add($"\"{path}\": {StorageNames.DeploymentMetaFileName} contains invalid file names.");
+                errors.Add($"\"{path}\": {StorageNames.DeploymentMetaFileName} contains file names outside of the directory.");
                 return false;
             }
 
-            var releaseNotesFile = Path.Combine(versionDir.FullName, meta.ReleaseNotesFileName);
             if (!File.Exists(releaseNotesFile))
             {
                 errors.Add($"\"{path}\": the release notes file \"{meta.ReleaseNotesFileName}\" is missing.");
@@ -574,7 +552,7 @@ namespace ReleaseServer.WebApi
                 }
             }
 
-            if (!File.Exists(Path.Combine(versionDir.FullName, meta.ArtifactFileName)))
+            if (!File.Exists(artifactFile))
             {
                 errors.Add($"\"{path}\": the artifact file \"{meta.ArtifactFileName}\" is missing.");
             }
@@ -709,10 +687,43 @@ namespace ReleaseServer.WebApi
         /// </summary>
         private static string ResolveFileInDirectory(string directory, string fileName)
         {
-            if (!StorageNames.IsValidFileName(fileName))
+            if (!TryResolveFileInDirectory(directory, fileName, out var path))
                 throw new InvalidDataException($"Invalid file name in {StorageNames.DeploymentMetaFileName}: {fileName}");
 
-            return Path.Combine(directory, fileName);
+            return path;
+        }
+
+        /// <summary>
+        /// Resolves a file name from a deployment.json. Like previous versions, relative paths to files in sub
+        /// directories are allowed, as long as the resolved path stays inside the artifact directory.
+        /// </summary>
+        private static bool TryResolveFileInDirectory(string directory, string fileName, out string path)
+        {
+            path = null;
+
+            if (string.IsNullOrWhiteSpace(fileName) || fileName.IndexOf('\0') >= 0)
+                return false;
+
+            var fullDirectory = Path.GetFullPath(directory);
+            var directoryWithSeparator = Path.EndsInDirectorySeparator(fullDirectory)
+                ? fullDirectory
+                : fullDirectory + Path.DirectorySeparatorChar;
+
+            string fullPath;
+            try
+            {
+                fullPath = Path.GetFullPath(Path.Combine(fullDirectory, fileName));
+            }
+            catch (Exception e) when (e is ArgumentException || e is NotSupportedException || e is PathTooLongException)
+            {
+                return false;
+            }
+
+            if (!fullPath.StartsWith(directoryWithSeparator, StringComparison.Ordinal))
+                return false;
+
+            path = fullPath;
+            return true;
         }
 
         private string GenerateTemporaryPath()

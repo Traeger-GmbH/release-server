@@ -135,6 +135,37 @@ namespace ReleaseServer.WebApi.Test.Integration
             Directory.CreateDirectory(Path.Combine(artifactDirectory, "pc-s7-link-demo2"));
         }
 
+        /// <summary>
+        /// Creates the legacy data set plus the special cases known from production data that the public API
+        /// does not reveal: an artifact directory with macOS metadata extracted from a Finder ZIP by an old
+        /// server version (testproduct/windows/arm64/1.0.0) and an artifact stored in a sub directory, which old
+        /// versions accepted as well.
+        /// </summary>
+        public static void CreateKnownSpecialCases(string artifactDirectory)
+        {
+            Create(artifactDirectory);
+
+            AddRelease(artifactDirectory, "testproduct", "windows", "arm64", "1.0.0", "test-file-150mb", ReleaseNotesFull, pascalCase: false);
+            var macOsMetadata = Path.Combine(artifactDirectory, "testproduct", "windows", "arm64", "1.0.0", "__MACOSX");
+            Directory.CreateDirectory(macOsMetadata);
+            File.WriteAllBytes(Path.Combine(macOsMetadata, "._releaseNotes.json"), AppleDoubleHeader());
+
+            var subfolderRelease = Path.Combine(artifactDirectory, "legacy-subfolder", "windows", "x64", "0.9");
+            Directory.CreateDirectory(Path.Combine(subfolderRelease, "bin"));
+            File.WriteAllText(Path.Combine(subfolderRelease, "deployment.json"), DeploymentCamelCase.Replace("{0}", "bin/setup.exe"));
+            File.WriteAllText(Path.Combine(subfolderRelease, "releaseNotes.json"), ReleaseNotesGermanOnly);
+            File.WriteAllBytes(Path.Combine(subfolderRelease, "bin", "setup.exe"), ArtifactContent("legacy-subfolder/windows/x64/0.9"));
+            File.WriteAllText(Path.Combine(subfolderRelease, "readme.txt"), "extracted with the artifact by an old server version");
+        }
+
+        /// <summary>
+        /// The beginning of an AppleDouble file ("._*" resource fork written by the macOS Finder).
+        /// </summary>
+        public static byte[] AppleDoubleHeader()
+        {
+            return new byte[] { 0x00, 0x05, 0x16, 0x07, 0x00, 0x02, 0x00, 0x00, 0x4D, 0x61, 0x63, 0x20, 0x4F, 0x53, 0x20, 0x58 };
+        }
+
         public static void AddRelease(string artifactDirectory, string product, string os, string architecture,
             string version, string artifactFileName, string releaseNotes, bool pascalCase)
         {

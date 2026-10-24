@@ -44,8 +44,6 @@ namespace ReleaseServer.WebApi.Test.Integration
             yield return Case("not a ZIP archive", null, Encoding.UTF8.GetBytes("this is not a zip file"));
             yield return Case("empty archive", new Dictionary<string, byte[]>());
             yield return Case("only empty product directories", new Dictionary<string, byte[]> { ["product/"] = new byte[0] });
-            yield return Case("file in the root directory", With(valid, "readme.txt", "x"));
-            yield return Case("file in a product directory", With(valid, "restored/readme.txt", "x"));
             yield return Case("missing deployment.json", Without(valid, "restored/windows/x64/1.0/deployment.json"));
             yield return Case("invalid deployment.json", With(valid, "restored/windows/x64/1.0/deployment.json", "{ invalid"));
             yield return Case("deployment.json pointing outside", With(valid, "restored/windows/x64/1.0/deployment.json",
@@ -53,8 +51,6 @@ namespace ReleaseServer.WebApi.Test.Integration
             yield return Case("missing release notes", Without(valid, "restored/windows/x64/1.0/releaseNotes.json"));
             yield return Case("invalid release notes", With(valid, "restored/windows/x64/1.0/releaseNotes.json", @"{ ""changes"": {} }"));
             yield return Case("missing artifact file", Without(valid, "restored/windows/x64/1.0/a.exe"));
-            yield return Case("version directory is not a version", Rename(valid, "restored/windows/x64/1.0/", "restored/windows/x64/latest/"));
-            yield return Case("artifact directory too shallow", Rename(valid, "restored/windows/x64/1.0/", "restored/windows/1.0/"));
             yield return Case("entry outside of the directory", With(valid, "../evil.txt", "evil"));
             yield return Case("one broken artifact among valid ones",
                 With(With(valid, "restored/linux/x64/3.0/deployment.json", LegacyStore.DeploymentCamelCase.Replace("{0}", "c.tar.gz")),
@@ -75,6 +71,62 @@ namespace ReleaseServer.WebApi.Test.Integration
             Assert.Contains("application/problem+json", response.Content.Headers.ContentType.ToString());
             ReleaseServerTestHost.AssertSameTree(before, ReleaseServerTestHost.ReadTree(host.ArtifactDirectory));
             Assert.Equal(outsideBefore, Directory.GetFileSystemEntries(host.RootDirectory).OrderBy(e => e, StringComparer.Ordinal).ToList());
+        }
+
+        public static IEnumerable<object[]> HarmlessBackups()
+        {
+            var valid = ValidBackupEntries();
+
+            // Previous versions extracted the complete upload archive into the artifact directory, e.g. with
+            // macOS metadata (exactly like testproduct/windows/arm64/1.0.0 in production).
+            yield return Case("sub directory with macOS metadata in an artifact directory",
+                With(valid, "restored/windows/x64/1.0/__MACOSX/._releaseNotes.json", "AppleDouble"));
+            yield return Case("additional files in an artifact directory",
+                With(With(valid, "restored/windows/x64/1.0/readme.txt", "x"), "restored/windows/x64/1.0/docs/manual.pdf", "pdf"));
+            yield return Case("artifact file in a sub directory",
+                With(Without(With(valid, "restored/windows/x64/1.0/bin/a.exe", "a"), "restored/windows/x64/1.0/a.exe"),
+                    "restored/windows/x64/1.0/deployment.json", LegacyStore.DeploymentCamelCase.Replace("{0}", "bin/a.exe")));
+            yield return Case("file in the root directory", With(valid, "readme.txt", "x"));
+            yield return Case("file in a product directory", With(valid, "restored/readme.txt", "x"));
+            yield return Case("version directory is not a version", Rename(valid, "restored/windows/x64/1.0/", "restored/windows/x64/latest/"));
+            yield return Case("files in an architecture directory", Rename(valid, "restored/windows/x64/1.0/", "restored/windows/1.0/"));
+        }
+
+        [Theory]
+        [MemberData(nameof(HarmlessBackups))]
+        public async Task Restore_UnknownButHarmlessStructure_IsAcceptedUnchanged(string description, byte[] backup)
+        {
+            using var client = host.CreateAuthenticatedClient();
+
+            var response = await client.PutAsync("/artifacts/restore", Zip.CreateFormContent("backupFile", backup, "backup.zip"));
+
+            Assert.True(HttpStatusCode.OK == response.StatusCode, $"{description}: {response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+            ReleaseServerTestHost.AssertSameTree(Zip.Read(backup), ReleaseServerTestHost.ReadTree(host.ArtifactDirectory));
+        }
+
+        [Fact]
+        public async Task BackupOfKnownSpecialCases_IsRestorableByteIdentical()
+        {
+            // All special cases known from production data, including the extracted macOS metadata.
+            LegacyStore.CreateKnownSpecialCases(host.ArtifactDirectory);
+            var expected = ReleaseServerTestHost.ReadTree(host.ArtifactDirectory);
+            using var client = host.CreateAuthenticatedClient();
+            var backup = await client.GetByteArrayAsync("/artifacts/backup");
+
+            // Restore into the same server (the data is replaced by itself) and into a new server
+            var sameServer = await client.PutAsync("/artifacts/restore", Zip.CreateFormContent("backupFile", backup, "backup.zip"));
+            using var otherHost = new ReleaseServerTestHost();
+            using var otherClient = otherHost.CreateAuthenticatedClient();
+            var otherServer = await otherClient.PutAsync("/artifacts/restore", Zip.CreateFormContent("backupFile", backup, "backup.zip"));
+
+            Assert.Equal(HttpStatusCode.OK, sameServer.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, otherServer.StatusCode);
+            ReleaseServerTestHost.AssertSameTree(expected, ReleaseServerTestHost.ReadTree(host.ArtifactDirectory));
+            ReleaseServerTestHost.AssertSameTree(expected, ReleaseServerTestHost.ReadTree(otherHost.ArtifactDirectory));
+            Assert.Equal(LegacyStore.ArtifactContent("testproduct/windows/arm64/1.0.0"),
+                await otherClient.GetByteArrayAsync("/artifacts/testproduct/windows/arm64/1.0.0"));
+            Assert.Equal(LegacyStore.ArtifactContent("legacy-subfolder/windows/x64/0.9"),
+                await otherClient.GetByteArrayAsync("/artifacts/legacy-subfolder/windows/x64/latest"));
         }
 
         [Fact]

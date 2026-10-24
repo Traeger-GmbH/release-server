@@ -9,6 +9,8 @@ Server (now .NET 10, ASP.NET Core 10 runtime image):
 * [FIX] Uploads above 128 MB failed (multipart limit); restores above about 30 MB could fail (request size limit)
 * [FIX] Incomplete or broken artifact directories no longer break /info and latest of the whole product
 * [FIX] Failed uploads no longer leave a "temp" product behind
+* [FIX] Restore accepts additional files and sub directories in release directories (e.g. macOS metadata extracted by old versions) and artifacts in sub directories, like previous versions
+* [CHANGE] Uploads ignore operating system metadata in ZIP files (macOS: __MACOSX/, ._*, .DS_Store; Windows: Thumbs.db, ehthumbs.db, desktop.ini, $RECYCLE.BIN/); existing data is not changed
 * [FEATURE] Keep the newest backups (BackupRetentionCount, default 5) instead of only the latest one
 * [FEATURE] Downloads are streamed from disk and support range requests (resume)
 * [CHANGE] A package upload is only rejected if its version already exists (new versions no longer need force=true)

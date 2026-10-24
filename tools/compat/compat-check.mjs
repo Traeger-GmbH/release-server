@@ -82,7 +82,25 @@ function createSeed () {
       }
     }
   }
+  addKnownSpecialCases(seed);
   return seed;
+}
+
+function addKnownSpecialCases (seed) {
+  // Structures in the production data that the public API does not reveal. Old server versions
+  // extracted the complete upload archive into the artifact directory, e.g. the macOS metadata of a
+  // Finder ZIP (production: testproduct/windows/arm64/1.0.0/__MACOSX/._releaseNotes.json).
+  const macOsMetadata = join(seed, 'testproduct', 'windows', 'arm64', '1.0.0', '__MACOSX');
+  mkdirSync(macOsMetadata, { recursive: true });
+  writeFileSync(join(macOsMetadata, '._releaseNotes.json'), Buffer.from('00051607000200004d6163204f532058', 'hex'));
+
+  // Old versions also accepted artifacts in sub directories of the upload archive
+  const subfolder = join(seed, 'legacy-subfolder', 'windows', 'x64', '0.9');
+  mkdirSync(join(subfolder, 'bin'), { recursive: true });
+  writeFileSync(join(subfolder, 'deployment.json'), JSON.stringify({ releaseNotesFileName: 'releaseNotes.json', artifactFileName: 'bin/setup.exe' }));
+  writeFileSync(join(subfolder, 'releaseNotes.json'), JSON.stringify({ releaseDate: '2021-05-07', changes: { de: [{ added: ['Alt'] }] } }));
+  writeFileSync(join(subfolder, 'bin', 'setup.exe'), 'artifact legacy-subfolder 0.9');
+  writeFileSync(join(subfolder, 'readme.txt'), 'extracted with the artifact');
 }
 
 function zipDirectory (sourceDir, entries, target) {

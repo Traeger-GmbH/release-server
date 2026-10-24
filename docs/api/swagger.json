@@ -159,7 +159,7 @@
           "ReleaseArtifact"
         ],
         "summary": "Uploads a release for one platform (requires authentication)",
-        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe request body is multipart/form-data with the field \"artifact\": a ZIP file (max. 500 MB) containing\n            \n- deployment.json: { \"artifactFileName\": \"setup.exe\", \"releaseNotesFileName\": \"releaseNotes.json\" }\n- the release notes file: { \"releaseDate\": \"2026-01-31\", \"isPreviewRelease\": false, \"isSecurityPatch\": false,\n  \"changes\": { \"en\": [ { \"added\": [], \"fixed\": [], \"breaking\": [], \"deprecated\": [] } ] } }\n- the artifact file itself\n            \nAn existing release with the same product, platform and version is replaced. Names may contain\nletters, digits, '-', '_' and '.'.",
+        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe request body is multipart/form-data with the field \"artifact\": a ZIP file (max. 500 MB) containing\n            \n- deployment.json: { \"artifactFileName\": \"setup.exe\", \"releaseNotesFileName\": \"releaseNotes.json\" }\n- the release notes file: { \"releaseDate\": \"2026-01-31\", \"isPreviewRelease\": false, \"isSecurityPatch\": false,\n  \"changes\": { \"en\": [ { \"added\": [], \"fixed\": [], \"breaking\": [], \"deprecated\": [] } ] } }\n- the artifact file itself\n            \nOperating system metadata in the ZIP file is ignored and not stored: macOS (\"__MACOSX/\", \"._*\",\n\".DS_Store\") and Windows (\"Thumbs.db\", \"ehthumbs.db\", \"desktop.ini\", \"$RECYCLE.BIN/\").\n            \nAn existing release with the same product, platform and version is replaced. Names may contain\nletters, digits, '-', '_' and '.'.",
         "parameters": [
           {
             "name": "product",
@@ -381,7 +381,7 @@
           "ReleaseArtifact"
         ],
         "summary": "Replaces all products by the content of a backup (requires authentication)",
-        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe backup is extracted and verified first (structure, meta information, release notes and files).\nThe existing data is only replaced if the backup is valid; otherwise it stays unchanged and the\nresponse describes the problems.",
+        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe backup is extracted and verified first (structure, meta information, release notes and files).\nThe existing data is only replaced if the backup is valid; otherwise it stays unchanged and the\nresponse describes the problems. Every release needs its deployment.json, release notes and\nartifact file; additional files and directories (e.g. stored by previous versions) are kept.",
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -834,7 +834,7 @@
           "ReleaseArtifact"
         ],
         "summary": "Uploads a release for several platforms (package) (requires authentication)",
-        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe request body is multipart/form-data with the field \"package\": a ZIP file (max. 1 GB) containing a\nfolder with package.json and the files of all platforms:\n            \n    {\n      \"identifier\": \"example-product\",\n      \"version\": \"1.2.0\",\n      \"releaseNotes\": { \"releaseDate\": \"2026-01-31\", \"changes\": { \"en\": [ { \"added\": [\"...\"] } ] } },\n      \"deployments\": {\n        \"windows/x64\": \"files/setup-x64.exe\",\n        \"linux/arm64\": \"files/app-arm64.tar.gz\",\n        \"any/any\": \"files/documentation.zip\"\n      }\n    }\n            \nIf the version already exists, the upload is rejected unless force=true is set.",
+        "description": "**Requires authentication** (HTTP Basic). Not intended for public use.\n\nThe request body is multipart/form-data with the field \"package\": a ZIP file (max. 1 GB) containing a\nfolder with package.json and the files of all platforms:\n            \n    {\n      \"identifier\": \"example-product\",\n      \"version\": \"1.2.0\",\n      \"releaseNotes\": { \"releaseDate\": \"2026-01-31\", \"changes\": { \"en\": [ { \"added\": [\"...\"] } ] } },\n      \"deployments\": {\n        \"windows/x64\": \"files/setup-x64.exe\",\n        \"linux/arm64\": \"files/app-arm64.tar.gz\",\n        \"any/any\": \"files/documentation.zip\"\n      }\n    }\n            \nOperating system metadata in the ZIP file is ignored and not stored: macOS (\"__MACOSX/\", \"._*\",\n\".DS_Store\") and Windows (\"Thumbs.db\", \"ehthumbs.db\", \"desktop.ini\", \"$RECYCLE.BIN/\").\n            \nIf the version already exists, the upload is rejected unless force=true is set.",
         "parameters": [
           {
             "name": "force",

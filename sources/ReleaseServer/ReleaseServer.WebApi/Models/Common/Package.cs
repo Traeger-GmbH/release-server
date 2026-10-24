@@ -51,7 +51,8 @@ namespace ReleaseServer.WebApi.Models
                     var zipEntry = this.ZipArchive.Entries[i];
                     var fileName = Path.GetFileName(zipEntry.FullName);
 
-                    if (fileName != null && fileName == InformationFileName) {
+                    // Operating system metadata (e.g. "__MACOSX/<folder>/._package.json") is ignored
+                    if (fileName != null && fileName == InformationFileName && !StorageNames.IsOperatingSystemMetadata(zipEntry.FullName)) {
                         packageInformationEntry = zipEntry;
                         rootDirectoryName = Path.GetDirectoryName(zipEntry.FullName);
                     }
@@ -79,6 +80,7 @@ namespace ReleaseServer.WebApi.Models
                                 var deploymentEntryName = rootDirectoryName + "/" + filePath;
                                 if (this.ZipArchive.TryGetEntry(deploymentEntryName, out var deploymentEntry)) {
                                     if (StorageNames.IsValidFileName(deploymentEntry.Name)
+                                        && !StorageNames.IsOperatingSystemMetadata(deploymentEntry.FullName)
                                         && deploymentEntry.Name != StorageNames.DeploymentMetaFileName
                                         && deploymentEntry.Name != "releaseNotes.json") {
                                         this.Deployments.Add(platform, deploymentEntry);

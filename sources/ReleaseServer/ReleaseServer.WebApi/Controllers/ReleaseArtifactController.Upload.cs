@@ -32,6 +32,9 @@ namespace ReleaseServer.WebApi
         ///   "changes": { "en": [ { "added": [], "fixed": [], "breaking": [], "deprecated": [] } ] } }
         /// - the artifact file itself
         ///
+        /// Operating system metadata in the ZIP file is ignored and not stored: macOS ("__MACOSX/", "._*",
+        /// ".DS_Store") and Windows ("Thumbs.db", "ehthumbs.db", "desktop.ini", "$RECYCLE.BIN/").
+        ///
         /// An existing release with the same product, platform and version is replaced. Names may contain
         /// letters, digits, '-', '_' and '.'.
         /// </remarks>
@@ -116,6 +119,9 @@ namespace ReleaseServer.WebApi
         ///         "any/any": "files/documentation.zip"
         ///       }
         ///     }
+        ///
+        /// Operating system metadata in the ZIP file is ignored and not stored: macOS ("__MACOSX/", "._*",
+        /// ".DS_Store") and Windows ("Thumbs.db", "ehthumbs.db", "desktop.ini", "$RECYCLE.BIN/").
         ///
         /// If the version already exists, the upload is rejected unless force=true is set.
         /// </remarks>

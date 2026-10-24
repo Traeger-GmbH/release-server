@@ -305,7 +305,9 @@ namespace ReleaseServer.WebApi
                 || !StorageNames.IsValidFileName(deploymentMetaInfo.ReleaseNotesFileName)
                 || deploymentMetaInfo.ArtifactFileName == StorageNames.DeploymentMetaFileName
                 || deploymentMetaInfo.ReleaseNotesFileName == StorageNames.DeploymentMetaFileName
-                || deploymentMetaInfo.ArtifactFileName == deploymentMetaInfo.ReleaseNotesFileName)
+                || deploymentMetaInfo.ArtifactFileName == deploymentMetaInfo.ReleaseNotesFileName
+                || StorageNames.IsOperatingSystemMetadata(deploymentMetaInfo.ArtifactFileName)
+                || StorageNames.IsOperatingSystemMetadata(deploymentMetaInfo.ReleaseNotesFileName))
             {
                 var validationError = "the file names in the deployment meta information (deployment.json) are invalid! "
                                       + "They must be different plain file names without path separators.";

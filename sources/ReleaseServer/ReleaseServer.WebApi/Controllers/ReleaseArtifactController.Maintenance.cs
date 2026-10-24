@@ -61,7 +61,8 @@ namespace ReleaseServer.WebApi
         /// <remarks>
         /// The backup is extracted and verified first (structure, meta information, release notes and files).
         /// The existing data is only replaced if the backup is valid; otherwise it stays unchanged and the
-        /// response describes the problems.
+        /// response describes the problems. Every release needs its deployment.json, release notes and
+        /// artifact file; additional files and directories (e.g. stored by previous versions) are kept.
         /// </remarks>
         /// <param name="backupFile">The backup (ZIP file created by GET /artifacts/backup), sent as multipart/form-data.</param>
         /// <returns>An <see cref="OkObjectResult"/> if the restore operation was successful and <see cref="BadRequestResult"/>, if not.</returns>

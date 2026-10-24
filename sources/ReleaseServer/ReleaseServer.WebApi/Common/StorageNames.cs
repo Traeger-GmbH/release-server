@@ -91,6 +91,51 @@ namespace ReleaseServer.WebApi
                    && !value.Any(char.IsControl);
         }
 
+        // Operating system metadata that file managers add to ZIP archives. Entries matching these rules
+        // are ignored in new uploads (existing data is never changed). The comparison ignores the case.
+        // Extend the lists to ignore further metadata.
+
+        // Directories whose complete content is metadata
+        private static readonly string[] MetadataDirectoryNames =
+        {
+            "__MACOSX",      // macOS Finder
+            "$RECYCLE.BIN",  // Windows recycle bin
+        };
+
+        // File names that are metadata
+        private static readonly string[] MetadataFileNames =
+        {
+            ".DS_Store",     // macOS Finder
+            "Thumbs.db",     // Windows thumbnail cache
+            "ehthumbs.db",   // Windows Media Center thumbnail cache
+            "desktop.ini",   // Windows folder settings
+        };
+
+        // File name prefixes that are metadata
+        private static readonly string[] MetadataFileNamePrefixes =
+        {
+            "._",            // macOS resource forks (AppleDouble files)
+        };
+
+        /// <summary>
+        /// Checks whether an entry of an uploaded ZIP archive is operating system metadata (e.g.
+        /// "__MACOSX/...", "._*", ".DS_Store", "Thumbs.db", "desktop.ini", "$RECYCLE.BIN/..."). Such entries
+        /// are ignored in uploads.
+        /// </summary>
+        public static bool IsOperatingSystemMetadata(string entryPath)
+        {
+            if (string.IsNullOrEmpty(entryPath))
+                return false;
+
+            var segments = entryPath.Split('/', '\\');
+            var fileName = segments[segments.Length - 1];
+            var directories = segments.Take(segments.Length - 1);
+
+            return directories.Any(directory => MetadataDirectoryNames.Contains(directory, StringComparer.OrdinalIgnoreCase))
+                   || MetadataFileNames.Contains(fileName, StringComparer.OrdinalIgnoreCase)
+                   || MetadataFileNamePrefixes.Any(prefix => fileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>
         /// Checks whether a directory in the artifact root is internal and not a product.
         /// </summary>
