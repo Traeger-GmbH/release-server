@@ -28,8 +28,15 @@ namespace ReleaseServer.WebApi.Test
 
         public void Dispose()
         {
-            if (root.Exists)
-                root.Delete(true);
+            try
+            {
+                if (root.Exists)
+                    root.Delete(true);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+                // Best effort cleanup of the temporary directory.
+            }
         }
 
         [Fact]

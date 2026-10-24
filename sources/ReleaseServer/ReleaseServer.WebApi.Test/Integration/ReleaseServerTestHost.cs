@@ -143,9 +143,9 @@ namespace ReleaseServer.WebApi.Test.Integration
             {
                 Directory.Delete(RootDirectory, true);
             }
-            catch (IOException)
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
             {
-                // Best effort cleanup of the temporary directory.
+                // Best effort cleanup of the temporary directory (files may still be locked on Windows).
             }
         }
     }

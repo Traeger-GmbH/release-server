@@ -31,7 +31,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
       working-directory: ./sources/ReleaseServer/
     - name: Test
-      run: dotnet test --configuration Release --no-build --verbosity normal
+      # Failed tests are additionally reported as annotations of the workflow run
+      run: dotnet test --configuration Release --no-build --verbosity normal --logger GitHubActions
       working-directory: ./sources/ReleaseServer/
 
   client:
