@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactController.Download.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace ReleaseServer.WebApi
 {
@@ -38,25 +37,20 @@ namespace ReleaseServer.WebApi
         [HttpGet("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
-            var provider = new FileExtensionContentTypeProvider();
-            string contentType;
 
             var response = await releaseArtifactService.GetSpecificArtifact(product, os, architecture, version);
 
             if (response != null)
             {
                 // Determine the content type
-                if (!provider.TryGetContentType(response.FileName, out contentType))
-                {
-                    contentType = "application/octet-stream";
-                }
+                var contentType = ArtifactContentTypeProvider.GetContentType(response.FileName);
 
                 //Set the filename of the response
                 var cd = new System.Net.Mime.ContentDisposition
                 {
                     FileName = response.FileName
                 };
-                Response.Headers.Add("Content-Disposition", cd.ToString());
+                Response.Headers["Content-Disposition"] = cd.ToString();
 
                 return new FileContentResult(response.Payload, contentType);
             }
@@ -83,25 +77,20 @@ namespace ReleaseServer.WebApi
         [HttpGet("{product}/{os}/{architecture}/latest")]
         public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
-            var provider = new FileExtensionContentTypeProvider();
-            string contentType;
 
             var response = await releaseArtifactService.GetLatestArtifact(product, os, architecture);
 
             if (response != null)
             {
                 // Determine the content type
-                if (!provider.TryGetContentType(response.FileName, out contentType))
-                {
-                    contentType = "application/octet-stream";
-                }
+                var contentType = ArtifactContentTypeProvider.GetContentType(response.FileName);
 
                 //Set the filename of the response
                 var cd = new System.Net.Mime.ContentDisposition
                 {
                     FileName = response.FileName
                 };
-                Response.Headers.Add("Content-Disposition", cd.ToString());
+                Response.Headers["Content-Disposition"] = cd.ToString();
 
                 return new FileContentResult(response.Payload, contentType);
             }

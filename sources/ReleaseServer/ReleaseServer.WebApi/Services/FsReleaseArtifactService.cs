@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Castle.Core.Internal;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

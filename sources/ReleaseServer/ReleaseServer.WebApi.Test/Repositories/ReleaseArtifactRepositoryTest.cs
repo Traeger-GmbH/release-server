@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactRepositoryTest.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -88,7 +88,7 @@ namespace ReleaseServer.WebApi.Test
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
 
             //Cleanup
-            //Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
+            Directory.Delete(Path.Combine(projectDirectory, "TestData", "product"), true);
         }
 
         
@@ -149,7 +149,7 @@ namespace ReleaseServer.WebApi.Test
             var testProductInfo = fsReleaseArtifactRepository.GetInfosByProductName("testproduct");
             
             //Assert
-            testProductInfo.Should().BeEquivalentTo(expectedProductInfo);
+            testProductInfo.Should().BeEquivalentTo(new[] { expectedProductInfo });
 
             //Cleanup
             Directory.Delete(Path.Combine(projectDirectory, "TestData", "testproduct"), true);

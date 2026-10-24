@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="Startup.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using Newtonsoft.Json;
 
@@ -75,7 +75,8 @@ namespace ReleaseServer.WebApi
                 .AddNewtonsoftJson(options =>
                 {
                     JsonConfiguration.Configure(options);
-                });
+                })
+                .ConfigureApiBehaviorOptions(LegacyProblemDetails.Configure);
 
             services.AddSwaggerGen(c =>
             {
@@ -127,7 +128,8 @@ namespace ReleaseServer.WebApi
                 });
             });
 
-            services.AddProblemDetails();
+            // Explicitly use the Hellang middleware: the response format is part of the public API.
+            ProblemDetailsExtensions.AddProblemDetails(services, LegacyProblemDetails.Configure);
         }
 
         /// <summary>

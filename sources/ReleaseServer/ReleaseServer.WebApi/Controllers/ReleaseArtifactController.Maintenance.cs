@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseArtifactController.Maintenance.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2021.
 // </copyright>
@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 using ReleaseServer.WebApi.Models;
 
@@ -35,18 +34,14 @@ namespace ReleaseServer.WebApi
         [HttpGet("backup")]
         public async Task<FileStreamResult> Backup()
         {
-            var provider = new FileExtensionContentTypeProvider();
-            string contentType;
 
             var backupInfo = await releaseArtifactService.RunBackup();
             
             var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
 
-            //Determine the content type
-            if (!provider.TryGetContentType(backupInfo.FileName, out contentType))
-            {
-                contentType = "application/octet-stream";
-            }
+            // Determine the content type
+
+            var contentType = ArtifactContentTypeProvider.GetContentType(backupInfo.FileName);
             
             return new FileStreamResult(stream, contentType)
             {
