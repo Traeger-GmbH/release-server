@@ -54,6 +54,11 @@ namespace ReleaseServer.WebApi.Models
         public string ArtifactFileName { get; set; }
 
         /// <summary>
+        /// Gets or sets the full path of the artifact file (null if the file name is invalid).
+        /// </summary>
+        public string ArtifactFilePath { get; set; }
+
+        /// <summary>
         /// Gets or sets the size of the artifact file in bytes (null if the file is missing).
         /// </summary>
         public long? ArtifactSize { get; set; }

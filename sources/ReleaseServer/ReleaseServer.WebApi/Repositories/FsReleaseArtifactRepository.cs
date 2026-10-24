@@ -186,6 +186,7 @@ namespace ReleaseServer.WebApi
                         Identifier = productName,
                         VersionDirectoryName = version,
                         ArtifactFileName = deploymentMetaInfo.ArtifactFileName,
+                        ArtifactFilePath = artifactFile?.FullName,
                         ArtifactSize = artifactFile != null && artifactFile.Exists ? artifactFile.Length : (long?)null,
                         Sha256 = ArtifactHashes.IsValid(deploymentMetaInfo.Sha256) ? deploymentMetaInfo.Sha256.ToLowerInvariant() : null
                     };

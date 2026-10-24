@@ -23,7 +23,7 @@ namespace ReleaseServer.WebApi.Test
 {
     public class ReleaseArtifactRepositoryTest
     {
-        private static readonly string[] ArtifactDetails = { "VersionDirectoryName", "ArtifactFileName", "ArtifactSize", "Sha256" };
+        private static readonly string[] ArtifactDetails = { "VersionDirectoryName", "ArtifactFileName", "ArtifactFilePath", "ArtifactSize", "Sha256" };
 
         private IReleaseArtifactRepository fsReleaseArtifactRepository;
         private readonly string projectDirectory;

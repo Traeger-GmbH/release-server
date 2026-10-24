@@ -1,0 +1,60 @@
+{
+  "version": "3.0.0",
+  "resources": [
+    {
+      "@id": "http://localhost/nuget/v3/flatcontainer/",
+      "@type": "PackageBaseAddress/3.0.0",
+      "comment": "Base URL of the package content (.nupkg, .nuspec)"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl/3.0.0-rc",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl/3.0.0-beta",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl/3.4.0",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl/3.6.0",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/",
+      "@type": "RegistrationsBaseUrl/Versioned",
+      "comment": "Base URL of the package metadata"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/search",
+      "@type": "SearchQueryService",
+      "comment": "Query endpoint of the package search"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/search",
+      "@type": "SearchQueryService/3.0.0-rc",
+      "comment": "Query endpoint of the package search"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/search",
+      "@type": "SearchQueryService/3.0.0-beta",
+      "comment": "Query endpoint of the package search"
+    },
+    {
+      "@id": "http://localhost/nuget/v3/search",
+      "@type": "SearchQueryService/3.5.0",
+      "comment": "Query endpoint of the package search"
+    }
+  ]
+}

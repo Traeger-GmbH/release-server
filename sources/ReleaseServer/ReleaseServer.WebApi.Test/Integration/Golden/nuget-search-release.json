@@ -1,0 +1,89 @@
+{
+  "totalHits": 2,
+  "data": [
+    {
+      "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json",
+      "@type": "Package",
+      "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json",
+      "id": "Opc.UaFx.Advanced",
+      "version": "2.57.1",
+      "description": "Test package Opc.UaFx.Advanced",
+      "summary": "",
+      "title": "Opc.UaFx.Advanced title",
+      "iconUrl": "",
+      "licenseUrl": "",
+      "projectUrl": "",
+      "tags": [
+        "opc",
+        "test"
+      ],
+      "authors": [
+        "Traeger Test"
+      ],
+      "owners": [
+        ""
+      ],
+      "totalDownloads": 0,
+      "verified": false,
+      "packageTypes": [
+        {
+          "name": "Dependency"
+        }
+      ],
+      "versions": [
+        {
+          "version": "2.0.1.1",
+          "downloads": 0,
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.0.1.1.json"
+        },
+        {
+          "version": "2.56.0",
+          "downloads": 0,
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.56.0.json"
+        },
+        {
+          "version": "2.57.1",
+          "downloads": 0,
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json"
+        }
+      ]
+    },
+    {
+      "@id": "http://localhost/nuget/v3/registration/test.dependency/index.json",
+      "@type": "Package",
+      "registration": "http://localhost/nuget/v3/registration/test.dependency/index.json",
+      "id": "Test.Dependency",
+      "version": "2.0.0",
+      "description": "Test package Test.Dependency",
+      "summary": "",
+      "title": "Test.Dependency title",
+      "iconUrl": "",
+      "licenseUrl": "",
+      "projectUrl": "",
+      "tags": [
+        "opc",
+        "test"
+      ],
+      "authors": [
+        "Traeger Test"
+      ],
+      "owners": [
+        ""
+      ],
+      "totalDownloads": 0,
+      "verified": false,
+      "packageTypes": [
+        {
+          "name": "Dependency"
+        }
+      ],
+      "versions": [
+        {
+          "version": "2.0.0",
+          "downloads": 0,
+          "@id": "http://localhost/nuget/v3/registration/test.dependency/2.0.0.json"
+        }
+      ]
+    }
+  ]
+}

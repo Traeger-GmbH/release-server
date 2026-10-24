@@ -1,0 +1,164 @@
+{
+  "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json",
+  "count": 1,
+  "items": [
+    {
+      "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json#page/2.0.1.1/2.58.0-preview.1",
+      "count": 4,
+      "items": [
+        {
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.0.1.1.json",
+          "catalogEntry": {
+            "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.0.1.1.json#catalogEntry",
+            "@type": "PackageDetails",
+            "id": "Opc.UaFx.Advanced",
+            "version": "2.0.1.1",
+            "authors": "Traeger Test",
+            "description": "Test package Opc.UaFx.Advanced",
+            "summary": "",
+            "title": "Opc.UaFx.Advanced title",
+            "tags": [
+              "opc",
+              "test"
+            ],
+            "projectUrl": "",
+            "licenseUrl": "",
+            "licenseExpression": "",
+            "iconUrl": "",
+            "requireLicenseAcceptance": false,
+            "listed": true,
+            "published": "2017-06-07T00:00:00Z",
+            "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.0.1.1/opc.uafx.advanced.2.0.1.1.nupkg",
+            "dependencyGroups": [
+              {
+                "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.0.1.1.json#dependencygroup/netstandard2.0",
+                "targetFramework": "netstandard2.0",
+                "dependencies": []
+              }
+            ]
+          },
+          "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.0.1.1/opc.uafx.advanced.2.0.1.1.nupkg",
+          "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json"
+        },
+        {
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.56.0.json",
+          "catalogEntry": {
+            "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.56.0.json#catalogEntry",
+            "@type": "PackageDetails",
+            "id": "Opc.UaFx.Advanced",
+            "version": "2.56.0",
+            "authors": "Traeger Test",
+            "description": "Test package Opc.UaFx.Advanced",
+            "summary": "",
+            "title": "Opc.UaFx.Advanced title",
+            "tags": [
+              "opc",
+              "test"
+            ],
+            "projectUrl": "",
+            "licenseUrl": "",
+            "licenseExpression": "",
+            "iconUrl": "",
+            "requireLicenseAcceptance": false,
+            "listed": true,
+            "published": "2026-08-19T00:00:00Z",
+            "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.56.0/opc.uafx.advanced.2.56.0.nupkg",
+            "dependencyGroups": [
+              {
+                "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.56.0.json#dependencygroup/netstandard2.0",
+                "targetFramework": "netstandard2.0",
+                "dependencies": [
+                  {
+                    "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.56.0.json#dependency/test.dependency",
+                    "id": "Test.Dependency",
+                    "range": "[2.0.0, )",
+                    "registration": "http://localhost/nuget/v3/registration/test.dependency/index.json"
+                  }
+                ]
+              }
+            ]
+          },
+          "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.56.0/opc.uafx.advanced.2.56.0.nupkg",
+          "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json"
+        },
+        {
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json",
+          "catalogEntry": {
+            "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json#catalogEntry",
+            "@type": "PackageDetails",
+            "id": "Opc.UaFx.Advanced",
+            "version": "2.57.1",
+            "authors": "Traeger Test",
+            "description": "Test package Opc.UaFx.Advanced",
+            "summary": "",
+            "title": "Opc.UaFx.Advanced title",
+            "tags": [
+              "opc",
+              "test"
+            ],
+            "projectUrl": "",
+            "licenseUrl": "",
+            "licenseExpression": "",
+            "iconUrl": "",
+            "requireLicenseAcceptance": false,
+            "listed": true,
+            "published": "2026-10-23T00:00:00Z",
+            "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.57.1/opc.uafx.advanced.2.57.1.nupkg",
+            "dependencyGroups": [
+              {
+                "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json#dependencygroup/netstandard2.0",
+                "targetFramework": "netstandard2.0",
+                "dependencies": [
+                  {
+                    "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json#dependency/test.dependency",
+                    "id": "Test.Dependency",
+                    "range": "[2.0.0, )",
+                    "registration": "http://localhost/nuget/v3/registration/test.dependency/index.json"
+                  }
+                ]
+              }
+            ]
+          },
+          "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.57.1/opc.uafx.advanced.2.57.1.nupkg",
+          "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json"
+        },
+        {
+          "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.58.0-preview.1.json",
+          "catalogEntry": {
+            "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.58.0-preview.1.json#catalogEntry",
+            "@type": "PackageDetails",
+            "id": "Opc.UaFx.Advanced",
+            "version": "2.58.0-preview.1",
+            "authors": "Traeger Test",
+            "description": "Test package Opc.UaFx.Advanced",
+            "summary": "",
+            "title": "Opc.UaFx.Advanced title",
+            "tags": [
+              "opc",
+              "test"
+            ],
+            "projectUrl": "",
+            "licenseUrl": "",
+            "licenseExpression": "",
+            "iconUrl": "",
+            "requireLicenseAcceptance": false,
+            "listed": true,
+            "published": "2026-11-02T00:00:00Z",
+            "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.58.0-preview.1/opc.uafx.advanced.2.58.0-preview.1.nupkg",
+            "dependencyGroups": [
+              {
+                "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.58.0-preview.1.json#dependencygroup/netstandard2.0",
+                "targetFramework": "netstandard2.0",
+                "dependencies": []
+              }
+            ]
+          },
+          "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.58.0-preview.1/opc.uafx.advanced.2.58.0-preview.1.nupkg",
+          "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json"
+        }
+      ],
+      "lower": "2.0.1.1",
+      "upper": "2.58.0-preview.1"
+    }
+  ]
+}

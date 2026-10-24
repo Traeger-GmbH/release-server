@@ -47,6 +47,9 @@ namespace ReleaseServer.WebApi
                 );
             });
 
+            // Read-only NuGet feed of the .nupkg artifacts
+            services.AddSingleton<NuGet.NuGetPackageIndex>();
+
             // Add the checksums of artifacts uploaded before version 1.1 in the background
             if (configuration.GetValue("AddMissingArtifactHashes", true))
             {

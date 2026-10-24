@@ -12,8 +12,11 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
 
@@ -40,7 +43,7 @@ namespace ReleaseServer.WebApi.Test.Integration
 
         private readonly WebApplicationFactory<Startup> factory;
 
-        public ReleaseServerTestHost(IDictionary<string, string> additionalSettings = null)
+        public ReleaseServerTestHost(IDictionary<string, string> additionalSettings = null, bool useKestrel = false)
         {
             RootDirectory = Path.Combine(Path.GetTempPath(), "release-server-tests", Guid.NewGuid().ToString("N"));
             ArtifactDirectory = Path.Combine(RootDirectory, "artifacts");
@@ -72,9 +75,23 @@ namespace ReleaseServer.WebApi.Test.Integration
                 // The settings are applied like environment variables of a container.
                 builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(settings));
             });
+
+            if (useKestrel)
+            {
+                // A real HTTP server on a free port, e.g. for external clients like the NuGet client
+                factory.UseKestrel(options => options.Listen(System.Net.IPAddress.Loopback, 0));
+                factory.StartServer();
+                var addresses = factory.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>().Addresses;
+                ServerAddress = addresses.First().Replace("[::]", "127.0.0.1").Replace("0.0.0.0", "127.0.0.1").Replace("localhost", "127.0.0.1");
+            }
         }
 
         public string RootDirectory { get; }
+
+        /// <summary>
+        /// Gets the address of the real HTTP server (only with useKestrel).
+        /// </summary>
+        public string ServerAddress { get; }
 
         public string ArtifactDirectory { get; }
 
@@ -87,7 +104,13 @@ namespace ReleaseServer.WebApi.Test.Integration
 
         public HttpClient CreateClient()
         {
-            return factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+            var options = new WebApplicationFactoryClientOptions { AllowAutoRedirect = false };
+            if (ServerAddress != null)
+            {
+                options.BaseAddress = new Uri(ServerAddress);
+            }
+
+            return factory.CreateClient(options);
         }
 
         public HttpClient CreateAuthenticatedClient()

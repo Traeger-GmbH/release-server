@@ -1,0 +1,8 @@
+{
+  "@id": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json",
+  "catalogEntry": "http://localhost/nuget/v3/registration/opc.uafx.advanced/2.57.1.json#catalogEntry",
+  "listed": true,
+  "packageContent": "http://localhost/nuget/v3/flatcontainer/opc.uafx.advanced/2.57.1/opc.uafx.advanced.2.57.1.nupkg",
+  "published": "2026-10-23T00:00:00Z",
+  "registration": "http://localhost/nuget/v3/registration/opc.uafx.advanced/index.json"
+}
