@@ -1,3 +1,11 @@
+## Unreleased
+
+Server:
+
+* [FEATURE] /artifacts/{product}/info lists the files of every release in the new field "artifacts" (platform, file name, size, SHA-256, download URL); the existing fields are unchanged
+* [FEATURE] The SHA-256 checksum is calculated on upload and stored in deployment.json; checksums of existing artifacts are added in the background (AddMissingArtifactHashes); older versions ignore the new property
+* [FEATURE] Downloads send the checksum as strong ETag and Repr-Digest header (conditional requests are supported)
+
 ## v1.0.0 (2026-10-24)
 
 Server (now .NET 10, ASP.NET Core 10 runtime image):

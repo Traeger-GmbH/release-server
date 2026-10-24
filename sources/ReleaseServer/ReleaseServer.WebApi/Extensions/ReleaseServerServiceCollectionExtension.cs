@@ -46,6 +46,14 @@ namespace ReleaseServer.WebApi
                     serviceProvider.GetRequiredService<ILogger<FsReleaseArtifactService>>()
                 );
             });
+
+            // Add the checksums of artifacts uploaded before version 1.1 in the background
+            if (configuration.GetValue("AddMissingArtifactHashes", true))
+            {
+                services.AddSingleton<ArtifactHashBackfillService>();
+                services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<ArtifactHashBackfillService>());
+            }
+
             return services;
         }
     }

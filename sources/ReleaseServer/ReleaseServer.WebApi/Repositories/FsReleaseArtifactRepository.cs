@@ -104,7 +104,8 @@ namespace ReleaseServer.WebApi
                 //Extract the payload to the temporary directory
 
                 using (var outputStream = new FileStream(Path.Combine(tmpDir.ToString(), artifact.DeploymentMetaInformation.ArtifactFileName), FileMode.CreateNew)) {
-                    artifact.Content.CopyTo(outputStream);
+                    // Calculate the SHA-256 checksum while writing; it is stored in deployment.json
+                    artifact.DeploymentMetaInformation.Sha256 = ArtifactHashes.CopyAndHash(artifact.Content, outputStream);
                 }
                 artifact.DeploymentMetaInformation.ToJsonFile(Path.Combine(tmpDir.ToString(), "deployment.json"));
                 artifact.DeploymentInformation.ReleaseNotes
@@ -168,13 +169,25 @@ namespace ReleaseServer.WebApi
 
                     var releaseNotesFileName = ResolveFileInDirectory(path, deploymentMetaInfo.ReleaseNotesFileName);
 
+                    // The artifact file is optional here (like in previous versions): size and checksum stay
+                    // empty if it is missing
+                    FileInfo artifactFile = null;
+                    if (TryResolveFileInDirectory(path, deploymentMetaInfo.ArtifactFileName, out var artifactPath))
+                    {
+                        artifactFile = new FileInfo(artifactPath);
+                    }
+
                     return new DeploymentInformation
                     {
                         ReleaseNotes = ReleaseNotes.FromJsonFile(releaseNotesFileName),
                         Architecture = architecture,
                         Os = os,
                         Version = new ProductVersion(version),
-                        Identifier = productName
+                        Identifier = productName,
+                        VersionDirectoryName = version,
+                        ArtifactFileName = deploymentMetaInfo.ArtifactFileName,
+                        ArtifactSize = artifactFile != null && artifactFile.Exists ? artifactFile.Length : (long?)null,
+                        Sha256 = ArtifactHashes.IsValid(deploymentMetaInfo.Sha256) ? deploymentMetaInfo.Sha256.ToLowerInvariant() : null
                     };
                 }
 
@@ -211,6 +224,7 @@ namespace ReleaseServer.WebApi
                     {
                         FilePath = filePath,
                         FileName = deploymentMetaInfo.ArtifactFileName,
+                        Sha256 = ArtifactHashes.IsValid(deploymentMetaInfo.Sha256) ? deploymentMetaInfo.Sha256.ToLowerInvariant() : null
                     };
                 }
 
@@ -833,6 +847,74 @@ namespace ReleaseServer.WebApi
 
             return
                 DeploymentMetaInformation.FromJsonFile(deploymentMetaName.FullName);
+        }
+
+        public List<string> FindReleaseDirectoriesWithoutHash()
+        {
+            var result = new List<string>();
+
+            foreach (var productDir in EnumerateProductDirectories())
+            foreach (var osDir in productDir.EnumerateDirectories())
+            foreach (var architectureDir in osDir.EnumerateDirectories())
+            foreach (var versionDir in architectureDir.EnumerateDirectories())
+            {
+                try
+                {
+                    var metaFile = Path.Combine(versionDir.FullName, StorageNames.DeploymentMetaFileName);
+                    if (!File.Exists(metaFile))
+                        continue;
+
+                    var meta = DeploymentMetaInformation.FromJsonFile(metaFile);
+                    if (meta != null && !ArtifactHashes.IsValid(meta.Sha256)
+                        && TryResolveFileInDirectory(versionDir.FullName, meta.ArtifactFileName, out var artifactFile)
+                        && File.Exists(artifactFile))
+                    {
+                        result.Add(versionDir.FullName);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Broken release directories are skipped like when reading
+                    logger.LogWarning("Skipping {0} when looking for missing checksums: {1}", versionDir.FullName, e.Message);
+                }
+            }
+
+            return result;
+        }
+
+        public ArtifactHash CalculateArtifactHash(string releaseDirectory)
+        {
+            var meta = DeploymentMetaInformation.FromJsonFile(Path.Combine(releaseDirectory, StorageNames.DeploymentMetaFileName));
+            var artifactFile = new FileInfo(ResolveFileInDirectory(releaseDirectory, meta.ArtifactFileName));
+
+            using var stream = artifactFile.OpenRead();
+            return new ArtifactHash
+            {
+                ReleaseDirectory = releaseDirectory,
+                ArtifactFileName = meta.ArtifactFileName,
+                Sha256 = ArtifactHashes.CopyAndHash(stream, Stream.Null),
+                Length = artifactFile.Length,
+                LastWriteTimeUtc = artifactFile.LastWriteTimeUtc
+            };
+        }
+
+        public bool StoreArtifactHash(ArtifactHash hash)
+        {
+            var metaFile = Path.Combine(hash.ReleaseDirectory, StorageNames.DeploymentMetaFileName);
+            if (!File.Exists(metaFile))
+                return false;
+
+            var meta = DeploymentMetaInformation.FromJsonFile(metaFile);
+            if (meta == null || ArtifactHashes.IsValid(meta.Sha256) || meta.ArtifactFileName != hash.ArtifactFileName)
+                return false;
+
+            // Only store the checksum if the artifact did not change while it was calculated
+            var artifactFile = new FileInfo(ResolveFileInDirectory(hash.ReleaseDirectory, meta.ArtifactFileName));
+            if (!artifactFile.Exists || artifactFile.Length != hash.Length || artifactFile.LastWriteTimeUtc != hash.LastWriteTimeUtc)
+                return false;
+
+            ArtifactHashes.AddToDeploymentFile(metaFile, hash.Sha256);
+            return true;
         }
 
         public List<string> GetProductList()

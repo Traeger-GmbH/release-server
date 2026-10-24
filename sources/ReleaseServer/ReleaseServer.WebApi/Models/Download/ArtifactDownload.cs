@@ -23,5 +23,10 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         /// <value>The full path of the artifact file.</value>
         public string FilePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SHA-256 checksum of the artifact file (null if not known yet).
+        /// </summary>
+        public string Sha256 { get; set; }
     }
 }

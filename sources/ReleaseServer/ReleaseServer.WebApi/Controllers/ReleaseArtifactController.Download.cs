@@ -6,11 +6,15 @@
 // <author>Timo Walter</author>
 //--------------------------------------------------------------------------------------------------
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+
+using ReleaseServer.WebApi.Models;
 
 namespace ReleaseServer.WebApi
 {
@@ -64,7 +68,7 @@ namespace ReleaseServer.WebApi
                 Response.Headers["Content-Disposition"] = cd.ToString();
 
                 // Stream the file from disk; range requests allow resuming interrupted downloads
-                return new PhysicalFileResult(response.FilePath, contentType) { EnableRangeProcessing = true };
+                return CreateFileResult(response, contentType);
             }
             else
             {
@@ -117,7 +121,7 @@ namespace ReleaseServer.WebApi
                 Response.Headers["Content-Disposition"] = cd.ToString();
 
                 // Stream the file from disk; range requests allow resuming interrupted downloads
-                return new PhysicalFileResult(response.FilePath, contentType) { EnableRangeProcessing = true };
+                return CreateFileResult(response, contentType);
             }
             else
             {
@@ -126,6 +130,24 @@ namespace ReleaseServer.WebApi
                     "Resource not found",
                     "The specified artifact does not exist.");
             }
+        }
+
+        #endregion
+
+        #region ---------- Private methods ----------
+
+        private PhysicalFileResult CreateFileResult(ArtifactDownload artifact, string contentType)
+        {
+            var result = new PhysicalFileResult(artifact.FilePath, contentType) { EnableRangeProcessing = true };
+
+            if (artifact.Sha256 != null)
+            {
+                // The checksum identifies the content: strong ETag (conditional requests) and Repr-Digest (RFC 9530)
+                result.EntityTag = new EntityTagHeaderValue($"\"{artifact.Sha256}\"");
+                Response.Headers["Repr-Digest"] = $"sha-256=:{Convert.ToBase64String(Convert.FromHexString(artifact.Sha256))}:";
+            }
+
+            return result;
         }
 
         #endregion

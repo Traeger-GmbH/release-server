@@ -264,6 +264,47 @@ namespace ReleaseServer.WebApi
         
         }
 
+        public async Task<int> AddMissingArtifactHashes(CancellationToken cancellationToken)
+        {
+            var added = 0;
+
+            foreach (var releaseDirectory in await Task.Run(() => fsReleaseArtifactRepository.FindReleaseDirectoriesWithoutHash(), cancellationToken))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    // Calculate without the lock (large files), store under the lock after checking that
+                    // nothing changed in the meantime
+                    var hash = await Task.Run(() => fsReleaseArtifactRepository.CalculateArtifactHash(releaseDirectory), cancellationToken);
+
+                    await directoryLock.WaitAsync(cancellationToken);
+                    try
+                    {
+                        if (fsReleaseArtifactRepository.StoreArtifactHash(hash))
+                        {
+                            added++;
+                        }
+                    }
+                    finally
+                    {
+                        directoryLock.Release();
+                    }
+                }
+                catch (Exception e) when (!(e is OperationCanceledException))
+                {
+                    logger.LogWarning("Could not add the checksum of {0}: {1}", releaseDirectory, e.Message);
+                }
+            }
+
+            if (added > 0)
+            {
+                logger.LogInformation("Added the SHA-256 checksum of {0} existing artifacts", added);
+            }
+
+            return added;
+        }
+
         public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
             DeploymentMetaInformation deploymentMetaInfo;

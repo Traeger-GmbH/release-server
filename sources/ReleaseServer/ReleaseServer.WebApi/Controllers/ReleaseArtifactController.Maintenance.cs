@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 using ReleaseServer.WebApi.Models;
 
@@ -81,6 +82,9 @@ namespace ReleaseServer.WebApi
                 try
                 {
                     await releaseArtifactService.RestoreBackup(backupFile);
+
+                    // The restored data may contain artifacts without checksum
+                    HttpContext.RequestServices.GetService<ArtifactHashBackfillService>()?.Trigger();
                 }
                 catch (BackupValidationException e)
                 {

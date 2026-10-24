@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -118,6 +119,12 @@ namespace ReleaseServer.WebApi
         /// </summary>
         /// <param name="payload">The backup payload in form of an <see cref="IFormFile"/></param>
         Task RestoreBackup(IFormFile payload);
+
+        /// <summary>
+        /// Calculates the missing SHA-256 checksums of existing artifacts and adds them to deployment.json.
+        /// Idempotent; nothing is removed. Returns the number of added checksums.
+        /// </summary>
+        Task<int> AddMissingArtifactHashes(CancellationToken cancellationToken);
         
         /// <summary>
         /// Validates the uploaded payload, if it fulfills the specified criteria.

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -79,6 +80,10 @@ namespace ReleaseServer.WebApi.Test.Integration
             var response = await client.GetAsync($"/artifacts/{Uri.EscapeDataString(product)}/info?limit=1000");
             var actual = await response.Content.ReadAsStringAsync();
 
+            // The additive field "artifacts" (version 1.1) is checked separately and not part of the snapshot
+            AssertArtifactsMatchPlatforms(actual);
+            actual = Regex.Replace(actual, ",\"artifacts\":\\[[^\\]]*\\]", "");
+
             var expectedStatus = ReadJson(expected)["status"]?.Value<int>() ?? 200;
             Assert.Equal(expectedStatus, (int)response.StatusCode);
             Assert.Equal(Golden.NormalizeJson(expected), Golden.NormalizeJson(actual));
@@ -101,6 +106,18 @@ namespace ReleaseServer.WebApi.Test.Integration
             Assert.Equal(
                 Operations(File.ReadAllText(Path.Combine(SnapshotDirectory, "swagger.json"))),
                 Operations(await response.Content.ReadAsStringAsync()));
+        }
+
+        private static void AssertArtifactsMatchPlatforms(string infoJson)
+        {
+            var info = ReadJson(infoJson);
+            foreach (var release in info["releases"] ?? new JArray())
+            {
+                var platforms = release["platforms"].Select(platform => (string)platform).ToList();
+                var artifacts = release["artifacts"].ToList();
+                Assert.Equal(platforms, artifacts.Select(artifact => (string)artifact["platform"]).ToList());
+                Assert.All(artifacts, artifact => Assert.Equal("artifact.bin", (string)artifact["fileName"]));
+            }
         }
 
         private void CreateStoreFromInfo(string product, string infoJson)

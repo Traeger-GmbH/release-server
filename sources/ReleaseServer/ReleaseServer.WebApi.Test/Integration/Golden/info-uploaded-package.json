@@ -33,7 +33,23 @@
             "deprecated": []
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "linux/arm64",
+          "fileName": "foobar_linux-arm64.tar.gz",
+          "size": 54,
+          "sha256": "c5dabc5afad241693103d14e2578e33491db353cd35166f5eacc7be7b05a71d5",
+          "downloadUrl": "/artifacts/foobar/linux/arm64/2.0.0-preview-2"
+        },
+        {
+          "platform": "windows/x64",
+          "fileName": "foobar_win-x64.exe",
+          "size": 54,
+          "sha256": "836345f45021a349b572c59e6bcd624af3c2323b65f67c12b723f8ad56004e0e",
+          "downloadUrl": "/artifacts/foobar/windows/x64/2.0.0-preview-2"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 1,

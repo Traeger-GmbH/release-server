@@ -54,6 +54,9 @@ namespace ReleaseServer.WebApi.Test.Integration
                 ["CREDENTIALS_PASSWORD"] = Password,
                 ["ArtifactRootDirectory"] = ArtifactDirectory,
                 ["BackupRootDirectory"] = BackupDirectory,
+                // The background calculation of checksums would change the test data while a test runs;
+                // the tests of this feature enable it explicitly.
+                ["AddMissingArtifactHashes"] = "false",
             };
 
             if (additionalSettings != null)
@@ -76,6 +79,11 @@ namespace ReleaseServer.WebApi.Test.Integration
         public string ArtifactDirectory { get; }
 
         public string BackupDirectory { get; }
+
+        /// <summary>
+        /// Gets the services of the hosted server (starts the server if necessary).
+        /// </summary>
+        public IServiceProvider Services => factory.Services;
 
         public HttpClient CreateClient()
         {

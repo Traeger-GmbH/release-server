@@ -62,7 +62,16 @@
             ]
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "teleprof/2",
+          "fileName": "firmware.bin",
+          "size": 61,
+          "sha256": null,
+          "downloadUrl": "/artifacts/teleprof2-os-firmware/teleprof/2/8.14.0.1"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 1,

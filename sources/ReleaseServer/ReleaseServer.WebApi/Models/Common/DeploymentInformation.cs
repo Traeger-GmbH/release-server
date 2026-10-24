@@ -42,5 +42,25 @@ namespace ReleaseServer.WebApi.Models
         /// </summary>
         /// <value>The release notes of the artifact.</value>
         public ReleaseNotes ReleaseNotes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the version directory (may differ from the normalized version string).
+        /// </summary>
+        public string VersionDirectoryName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file name of the artifact (from deployment.json).
+        /// </summary>
+        public string ArtifactFileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the artifact file in bytes (null if the file is missing).
+        /// </summary>
+        public long? ArtifactSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SHA-256 checksum of the artifact file (null if not known yet).
+        /// </summary>
+        public string Sha256 { get; set; }
     }
 }

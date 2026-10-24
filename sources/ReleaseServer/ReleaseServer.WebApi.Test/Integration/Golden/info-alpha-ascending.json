@@ -64,7 +64,30 @@
             ]
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "linux/x64",
+          "fileName": "alpha.tar.gz",
+          "size": 39,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/linux/x64/1.0"
+        },
+        {
+          "platform": "windows/x64",
+          "fileName": "alpha-setup.exe",
+          "size": 41,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/x64/1.0"
+        },
+        {
+          "platform": "windows/x86",
+          "fileName": "alpha-setup.exe",
+          "size": 41,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/x86/1.0"
+        }
+      ]
     },
     {
       "version": "1.9",
@@ -89,7 +112,16 @@
           }
         ],
         "en": []
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows/any",
+          "fileName": "alpha-1.9.zip",
+          "size": 41,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/any/1.9"
+        }
+      ]
     },
     {
       "version": "1.10-beta",
@@ -111,7 +143,16 @@
             "deprecated": null
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows/any",
+          "fileName": "alpha-1.10-beta.zip",
+          "size": 47,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/any/1.10-beta"
+        }
+      ]
     },
     {
       "version": "1.10-rc",
@@ -133,7 +174,16 @@
             "deprecated": null
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows/any",
+          "fileName": "alpha-1.10-rc.zip",
+          "size": 45,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/any/1.10-rc"
+        }
+      ]
     },
     {
       "version": "1.10",
@@ -166,7 +216,16 @@
             "deprecated": null
           }
         ]
-      }
+      },
+      "artifacts": [
+        {
+          "platform": "windows/any",
+          "fileName": "alpha-1.10.zip",
+          "size": 42,
+          "sha256": null,
+          "downloadUrl": "/artifacts/alpha/windows/any/1.10"
+        }
+      ]
     }
   ],
   "totalReleaseCount": 5,
