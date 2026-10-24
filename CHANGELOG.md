@@ -6,7 +6,7 @@ Server (now .NET 10, ASP.NET Core 10 runtime image):
 * [FIX] Prevent writing, reading and deleting outside of the artifact directory (path traversal via names in uploads)
 * [FIX] Restore verifies the backup before replacing any data; an invalid backup no longer deletes the existing data
 * [FIX] Passwords may contain ':'; requests are denied (401) if no credentials are configured
-* [FIX] Uploads above 128 MB and restores above 30 MB failed because of framework limits
+* [FIX] Uploads above 128 MB failed (multipart limit); restores above about 30 MB could fail (request size limit)
 * [FIX] Incomplete or broken artifact directories no longer break /info and latest of the whole product
 * [FIX] Failed uploads no longer leave a "temp" product behind
 * [FEATURE] Keep the newest backups (BackupRetentionCount, default 5) instead of only the latest one
