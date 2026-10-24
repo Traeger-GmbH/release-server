@@ -131,3 +131,30 @@ describe('UploadView', () => {
     expect(forced).toEqual([true, true]);
   });
 });
+
+describe('FilterInput', () => {
+  it('can shrink to the width of narrow columns', async () => {
+    const { default: FilterInput } = await import('../src/components/FilterInput.vue');
+    const wrapper = mount(FilterInput, { props: { modelValue: '' } });
+
+    // Without min-width 0 the intrinsic size of the input overflows its flex container (seen in Explore)
+    expect(wrapper.classes()).toContain('min-w-0');
+    expect(wrapper.find('input').classes()).toEqual(expect.arrayContaining(['min-w-0', 'w-full']));
+  });
+
+  it('keeps a single root element, so the layout classes of the parent apply', async () => {
+    const { default: FilterInput } = await import('../src/components/FilterInput.vue');
+    const wrapper = mount(FilterInput, { props: { modelValue: '' }, attrs: { class: '-mx-4' } });
+
+    expect(wrapper.classes()).toContain('-mx-4');
+  });
+
+  it('clears the filter', async () => {
+    const { default: FilterInput } = await import('../src/components/FilterInput.vue');
+    const wrapper = mount(FilterInput, { props: { modelValue: 'tic' } });
+
+    await wrapper.find('button').trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([['']]);
+  });
+});

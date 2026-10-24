@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-2 min-h-0 grow">
     <div v-if="products && products.length > 0" class="shrink grow flex flex-row min-h-0 gap-2 h-full">
-      <div class="flex flex-col w-1/5 max-h-full">
-        <UiPane class="min-h-0 gap-2 flex flex-col grow">
+      <div class="flex flex-col w-1/5 min-w-0 max-h-full">
+        <UiPane class="min-h-0 min-w-0 gap-2 flex flex-col grow">
           <FilterInput v-model="filter" class="-mt-4 -mx-4 mb-2" />
           <div class="overflow-y-auto flex flex-col gap-2 -mx-4 px-4 h-full -my-4 py-4">
             <RouterLink

@@ -1,7 +1,8 @@
 <template>
-  <div class="rounded-sm flex flex-row items-center gap-2 font-semibold px-4 py-4 bg-gray-500 relative">
+  <div class="rounded-sm flex flex-row items-center gap-2 font-semibold px-4 py-4 bg-gray-500 relative min-w-0">
+    <!-- min-w-0/w-full: an input has an intrinsic minimum width and would overflow narrow columns otherwise -->
     <input
-      class="rounded-sm px-3 py-2 grow bg-white focus:outline-hidden focus:ring-3 ring-green-500 font-medium"
+      class="rounded-sm px-3 py-2 grow min-w-0 w-full bg-white focus:outline-hidden focus:ring-3 ring-green-500 font-medium"
       type="text"
       :value="modelValue"
       placeholder="Filter"
