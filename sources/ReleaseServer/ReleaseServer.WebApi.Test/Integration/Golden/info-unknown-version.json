@@ -1,0 +1,6 @@
+{
+  "title": "Resource not found.",
+  "status": 404,
+  "detail": "There is no release of \"alpha\" that matches the specified filter criteria.",
+  "traceId": "<traceId>"
+}

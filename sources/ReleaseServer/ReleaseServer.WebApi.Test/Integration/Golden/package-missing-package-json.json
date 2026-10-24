@@ -1,0 +1,6 @@
+{
+  "title": "Bad request",
+  "status": 400,
+  "detail": "package.json is missing. ",
+  "traceId": "<traceId>"
+}

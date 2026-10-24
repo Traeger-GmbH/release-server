@@ -1,0 +1,29 @@
+{
+  "ReleaseDate": "2021-10-28T00:00:00",
+  "IsPreviewRelease": true,
+  "IsSecurityPatch": false,
+  "Changes": {
+    "de": [
+      {
+        "Platforms": null,
+        "Added": [
+          "Neu"
+        ],
+        "Fixed": [],
+        "Breaking": [],
+        "Deprecated": []
+      }
+    ],
+    "en": [
+      {
+        "Platforms": null,
+        "Added": [
+          "New"
+        ],
+        "Fixed": [],
+        "Breaking": [],
+        "Deprecated": []
+      }
+    ]
+  }
+}

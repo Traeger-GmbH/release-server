@@ -1,0 +1,70 @@
+{
+  "identifier": "teleprof2-os-firmware",
+  "releases": [
+    {
+      "version": "8.14.0.1",
+      "platforms": [
+        "teleprof/2"
+      ],
+      "releaseDate": "2021-05-07T00:00:00",
+      "isPreviewRelease": false,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
+          {
+            "platforms": [
+              "linux/rpi"
+            ],
+            "added": [],
+            "fixed": [
+              "Das Problem wurde behoben."
+            ],
+            "breaking": [],
+            "deprecated": []
+          },
+          {
+            "platforms": null,
+            "added": [
+              "Feature xyz wurde hinzugefügt."
+            ],
+            "fixed": [],
+            "breaking": [
+              "Komponente D wurde ersetzt."
+            ],
+            "deprecated": [
+              "Funktion foo entfällt."
+            ]
+          }
+        ],
+        "en": [
+          {
+            "platforms": [
+              "linux/rpi"
+            ],
+            "added": [],
+            "fixed": [
+              "The problem has been fixed."
+            ],
+            "breaking": [],
+            "deprecated": []
+          },
+          {
+            "platforms": null,
+            "added": [
+              "Feature xyz has been added."
+            ],
+            "fixed": [],
+            "breaking": [
+              "Component D has been replaced."
+            ],
+            "deprecated": [
+              "Function foo will be removed."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "totalReleaseCount": 1,
+  "nextOffset": null
+}

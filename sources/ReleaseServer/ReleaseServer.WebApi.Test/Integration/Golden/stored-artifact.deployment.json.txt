@@ -1,0 +1,4 @@
+{
+  "ReleaseNotesFileName": "releaseNotes.json",
+  "ArtifactFileName": "new-setup.exe"
+}

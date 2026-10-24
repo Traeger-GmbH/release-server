@@ -1,0 +1,6 @@
+{
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "The specified product does not exist.",
+  "traceId": "<traceId>"
+}

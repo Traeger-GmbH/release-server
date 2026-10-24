@@ -1,0 +1,6 @@
+{
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "The specified artifact does not exist.",
+  "traceId": "<traceId>"
+}

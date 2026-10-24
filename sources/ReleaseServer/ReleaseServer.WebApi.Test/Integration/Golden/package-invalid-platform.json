@@ -1,0 +1,6 @@
+{
+  "title": "Bad request",
+  "status": 400,
+  "detail": "Invalid platform in deployments: \"windows\" ",
+  "traceId": "<traceId>"
+}
