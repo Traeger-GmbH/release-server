@@ -1,11 +1,27 @@
 version: 2
-updates:    
-  # Dependencies of the WebApi-Test & WebApi project (the WebApi project is referenced via the "ProjectReference")
-  - package-ecosystem: "nuget" 
-    directory: "/sources/ReleaseServer/ReleaseServer.WebApi"
+updates:
+  - package-ecosystem: "nuget"
+    directories:
+      - "/sources/ReleaseServer/ReleaseServer.WebApi"
+      - "/sources/ReleaseServer/ReleaseServer.WebApi.Test"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
-    reviewers:
-    - f-porter
-    - tiwalter
+
+  - package-ecosystem: "npm"
+    directory: "/sources/release-client"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/"
+      - "/sources/release-client"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
