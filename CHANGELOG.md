@@ -1,4 +1,4 @@
-## Unreleased
+## v1.0.0 (2026-10-24)
 
 Server (now .NET 10, ASP.NET Core 10 runtime image):
 
