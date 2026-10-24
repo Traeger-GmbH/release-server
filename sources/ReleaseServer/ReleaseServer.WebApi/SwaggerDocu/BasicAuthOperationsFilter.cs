@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ReleaseServer.WebApi
@@ -21,21 +21,21 @@ namespace ReleaseServer.WebApi
 
             if (noAuthRequired) return;
 
+            // Make the authentication requirement visible in the operation list and in the details.
+            operation.Summary = (operation.Summary ?? "").TrimEnd('.') + " (requires authentication)";
+            operation.Description = "**Requires authentication** (HTTP Basic). Not intended for public use.\n\n" + operation.Description;
+
+            operation.Responses ??= new OpenApiResponses();
+            if (!operation.Responses.ContainsKey("401"))
+            {
+                operation.Responses.Add("401", new OpenApiResponse { Description = "Authentication is missing or the credentials are wrong." });
+            }
+
             operation.Security = new List<OpenApiSecurityRequirement>
             {
                 new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "basic"
-                            }
-                        },
-                        new List<string>()
-                    }
+                    [new OpenApiSecuritySchemeReference("basic", context.Document)] = new List<string>()
                 }
             };
         }

@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using Newtonsoft.Json;
 
@@ -49,15 +49,11 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="env">Information about the web hosting environment of the application.</param>
-        public Startup(IWebHostEnvironment env)
+        /// <param name="configuration">The configuration of the host (appsettings.json of the content root,
+        /// environment variables and command line arguments).</param>
+        public Startup(IConfiguration configuration)
         {
-            var conf = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json")
-                .Build();
-            
-            Configuration = conf;
+            Configuration = configuration;
         }
         
         #endregion
@@ -75,7 +71,8 @@ namespace ReleaseServer.WebApi
                 .AddNewtonsoftJson(options =>
                 {
                     JsonConfiguration.Configure(options);
-                });
+                })
+                .ConfigureApiBehaviorOptions(LegacyProblemDetails.Configure);
 
             services.AddSwaggerGen(c =>
             {
@@ -84,8 +81,16 @@ namespace ReleaseServer.WebApi
                 {
                     Title = "Release Server API",
                     Version = "v1",
-                    Description = "An application for managing your own release artifacts. " +
-                                  "The release server provides several REST endpoints for the following operations.",
+                    Description = "Download server for released software. " +
+                                  "Products are published as releases (version, release date, change log) for one or more platforms " +
+                                  "(operating system and architecture).\n\n" +
+                                  "**Public endpoints** (no authentication):\n" +
+                                  "- `GET /artifacts` lists all products\n" +
+                                  "- `GET /artifacts/{product}/info` lists the releases of a product (filter, sort and paging)\n" +
+                                  "- `GET /artifacts/{product}/{os}/{architecture}/{version}` downloads a release\n" +
+                                  "- `GET /artifacts/{product}/{os}/{architecture}/latest` downloads the latest release\n\n" +
+                                  "All other endpoints maintain the server and **require authentication** (HTTP Basic).\n\n" +
+                                  "Errors are returned as problem details (RFC 7807) with the fields title, status and detail.",
                     Contact = new OpenApiContact
                     {
                         Name = "Traeger Industry Components GmbH",
@@ -103,31 +108,24 @@ namespace ReleaseServer.WebApi
                     In = ParameterLocation.Header,
                 });
                 
-                c.OperationFilter<BasicAuthOperationsFilter>();
-                
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ReleaseServer.WebApi.xml"));
+
+                // Registered after the XML comments, so it can extend the summaries and descriptions
+                c.OperationFilter<BasicAuthOperationsFilter>();
                 c.ExampleFilters();
             });
             
-            services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
+            services.AddSwaggerExamplesFromAssemblies(typeof(Startup).Assembly);
 
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
             
             services.AddFsReleaseArtifactService(Configuration);
 
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder
-                        .AllowAnyMethod()
-                        .SetIsOriginAllowed(_ => true)
-                        .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000));
-                });
-            });
+            services.AddCors(options => CorsPolicies.Configure(options, Configuration));
 
-            services.AddProblemDetails();
+            // Explicitly use the Hellang middleware: the response format is part of the public API.
+            ProblemDetailsExtensions.AddProblemDetails(services, LegacyProblemDetails.Configure);
         }
 
         /// <summary>

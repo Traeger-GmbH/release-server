@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -47,7 +48,7 @@ namespace ReleaseServer.WebApi.Test
         }
 
         [Fact]
-        public async void TestGetLatestVersion()
+        public async Task TestGetLatestVersion()
         {
            //Act
             var testVersions1 = await fsReleaseArtifactService.GetLatestVersion("productx", "debian", "amd64");
@@ -59,7 +60,7 @@ namespace ReleaseServer.WebApi.Test
         }
         
         [Fact]
-        public async void TestGetLatestVersion_Not_Found()
+        public async Task TestGetLatestVersion_Not_Found()
         {
             //Act
             var testVersion = await fsReleaseArtifactService.GetLatestVersion("nonExistentProduct", "noOs", "noArch");

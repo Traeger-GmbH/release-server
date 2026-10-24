@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReleaseServer.WebApi
@@ -21,22 +22,38 @@ namespace ReleaseServer.WebApi
         #region ---------- Public methods ----------
         
         /// <summary>
-        /// Uploads a specific release artifact.
+        /// Uploads a release for one platform.
         /// </summary>
-        /// <param name="product">The product name of the uploaded artifact.</param>
-        /// <param name="os">The operating system of the uploaded artifact.</param>
-        /// <param name="architecture">The hardware architecture of the uploaded artifact.</param>
-        /// <param name="version">The version of the uploaded artifact.</param>
-        /// <param name="artifact">The payload of the uploaded artifact (Zip file).</param>
+        /// <remarks>
+        /// The request body is multipart/form-data with the field "artifact": a ZIP file (max. 500 MB) containing
+        ///
+        /// - deployment.json: { "artifactFileName": "setup.exe", "releaseNotesFileName": "releaseNotes.json" }
+        /// - the release notes file: { "releaseDate": "2026-01-31", "isPreviewRelease": false, "isSecurityPatch": false,
+        ///   "changes": { "en": [ { "added": [], "fixed": [], "breaking": [], "deprecated": [] } ] } }
+        /// - the artifact file itself
+        ///
+        /// Operating system metadata in the ZIP file is ignored and not stored: macOS ("__MACOSX/", "._*",
+        /// ".DS_Store") and Windows ("Thumbs.db", "ehthumbs.db", "desktop.ini", "$RECYCLE.BIN/").
+        ///
+        /// An existing release with the same product, platform and version is replaced. Names may contain
+        /// letters, digits, '-', '_' and '.'.
+        /// </remarks>
+        /// <param name="product">The identifier of the product.</param>
+        /// <param name="os">The operating system of the release, e.g. "windows", "linux" or "any".</param>
+        /// <param name="architecture">The architecture of the release, e.g. "x64", "arm64" or "any".</param>
+        /// <param name="version">The version of the release, e.g. "1.2.0" or "2.0.0-beta".</param>
+        /// <param name="artifact">The ZIP file with deployment.json, release notes and artifact.</param>
         /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
         /// if the payload is invalid.</returns>
-        /// <response code="200">Upload of the artifact was successful.</response>
-        /// <response code="400">No or invalid body provided (must be a Zip file).</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
+        /// <response code="200">The release was stored.</response>
+        /// <response code="400">The file is missing or invalid, or a name is not allowed.</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("{product}/{os}/{architecture}/{version}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
         public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, 
             [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
@@ -53,6 +70,14 @@ namespace ReleaseServer.WebApi
                     HttpContext,
                     "Bad request",
                     "The required upload body not a .zip file.");
+            }
+            else if (!StorageNames.IsValidSegment(product) || !StorageNames.IsValidSegment(os)
+                     || !StorageNames.IsValidSegment(architecture) || !StorageNames.IsValidVersion(version))
+            {
+                return BadRequestResponseFactory.Create(
+                    HttpContext,
+                    "Bad request",
+                    "Invalid product, operating system, architecture or version. Allowed are letters, digits, '-', '_' and '.' (starting with a letter or digit); the version has to be a valid version number like 1.2.3 or 1.2.3-beta.");
             }
             else
             {
@@ -78,19 +103,41 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Uploads a specific release artifact.
+        /// Uploads a release for several platforms (package).
         /// </summary>
-        /// <param name="package"></param>
-        /// <param name="force"></param>
+        /// <remarks>
+        /// The request body is multipart/form-data with the field "package": a ZIP file (max. 1 GB) containing a
+        /// folder with package.json and the files of all platforms:
+        ///
+        ///     {
+        ///       "identifier": "example-product",
+        ///       "version": "1.2.0",
+        ///       "releaseNotes": { "releaseDate": "2026-01-31", "changes": { "en": [ { "added": ["..."] } ] } },
+        ///       "deployments": {
+        ///         "windows/x64": "files/setup-x64.exe",
+        ///         "linux/arm64": "files/app-arm64.tar.gz",
+        ///         "any/any": "files/documentation.zip"
+        ///       }
+        ///     }
+        ///
+        /// Operating system metadata in the ZIP file is ignored and not stored: macOS ("__MACOSX/", "._*",
+        /// ".DS_Store") and Windows ("Thumbs.db", "ehthumbs.db", "desktop.ini", "$RECYCLE.BIN/").
+        ///
+        /// If the version already exists, the upload is rejected unless force=true is set.
+        /// </remarks>
+        /// <param name="package">The ZIP file with package.json and the files of all platforms.</param>
+        /// <param name="force">Replace the release if this version of the product already exists.</param>
         /// <returns>Returns an <see cref="OkObjectResult"/>, if the upload was successful. Returns <see cref="BadRequestObjectResult"/>,
         /// if the payload is invalid.</returns>
-        /// <response code="200">Upload of the artifact was successful.</response>
-        /// <response code="400">No or invalid body provided (must be a Zip file).</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
+        /// <response code="200">The release was stored for all platforms.</response>
+        /// <response code="400">The file is missing or invalid, a name is not allowed, or the version already exists (title "Conflict").</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
         /// <response code="500">Internal error.</response>
         [HttpPut("")]
+        [EnableCors(CorsPolicies.Authenticated)]
         //Max. 1024 MB
         [RequestSizeLimit(1073741824)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
         public async Task<IActionResult> UploadPackage([Required] IFormFile package, [FromQuery] bool force = false)
         {
             if (package == null) {

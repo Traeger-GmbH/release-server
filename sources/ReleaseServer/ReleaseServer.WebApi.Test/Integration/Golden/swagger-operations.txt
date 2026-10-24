@@ -1,0 +1,11 @@
+DELETE /artifacts/{product}
+DELETE /artifacts/{product}/{os}/{architecture}/{version}
+GET /artifacts
+GET /artifacts/backup
+GET /artifacts/statistics
+GET /artifacts/{product}/info
+GET /artifacts/{product}/{os}/{architecture}/latest
+GET /artifacts/{product}/{os}/{architecture}/{version}
+PUT /artifacts
+PUT /artifacts/restore
+PUT /artifacts/{product}/{os}/{architecture}/{version}

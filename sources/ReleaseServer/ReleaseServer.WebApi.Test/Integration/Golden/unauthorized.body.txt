@@ -1,0 +1,6 @@
+{
+  "type": "https://httpstatuses.com/401",
+  "title": "Unauthorized",
+  "status": 401,
+  "traceId": "<traceId>"
+}

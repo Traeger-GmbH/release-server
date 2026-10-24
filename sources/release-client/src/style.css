@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  h1 {
+    @apply text-5xl leading-none font-bold;
+  }
+
+  h2 {
+    @apply text-4xl font-bold leading-none;
+  }
+
+  h3 {
+    @apply text-2xl font-bold leading-none;
+  }
+
+  h4 {
+    @apply text-xl font-normal leading-none;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply py-2 px-3 font-bold rounded-sm disabled:opacity-50 disabled:cursor-not-allowed w-48 text-center;
+  }
+
+  .btn-green {
+    @apply text-white bg-green-500 hover:bg-green-700;
+  }
+
+  .btn-green-outline {
+    @apply text-green-500 border border-green-500 hover:bg-green-700 hover:border-green-700 hover:text-white;
+  }
+
+  .btn-red-outline {
+    @apply text-red-500 border border-red-500 hover:bg-red-700 hover:border-red-700 hover:text-white;
+  }
+
+  .badge {
+    @apply bg-gray-700 text-white py-1 px-2 rounded-full text-center text-sm;
+  }
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}

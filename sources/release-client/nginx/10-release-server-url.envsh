@@ -1,0 +1,5 @@
+#!/bin/sh
+# Default and normalization of the release server address. A trailing slash is removed, otherwise
+# nginx would not forward the original request path.
+RELEASE_SERVER_URL="${RELEASE_SERVER_URL:-http://localhost:5000}"
+export RELEASE_SERVER_URL="${RELEASE_SERVER_URL%/}"

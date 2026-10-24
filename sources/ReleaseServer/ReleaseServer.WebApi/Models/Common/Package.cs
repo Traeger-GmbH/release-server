@@ -51,7 +51,8 @@ namespace ReleaseServer.WebApi.Models
                     var zipEntry = this.ZipArchive.Entries[i];
                     var fileName = Path.GetFileName(zipEntry.FullName);
 
-                    if (fileName != null && fileName == InformationFileName) {
+                    // Operating system metadata (e.g. "__MACOSX/<folder>/._package.json") is ignored
+                    if (fileName != null && fileName == InformationFileName && !StorageNames.IsOperatingSystemMetadata(zipEntry.FullName)) {
                         packageInformationEntry = zipEntry;
                         rootDirectoryName = Path.GetDirectoryName(zipEntry.FullName);
                     }
@@ -62,11 +63,31 @@ namespace ReleaseServer.WebApi.Models
                         packageInformation = PackageInformation.FromJsonFile(packageInformationEntry);
                         this.Deployments = new Dictionary<Platform, ZipArchiveEntry>();
 
+                        if (!StorageNames.IsValidSegment(packageInformation.Identifier)) {
+                            validationErrors.Add($"Invalid identifier: \"{packageInformation.Identifier}\". Allowed are letters, digits, '-', '_' and '.' (starting with a letter or digit).");
+                        }
+                        if (!StorageNames.IsValidVersion(packageInformation.Version.ToString())) {
+                            validationErrors.Add($"Invalid version: \"{packageInformation.Version}\".");
+                        }
+
                         foreach (var (platformString, filePath) in packageInformation.Deployments) {
-                            if (Platform.TryParse(platformString, out var platform)) {
+                            if (Platform.TryParse(platformString, out var platform)
+                                && (!StorageNames.IsValidSegment(platform.OperatingSystem) || !StorageNames.IsValidSegment(platform.Architecture))) {
+                                var error = $"Invalid platform in deployments: \"{platformString}\"";
+                                validationErrors.Add(error);
+                            }
+                            else if (Platform.TryParse(platformString, out platform)) {
                                 var deploymentEntryName = rootDirectoryName + "/" + filePath;
                                 if (this.ZipArchive.TryGetEntry(deploymentEntryName, out var deploymentEntry)) {
-                                    this.Deployments.Add(platform, deploymentEntry);
+                                    if (StorageNames.IsValidFileName(deploymentEntry.Name)
+                                        && !StorageNames.IsOperatingSystemMetadata(deploymentEntry.FullName)
+                                        && deploymentEntry.Name != StorageNames.DeploymentMetaFileName
+                                        && deploymentEntry.Name != "releaseNotes.json") {
+                                        this.Deployments.Add(platform, deploymentEntry);
+                                    }
+                                    else {
+                                        validationErrors.Add($"Invalid deployment file name for platform \"{platform}\": {deploymentEntry.Name}");
+                                    }
                                 }
                                 else {
                                     var error = $"Missing deployment file for platform \"{platform}\": {filePath}";

@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Castle.Core.Internal;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -33,20 +32,26 @@ namespace ReleaseServer.WebApi
         
         #endregion
         
-        #region ---------- Private static fields ----------
+        #region ---------- Private synchronization fields ----------
         
-        private static SemaphoreSlim directoryLock;
+        // Serializes all write operations on the artifact directory (the service is a singleton).
+        private readonly SemaphoreSlim directoryLock = new SemaphoreSlim(1, 1);
 
         #endregion
         
         #region ---------- Public constructors ----------
         
+        static FsReleaseArtifactService()
+        {
+            // Avoid skipped [JsonRequired] checks when the first uploads are validated concurrently
+            JsonConfiguration.PrepareContracts();
+        }
+
         public FsReleaseArtifactService(IReleaseArtifactRepository fsReleaseArtifactRepository,
             ILogger<FsReleaseArtifactService> logger)
         {
             this.fsReleaseArtifactRepository = fsReleaseArtifactRepository;
             this.logger = logger;
-            directoryLock = new SemaphoreSlim(1, 1);
         }
 
         #endregion
@@ -60,9 +65,11 @@ namespace ReleaseServer.WebApi
             ServiceActionResult result;
             
             if (package.ValidationResult.IsValid) {
-                var existingPackage = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier);
+                // Only the same version of the product is a conflict; new versions can be added without "force".
+                var versionExists = this.fsReleaseArtifactRepository.GetInfosByProductName(package.Identifier)
+                    .Any(deployment => deployment.Version == package.Version);
 
-                if (!existingPackage.IsNullOrEmpty() && !force) {
+                if (versionExists && !force) {
                     var errorMessage = $"This package ({package.Identifier}-v{package.Version}) already exists. " +
                         $"Set the parameter \"force = true\" in order to overwrite the existing package.";
                     result = new ServiceActionResult(System.Net.HttpStatusCode.Conflict, new string[] { errorMessage });
@@ -135,22 +142,6 @@ namespace ReleaseServer.WebApi
             return await Task.Run(() => fsReleaseArtifactRepository.GetInfosByProductName(productName));
         }
 
-        public async Task<List<string>> GetPlatforms(string productName, string version)
-        {
-            return await Task.Run(() => fsReleaseArtifactRepository.GetPlatforms(productName, version));
-        }
-
-        public async Task<DeploymentInformation> GetDeploymentInformation(string productName, string os, string architecture, string version)
-        {
-            return await Task.Run(() =>
-                fsReleaseArtifactRepository.GetDeploymentInformation(productName, os, architecture, version));
-        }
-
-        public async Task<List<ProductVersion>> GetVersions(string productName, string os, string architecture)
-        {
-            return await Task.Run(() => fsReleaseArtifactRepository.GetVersions(productName, os, architecture));
-        }
-
         public async Task<ProductVersion> GetLatestVersion(string productName, string os, string architecture)
         {
             var versions = await Task.Run(() => fsReleaseArtifactRepository.GetVersions(productName, os, architecture));
@@ -170,15 +161,26 @@ namespace ReleaseServer.WebApi
 
         public async Task<ArtifactDownload> GetLatestArtifact(string productName, string os, string architecture)
         {
-            var latestVersion = await Task.Run(() => GetLatestVersion(productName, os, architecture));
+            return await Task.Run(() =>
+            {
+                // Versions are ordered descending. Incomplete or broken artifact directories (e.g. of an
+                // interrupted upload) are skipped, so the latest complete version is delivered.
+                foreach (var version in fsReleaseArtifactRepository.GetVersions(productName, os, architecture))
+                {
+                    try
+                    {
+                        var artifact = fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, version.ToString());
+                        if (artifact != null)
+                            return artifact;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogWarning("Skipping the broken artifact {0}/{1}/{2}/{3}: {4}", productName, os, architecture, version, e.Message);
+                    }
+                }
 
-            if (latestVersion == null) {
                 return null;
-            }
-            else {
-                return await Task.Run(() =>
-                    fsReleaseArtifactRepository.GetSpecificArtifact(productName, os, architecture, latestVersion.ToString()));
-            }
+            });
         }
 
         public async Task<bool> DeleteSpecificArtifactIfExists(string productName, string os, string architecture,
@@ -237,8 +239,17 @@ namespace ReleaseServer.WebApi
             
             logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
-            using var zipPayload = new ZipArchive(payload.OpenReadStream());
-            
+            ZipArchive zipPayload;
+            try
+            {
+                zipPayload = new ZipArchive(fileStream);
+            }
+            catch (InvalidDataException e)
+            {
+                throw new BackupValidationException(new[] { "The uploaded file is not a valid ZIP archive: " + e.Message });
+            }
+
+            using var disposableZipPayload = zipPayload;
             await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 
@@ -286,6 +297,28 @@ namespace ReleaseServer.WebApi
                     logger.LogError(validationError);
                     return new ValidationResult(false, validationError);
                 }
+            }
+
+            if (deploymentMetaInfo == null)
+            {
+                var validationError = "the deployment meta information (deployment.json) is empty!";
+                logger.LogError(validationError);
+                return new ValidationResult(false, validationError);
+            }
+
+            //Check the file names, they are used as file names in the artifact directory
+            if (!StorageNames.IsValidFileName(deploymentMetaInfo.ArtifactFileName)
+                || !StorageNames.IsValidFileName(deploymentMetaInfo.ReleaseNotesFileName)
+                || deploymentMetaInfo.ArtifactFileName == StorageNames.DeploymentMetaFileName
+                || deploymentMetaInfo.ReleaseNotesFileName == StorageNames.DeploymentMetaFileName
+                || deploymentMetaInfo.ArtifactFileName == deploymentMetaInfo.ReleaseNotesFileName
+                || StorageNames.IsOperatingSystemMetadata(deploymentMetaInfo.ArtifactFileName)
+                || StorageNames.IsOperatingSystemMetadata(deploymentMetaInfo.ReleaseNotesFileName))
+            {
+                var validationError = "the file names in the deployment meta information (deployment.json) are invalid! "
+                                      + "They must be different plain file names without path separators.";
+                logger.LogError(validationError);
+                return new ValidationResult(false, validationError);
             }
 
             //Check if the uploaded payload contains the the artifact file

@@ -1,0 +1,29 @@
+{
+  "identifier": "alpha",
+  "releases": [
+    {
+      "version": "1.10-beta",
+      "platforms": [
+        "windows/any"
+      ],
+      "releaseDate": "2024-03-22T10:15:00Z",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              "Preview of feature abc."
+            ],
+            "fixed": null,
+            "breaking": null,
+            "deprecated": null
+          }
+        ]
+      }
+    }
+  ],
+  "totalReleaseCount": 1,
+  "nextOffset": null
+}

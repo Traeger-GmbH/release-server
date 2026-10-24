@@ -19,9 +19,9 @@ namespace ReleaseServer.WebApi.Models
         public string FileName { get; set; }
         
         /// <summary>
-        /// Gets or sets the payload of the downloaded artifact file (contains the artifact incl. meta information).
+        /// Gets or sets the full path of the artifact file. The file is streamed from disk when downloaded.
         /// </summary>
-        /// <value>The payload of the downloaded artifact.</value>
-        public byte[] Payload { get; set; }
+        /// <value>The full path of the artifact file.</value>
+        public string FilePath { get; set; }
     }
 }

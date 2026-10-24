@@ -9,6 +9,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReleaseServer.WebApi
@@ -22,17 +23,18 @@ namespace ReleaseServer.WebApi
         #region ---------- Public methods ----------
         
         /// <summary>
-        /// Deletes a specific artifact.
+        /// Deletes a release for one platform.
         /// </summary>
-        /// <param name="product">The product name of the specified artifact.</param>
-        /// <param name="os">The operating system of the specified artifact.</param>
-        /// <param name="architecture">The hardware architecture of the specified artifact.</param>
-        /// <param name="version">The version of the specified artifact.</param>
+        /// <param name="product">The identifier of the product.</param>
+        /// <param name="os">The operating system of the release.</param>
+        /// <param name="architecture">The architecture of the release.</param>
+        /// <param name="version">The version of the release.</param>
         /// <returns>An <see cref="OkObjectResult"/> if the deletion was successful and <see cref="NotFoundObjectResult"/>, if not.</returns>
-        /// <response code="200">The specified artifact got deleted successfully.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
-        /// <response code="404">There exists no artifact with the specified parameters.</response>
+        /// <response code="200">The release was deleted.</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
+        /// <response code="404">The release does not exist.</response>
         [HttpDelete("{product}/{os}/{architecture}/{version}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<IActionResult> DeleteSpecificArtifact ([Required] string product, [Required] string os, [Required] string architecture, [Required] string version)
         {
             var artifactFound = await releaseArtifactService.DeleteSpecificArtifactIfExists(product, os, architecture, version);
@@ -51,14 +53,15 @@ namespace ReleaseServer.WebApi
         }
         
         /// <summary>
-        /// Deletes all artifacts of a specific product name.
+        /// Deletes a product with all its releases.
         /// </summary>
-        /// <param name="product">The product name of the artifacts, that have to be deleted.</param>
+        /// <param name="product">The identifier of the product.</param>
         /// <returns>An <see cref="OkObjectResult"/> if the deletion was successful and <see cref="NotFoundObjectResult"/>, if not.</returns>
-        /// <response code="200">All artifacts of the specified product name got deleted successfully.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
-        /// <response code="404">There exists no artifact with the specified product name.</response>
+        /// <response code="200">The product was deleted.</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
+        /// <response code="404">The product does not exist.</response>
         [HttpDelete("{product}")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<IActionResult> DeleteProduct ([Required] string product)
         {
             var productFound = await releaseArtifactService.DeleteProductIfExists(product);

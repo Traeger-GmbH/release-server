@@ -1,0 +1,4 @@
+{
+  "ReleaseNotesFileName": "releaseNotes.json",
+  "ArtifactFileName": "foobar_win-x64.exe"
+}

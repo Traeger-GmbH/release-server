@@ -1,0 +1,6 @@
+{
+  "title": "Bad request",
+  "status": 400,
+  "detail": "The backup cannot be restored: \"restored/windows/x64/1.0\": the artifact file \"a.exe\" is missing.",
+  "traceId": "<traceId>"
+}

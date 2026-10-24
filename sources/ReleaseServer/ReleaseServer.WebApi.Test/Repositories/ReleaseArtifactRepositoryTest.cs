@@ -88,7 +88,7 @@ namespace ReleaseServer.WebApi.Test
             Assert.True(File.Exists(Path.Combine(testPath, "testprogram_update.exe")));
 
             //Cleanup
-            //Directory.Delete(Path.Combine(ProjectDirectory, "TestData", "product"), true);
+            Directory.Delete(Path.Combine(projectDirectory, "TestData", "product"), true);
         }
 
         
@@ -149,34 +149,10 @@ namespace ReleaseServer.WebApi.Test
             var testProductInfo = fsReleaseArtifactRepository.GetInfosByProductName("testproduct");
             
             //Assert
-            testProductInfo.Should().BeEquivalentTo(expectedProductInfo);
+            testProductInfo.Should().BeEquivalentTo(new[] { expectedProductInfo });
 
             //Cleanup
             Directory.Delete(Path.Combine(projectDirectory, "TestData", "testproduct"), true);
-        }
-        
-        [Fact]
-        public void TestGetPlatforms()
-        {
-            //Setup
-            List<string> expectedPlatforms1 = new List<string>()
-                {"ubuntu-amd64", "ubuntu-arm64"};
-            
-            List<string> expectedPlatforms2 = new List<string>()
-                {"debian-amd64", "ubuntu-amd64"};
-            
-            List<string> expectedPlatforms3 = new List<string>()
-                {"debian-amd64"};
-
-            //Act
-            var testPlatforms1 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.0");
-            var testPlatforms2 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.1");
-            var testPlatforms3 = fsReleaseArtifactRepository.GetPlatforms("productx", "1.2-beta");
-
-            //Assert
-            Assert.Equal(expectedPlatforms1, testPlatforms1);
-            Assert.Equal(expectedPlatforms2, testPlatforms2);
-            Assert.Equal(expectedPlatforms3, testPlatforms3);
         }
         
         [Fact]
@@ -284,7 +260,7 @@ namespace ReleaseServer.WebApi.Test
                 FileName = Path.GetFileName(Path.Combine(projectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip")),
 
-                Payload = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "productx",
+                FilePath = Path.GetFullPath(Path.Combine(projectDirectory, "TestData", "productx",
                     "ubuntu", "amd64", "1.1", "artifact.zip"))
             };
 
@@ -322,9 +298,11 @@ namespace ReleaseServer.WebApi.Test
             //Assert
             Assert.True(productFound);
             Assert.False(Directory.Exists(Path.Combine(projectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1")));
+            //The product had only this release, so the empty parent directories are removed as well
+            Assert.False(Directory.Exists(Path.Combine(projectDirectory, "TestData", "producty")));
             
             //Cleanup
-            Directory.Delete(Path.Combine(projectDirectory, "TestData", "producty"), true);
+            TestUtils.CleanupDirIfExists(Path.Combine(projectDirectory, "TestData", "producty"));
         }
         
         [Fact]
@@ -417,7 +395,7 @@ namespace ReleaseServer.WebApi.Test
 
 
         [Fact]
-        public void TestRestore()
+        public void TestRestore_InvalidBackup_KeepsExistingData()
         {
             var testArtifactRoot = new DirectoryInfo(Path.Combine(projectDirectory, "TestArtifactRoot"));
             var testBackupDir = new DirectoryInfo(Path.Combine(projectDirectory, "TestBackup"));
@@ -433,24 +411,25 @@ namespace ReleaseServer.WebApi.Test
                 testBackupDir.Create();
             }
 
+            //Existing data that must survive the failed restore
+            var existingFile = Path.Combine(testArtifactRoot.FullName, "existing.txt");
+            File.WriteAllText(existingFile, "existing");
+
             var customRepository = new FsReleaseArtifactRepository(
                 Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                 testArtifactRoot,
                 testBackupDir
             );
             
-            var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.zip")));
-            var expectedFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.txt"));
+            //The archive only contains a single text file and no artifact structure
+            using var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.zip")));
             
             //Act
-            customRepository.RestoreBackup(testBackupZip);
-            
-            //Get the (only) one file in the testArtifactRootDirectory
-            var artifactFiles = Directory.GetFiles(testArtifactRoot.FullName);
-            var testFile = File.ReadAllBytes(artifactFiles.First());
+            Assert.Throws<BackupValidationException>(() => customRepository.RestoreBackup(testBackupZip));
             
             //Assert
-            Assert.Equal(expectedFile, testFile);
+            Assert.Equal(new[] { existingFile }, Directory.GetFileSystemEntries(testArtifactRoot.FullName));
+            Assert.Equal("existing", File.ReadAllText(existingFile));
             
             //Cleanup
             testArtifactRoot.Delete(true);

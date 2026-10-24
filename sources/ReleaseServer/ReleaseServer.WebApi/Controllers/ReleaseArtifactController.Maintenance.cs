@@ -11,8 +11,8 @@ using System.IO;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 using ReleaseServer.WebApi.Models;
 
@@ -27,26 +27,27 @@ namespace ReleaseServer.WebApi
         #region ---------- Public methods ----------
         
         /// <summary>
-        /// Backups the whole artifact directory and retrieves it as a ZIP file.
+        /// Creates a backup of all products and returns it as ZIP file.
         /// </summary>
+        /// <remarks>
+        /// The backup is also kept on the server (the newest backups, see the setting BackupRetentionCount).
+        /// It can be restored with PUT /artifacts/restore.
+        /// </remarks>
         /// <returns>The created <see cref="FileStreamResult"/> with the backup.</returns>
-        /// <response code="200">The artifact directory backup was successful.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
+        /// <response code="200">The backup (ZIP file).</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
         [HttpGet("backup")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<FileStreamResult> Backup()
         {
-            var provider = new FileExtensionContentTypeProvider();
-            string contentType;
 
             var backupInfo = await releaseArtifactService.RunBackup();
             
             var stream = new FileStream(backupInfo.FullPath, FileMode.Open, FileAccess.Read);
 
-            //Determine the content type
-            if (!provider.TryGetContentType(backupInfo.FileName, out contentType))
-            {
-                contentType = "application/octet-stream";
-            }
+            // Determine the content type
+
+            var contentType = ArtifactContentTypeProvider.GetContentType(backupInfo.FileName);
             
             return new FileStreamResult(stream, contentType)
             {
@@ -55,19 +56,39 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Restores the uploaded backup file.
+        /// Replaces all products by the content of a backup.
         /// </summary>
-        /// <param name="backupFile">The uploaded backup file (ZIP file).</param>
+        /// <remarks>
+        /// The backup is extracted and verified first (structure, meta information, release notes and files).
+        /// The existing data is only replaced if the backup is valid; otherwise it stays unchanged and the
+        /// response describes the problems. Every release needs its deployment.json, release notes and
+        /// artifact file; additional files and directories (e.g. stored by previous versions) are kept.
+        /// </remarks>
+        /// <param name="backupFile">The backup (ZIP file created by GET /artifacts/backup), sent as multipart/form-data.</param>
         /// <returns>An <see cref="OkObjectResult"/> if the restore operation was successful and <see cref="BadRequestResult"/>, if not.</returns>
-        /// <response code="200">The restore process was successful.</response>
-        /// <response code="400">No body provided.</response>
-        /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
+        /// <response code="200">The backup was restored.</response>
+        /// <response code="400">The file is missing or the backup is invalid (the existing data is unchanged).</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
         [HttpPut("restore")]
+        [EnableCors(CorsPolicies.Authenticated)]
+        // Backups contain all artifacts and can be large; the endpoint requires authentication.
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
         public async Task<IActionResult> Restore([Required] IFormFile backupFile)
         {
             if (backupFile != null)
             {
-                await releaseArtifactService.RestoreBackup(backupFile);
+                try
+                {
+                    await releaseArtifactService.RestoreBackup(backupFile);
+                }
+                catch (BackupValidationException e)
+                {
+                    return BadRequestResponseFactory.Create(
+                        HttpContext,
+                        "Bad request",
+                        e.Message);
+                }
                 return Ok();
             }
             else
@@ -81,10 +102,16 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
-        /// Gets statistics of the server like disk usage, number of products and artifacts.
+        /// Returns statistics of the server.
         /// </summary>
-        /// <response code="200">The restore process was successful.</response>
+        /// <remarks>
+        /// Disk usage in MB (total size and free space of the disk, space used by the artifacts) and the number
+        /// of products and artifacts (releases per platform).
+        /// </remarks>
+        /// <response code="200">The statistics.</response>
+        /// <response code="401">Authentication is missing or the credentials are wrong.</response>
         [HttpGet("statistics")]
+        [EnableCors(CorsPolicies.Authenticated)]
         public async Task<ActionResult<Statistics>> GetStatistics()
         {
             return await this.releaseArtifactService.GetStatistics();

@@ -1,17 +1,29 @@
-version: '3'
-
+# Example stack: release server and administration UI.
+# Keep the volume names: existing installations store their data in these named volumes
+# (Docker Compose prefixes them with the project name, e.g. "releaseserver_artifacts").
 services:
   release-server:
     image: ghcr.io/traeger-gmbh/release-server:latest
     working_dir: /app
+    restart: always
     ports:
       - "5000:5000"
     environment:
+      # Replace the example credentials
       - "CREDENTIALS_USERNAME=TestUser"
       - "CREDENTIALS_PASSWORD=SomePassword"
-    volumes: 
+    volumes:
       - backups:/app/backups
       - artifacts:/app/artifacts
+
+  release-client:
+    image: ghcr.io/traeger-gmbh/release-client:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - "RELEASE_SERVER_URL=http://release-server:5000"
+
 volumes:
   artifacts:
   backups:

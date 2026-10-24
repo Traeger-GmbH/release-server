@@ -2,29 +2,80 @@ name: build
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+env:
+  # Production image (2022-04-26) used as reference for the compatibility check
+  REFERENCE_IMAGE: ghcr.io/traeger-gmbh/release-server@sha256:39934dd4a42a73ccdd5600a5726f9808ea6dedb123d4c5bf877137039a24ee05
+
 jobs:
-  build:
-    name: Build on ${{ matrix.os }}
+  server:
+    name: Server on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v7
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 3.1.x
-    - name: Clean
-      run: dotnet clean && dotnet nuget locals all --clear
-      working-directory: ./sources/ReleaseServer/
-    - name: Install dependencies
+        dotnet-version: 10.0.x
+    - name: Restore
       run: dotnet restore
       working-directory: ./sources/ReleaseServer/
     - name: Build
       run: dotnet build --configuration Release --no-restore
       working-directory: ./sources/ReleaseServer/
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      # Failed tests are additionally reported as annotations of the workflow run
+      run: dotnet test --configuration Release --no-build --verbosity normal --logger GitHubActions
       working-directory: ./sources/ReleaseServer/
+
+  client:
+    name: Client
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Setup Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24
+        cache: npm
+        cache-dependency-path: sources/release-client/package-lock.json
+    - name: Install dependencies
+      run: npm ci
+      working-directory: ./sources/release-client/
+    - name: Lint
+      run: npm run lint
+      working-directory: ./sources/release-client/
+    - name: Test
+      run: npm test
+      working-directory: ./sources/release-client/
+    - name: Build
+      run: npm run build
+      working-directory: ./sources/release-client/
+
+  docker:
+    name: Docker images and end-to-end checks
+    runs-on: ubuntu-latest
+    needs: [server, client]
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Setup Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24
+    - name: Build server image (not pushed)
+      run: docker build -t release-server:ci .
+    - name: Build client image (not pushed)
+      run: docker build -t release-client:ci ./sources/release-client/
+    - name: Compare server with production image
+      run: node tools/compat/compat-check.mjs --old "$REFERENCE_IMAGE" --new release-server:ci
+    - name: Check server and client together
+      run: node tools/compat/stack-check.mjs --server release-server:ci --client release-client:ci

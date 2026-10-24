@@ -1,0 +1,59 @@
+{
+  "ReleaseDate": "2021-05-07T00:00:00",
+  "IsPreviewRelease": false,
+  "IsSecurityPatch": false,
+  "Changes": {
+    "de": [
+      {
+        "Platforms": [
+          "linux/rpi"
+        ],
+        "Added": [],
+        "Fixed": [
+          "Das Problem wurde behoben."
+        ],
+        "Breaking": [],
+        "Deprecated": []
+      },
+      {
+        "Platforms": null,
+        "Added": [
+          "Feature xyz wurde hinzugefügt."
+        ],
+        "Fixed": [],
+        "Breaking": [
+          "Komponente D wurde ersetzt."
+        ],
+        "Deprecated": [
+          "Funktion foo entfällt."
+        ]
+      }
+    ],
+    "en": [
+      {
+        "Platforms": [
+          "linux/rpi"
+        ],
+        "Added": [],
+        "Fixed": [
+          "The problem has been fixed."
+        ],
+        "Breaking": [],
+        "Deprecated": []
+      },
+      {
+        "Platforms": null,
+        "Added": [
+          "Feature xyz has been added."
+        ],
+        "Fixed": [],
+        "Breaking": [
+          "Component D has been replaced."
+        ],
+        "Deprecated": [
+          "Function foo will be removed."
+        ]
+      }
+    ]
+  }
+}

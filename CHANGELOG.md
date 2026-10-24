@@ -1,3 +1,32 @@
+## v1.0.0 (2026-10-24)
+
+Server (now .NET 10, ASP.NET Core 10 runtime image):
+
+* [CHANGE] Upgrade from .NET Core 3.1 to .NET 10; the public API, the storage layout and the backup format are unchanged
+* [FIX] Prevent writing, reading and deleting outside of the artifact directory (path traversal via names in uploads)
+* [FIX] Restore verifies the backup before replacing any data; an invalid backup no longer deletes the existing data
+* [FIX] Passwords may contain ':'; requests are denied (401) if no credentials are configured
+* [FIX] Uploads above 128 MB failed (multipart limit); restores above about 30 MB could fail (request size limit)
+* [FIX] Incomplete or broken artifact directories no longer break /info and latest of the whole product
+* [FIX] Failed uploads no longer leave a "temp" product behind
+* [FIX] Restore accepts additional files and sub directories in release directories (e.g. macOS metadata extracted by old versions) and artifacts in sub directories, like previous versions
+* [CHANGE] Uploads ignore operating system metadata in ZIP files (macOS: __MACOSX/, ._*, .DS_Store; Windows: Thumbs.db, ehthumbs.db, desktop.ini, $RECYCLE.BIN/); existing data is not changed
+* [CHANGE] Deleting the last release of a platform or product removes the then empty directories; product directories without any release (e.g. left behind by previous versions) are no longer listed by GET /artifacts and not counted as products (their /info was and is 404)
+* [FIX] Concurrent first uploads after a start could skip the check of required properties in deployment.json (thread-safety issue of Newtonsoft.Json)
+* [FEATURE] Keep the newest backups (BackupRetentionCount, default 5) instead of only the latest one
+* [FEATURE] Downloads are streamed from disk and support range requests (resume)
+* [CHANGE] A package upload is only rejected if its version already exists (new versions no longer need force=true)
+* [CHANGE] Browsers may only call authenticated endpoints from configured origins (Cors:WriteOrigins); public endpoints stay open
+* [CHANGE] Remove the query endpoints that were disabled in 2021 (replaced by /artifacts/{product}/info)
+* [DOCS] Swagger documentation for external users
+
+Client:
+
+* [CHANGE] Replace the Nuxt 2 client by a Vue 3 single page application served by nginx (port and RELEASE_SERVER_URL unchanged)
+* [FIX] Corrupted downloads, missing change logs without English entries, truncated release lists, repeated uploads
+* [FIX] The filter field in Explore overflowed its column
+* [SECURITY] The password is no longer stored in the local storage of the browser
+
 ## v0.2.0
 
 * [FEATURE] Proof & apply code style and conventions #34 

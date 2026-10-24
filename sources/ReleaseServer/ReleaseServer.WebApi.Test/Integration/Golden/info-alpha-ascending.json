@@ -1,0 +1,174 @@
+{
+  "identifier": "alpha",
+  "releases": [
+    {
+      "version": "1.0",
+      "platforms": [
+        "linux/x64",
+        "windows/x64",
+        "windows/x86"
+      ],
+      "releaseDate": "2021-05-07T00:00:00",
+      "isPreviewRelease": false,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
+          {
+            "platforms": [
+              "linux/rpi"
+            ],
+            "added": [],
+            "fixed": [
+              "Das Problem wurde behoben."
+            ],
+            "breaking": [],
+            "deprecated": []
+          },
+          {
+            "platforms": null,
+            "added": [
+              "Feature xyz wurde hinzugefügt."
+            ],
+            "fixed": [],
+            "breaking": [
+              "Komponente D wurde ersetzt."
+            ],
+            "deprecated": [
+              "Funktion foo entfällt."
+            ]
+          }
+        ],
+        "en": [
+          {
+            "platforms": [
+              "linux/rpi"
+            ],
+            "added": [],
+            "fixed": [
+              "The problem has been fixed."
+            ],
+            "breaking": [],
+            "deprecated": []
+          },
+          {
+            "platforms": null,
+            "added": [
+              "Feature xyz has been added."
+            ],
+            "fixed": [],
+            "breaking": [
+              "Component D has been replaced."
+            ],
+            "deprecated": [
+              "Function foo will be removed."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.9",
+      "platforms": [
+        "windows/any"
+      ],
+      "releaseDate": "2019-02-21T00:00:00",
+      "isPreviewRelease": false,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
+          {
+            "platforms": null,
+            "added": [
+              "Version HW 3 Freigabe"
+            ],
+            "fixed": [
+              "Kein Neustart nach Firmwaretransfer."
+            ],
+            "breaking": null,
+            "deprecated": null
+          }
+        ],
+        "en": []
+      }
+    },
+    {
+      "version": "1.10-beta",
+      "platforms": [
+        "windows/any"
+      ],
+      "releaseDate": "2024-03-22T10:15:00Z",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              "Preview of feature abc."
+            ],
+            "fixed": null,
+            "breaking": null,
+            "deprecated": null
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.10-rc",
+      "platforms": [
+        "windows/any"
+      ],
+      "releaseDate": "2024-03-22T10:15:00Z",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              "Preview of feature abc."
+            ],
+            "fixed": null,
+            "breaking": null,
+            "deprecated": null
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.10",
+      "platforms": [
+        "windows/any"
+      ],
+      "releaseDate": "2023-02-20T00:00:00",
+      "isPreviewRelease": false,
+      "isSecurityPatch": true,
+      "changes": {
+        "de": [
+          {
+            "platforms": null,
+            "added": null,
+            "fixed": [
+              "Sicherheitslücke geschlossen."
+            ],
+            "breaking": null,
+            "deprecated": null
+          }
+        ],
+        "en": [
+          {
+            "platforms": null,
+            "added": null,
+            "fixed": [
+              "Security issue fixed."
+            ],
+            "breaking": null,
+            "deprecated": null
+          }
+        ]
+      }
+    }
+  ],
+  "totalReleaseCount": 5,
+  "nextOffset": null
+}

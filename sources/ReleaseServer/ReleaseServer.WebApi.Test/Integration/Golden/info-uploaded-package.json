@@ -1,0 +1,41 @@
+{
+  "identifier": "foobar",
+  "releases": [
+    {
+      "version": "2.0.0-preview-2",
+      "platforms": [
+        "linux/arm64",
+        "windows/x64"
+      ],
+      "releaseDate": "2021-10-28T00:00:00",
+      "isPreviewRelease": true,
+      "isSecurityPatch": false,
+      "changes": {
+        "de": [
+          {
+            "platforms": null,
+            "added": [
+              "Neu"
+            ],
+            "fixed": [],
+            "breaking": [],
+            "deprecated": []
+          }
+        ],
+        "en": [
+          {
+            "platforms": null,
+            "added": [
+              "New"
+            ],
+            "fixed": [],
+            "breaking": [],
+            "deprecated": []
+          }
+        ]
+      }
+    }
+  ],
+  "totalReleaseCount": 1,
+  "nextOffset": null
+}

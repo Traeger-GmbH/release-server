@@ -102,13 +102,6 @@ namespace ReleaseServer.WebApi
         /// <returns>A <see cref="List{T}"/> of <see cref="ProductVersion"/> objects, that fit the given arguments.</returns>
         List<ProductVersion> GetVersions(string productName, string os, string architecture);
         
-        /// <summary>
-        /// Retrieves all available platforms for a specific artifact.
-        /// </summary>
-        /// <param name="productName">The product name of the release artifact.</param>
-        /// <param name="version">The version of the release artifact</param>
-        /// <returns>A <see cref="List{T}"/> <see cref="string"/> objects with the corresponding versions.</returns>
-        List<string> GetPlatforms(string productName, string version);
         
         /// <summary>
         /// Creates a backup of the whole repository.

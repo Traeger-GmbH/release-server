@@ -1,0 +1,6 @@
+{
+  "title": "Conflict",
+  "status": 400,
+  "detail": "This package (foobar-v1.0) already exists. Set the parameter \"force = true\" in order to overwrite the existing package. ",
+  "traceId": "<traceId>"
+}
