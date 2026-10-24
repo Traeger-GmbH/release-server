@@ -37,6 +37,7 @@ namespace ReleaseServer.WebApi
         [HttpPut("{product}/{os}/{architecture}/{version}")]
         //Max. 500 MB
         [RequestSizeLimit(524288000)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
         public async Task<IActionResult> UploadSpecificArtifact([Required] string product, [Required] string os, 
             [Required] string architecture, [Required] string version, [Required] IFormFile artifact)
         {
@@ -99,6 +100,7 @@ namespace ReleaseServer.WebApi
         [HttpPut("")]
         //Max. 1024 MB
         [RequestSizeLimit(1073741824)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
         public async Task<IActionResult> UploadPackage([Required] IFormFile package, [FromQuery] bool force = false)
         {
             if (package == null) {

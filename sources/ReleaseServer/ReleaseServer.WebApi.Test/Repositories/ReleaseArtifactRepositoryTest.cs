@@ -417,7 +417,7 @@ namespace ReleaseServer.WebApi.Test
 
 
         [Fact]
-        public void TestRestore()
+        public void TestRestore_InvalidBackup_KeepsExistingData()
         {
             var testArtifactRoot = new DirectoryInfo(Path.Combine(projectDirectory, "TestArtifactRoot"));
             var testBackupDir = new DirectoryInfo(Path.Combine(projectDirectory, "TestBackup"));
@@ -433,24 +433,25 @@ namespace ReleaseServer.WebApi.Test
                 testBackupDir.Create();
             }
 
+            //Existing data that must survive the failed restore
+            var existingFile = Path.Combine(testArtifactRoot.FullName, "existing.txt");
+            File.WriteAllText(existingFile, "existing");
+
             var customRepository = new FsReleaseArtifactRepository(
                 Substitute.For<ILogger<FsReleaseArtifactRepository>>(),
                 testArtifactRoot,
                 testBackupDir
             );
             
-            var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.zip")));
-            var expectedFile = File.ReadAllBytes(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.txt"));
+            //The archive only contains a single text file and no artifact structure
+            using var testBackupZip = new ZipArchive(File.OpenRead(Path.Combine(projectDirectory, "TestData", "restoreTest", "testFile.zip")));
             
             //Act
-            customRepository.RestoreBackup(testBackupZip);
-            
-            //Get the (only) one file in the testArtifactRootDirectory
-            var artifactFiles = Directory.GetFiles(testArtifactRoot.FullName);
-            var testFile = File.ReadAllBytes(artifactFiles.First());
+            Assert.Throws<BackupValidationException>(() => customRepository.RestoreBackup(testBackupZip));
             
             //Assert
-            Assert.Equal(expectedFile, testFile);
+            Assert.Equal(new[] { existingFile }, Directory.GetFileSystemEntries(testArtifactRoot.FullName));
+            Assert.Equal("existing", File.ReadAllText(existingFile));
             
             //Cleanup
             testArtifactRoot.Delete(true);

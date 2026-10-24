@@ -247,8 +247,17 @@ namespace ReleaseServer.WebApi
             
             logger.LogDebug("convert the uploaded payload to a ZIP archive");
             using var fileStream = payload.OpenReadStream();
-            using var zipPayload = new ZipArchive(payload.OpenReadStream());
-            
+            ZipArchive zipPayload;
+            try
+            {
+                zipPayload = new ZipArchive(fileStream);
+            }
+            catch (InvalidDataException e)
+            {
+                throw new BackupValidationException(new[] { "The uploaded file is not a valid ZIP archive: " + e.Message });
+            }
+
+            using var disposableZipPayload = zipPayload;
             await directoryLock.WaitAsync();
 
             //It's important to release the semaphore. try / finally block ensures a guaranteed release (also if the operation may crash) 

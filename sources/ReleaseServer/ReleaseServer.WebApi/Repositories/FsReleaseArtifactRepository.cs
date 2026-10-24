@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.Extensions.Logging;
 using ReleaseServer.WebApi.Models;
@@ -24,11 +25,36 @@ namespace ReleaseServer.WebApi
         // Internal directory for uploads in progress (inside the artifact root, so moving is atomic).
         private const string TemporaryDirectoryName = ".temp";
 
+        // Internal directories used while restoring a backup.
+        private const string RestoreStagingPrefix = ".restore-";
+        private const string RestorePreviousPrefix = ".previous-";
+
+        // Directory used for uploads in progress by release servers before version 1.0. It may be part
+        // of old backups and is not restored.
+        private const string LegacyTemporaryDirectoryName = "temp";
+
+        private const string BackupFilePrefix = "backup_";
+        private const string BackupFileExtension = ".zip";
+        private const string PartialFileExtension = ".partial";
+
+        // Free space that has to remain on the disk after extracting a backup.
+        private const long RestoreSpaceReserve = 100L * 1024 * 1024;
+
+        #endregion
+
+        #region ---------- Public constants ----------
+
+        /// <summary>
+        /// The number of backups that are kept in the backup directory by default.
+        /// </summary>
+        public const int DefaultBackupRetentionCount = 5;
+
         #endregion
 
         #region ---------- Private fields ----------
         
         private readonly DirectoryInfo artifactRootDir, backupRootDir;
+        private readonly int backupRetentionCount;
         private ILogger logger;
         
         #endregion
@@ -38,10 +64,12 @@ namespace ReleaseServer.WebApi
         public FsReleaseArtifactRepository(
             ILogger<FsReleaseArtifactRepository> logger,
             DirectoryInfo artifactDirectory,
-            DirectoryInfo backupDirectory)
+            DirectoryInfo backupDirectory,
+            int backupRetentionCount = DefaultBackupRetentionCount)
         {
             artifactRootDir = artifactDirectory;
             backupRootDir = backupDirectory;
+            this.backupRetentionCount = Math.Max(1, backupRetentionCount);
             this.logger = logger;
         }
 
@@ -242,23 +270,41 @@ namespace ReleaseServer.WebApi
 
         public BackupInformation RunBackup()
         {
-            var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
-
-            string backupFileName = "backup_" + timeStamp + ".zip";
-            string backupArchiveFileName = Path.Combine(backupRootDir.ToString(), backupFileName);
-
-            //Clear the backup folder first
-            if (backupRootDir.Exists)
-            {
-                backupRootDir.DeleteContent();
-            }
-            else
+            if (!backupRootDir.Exists)
             {
                 backupRootDir.Create();
             }
 
-            //Create the backup -> zip the whole ArtifactRoot folder
-            ZipFile.CreateFromDirectory(artifactRootDir.ToString(), backupArchiveFileName);
+            string backupFileName;
+            string backupArchiveFileName;
+
+            // Backup names have a resolution of one second, never overwrite an existing backup.
+            while (true)
+            {
+                var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
+                backupFileName = BackupFilePrefix + timeStamp + BackupFileExtension;
+                backupArchiveFileName = Path.Combine(backupRootDir.FullName, backupFileName);
+
+                if (!File.Exists(backupArchiveFileName))
+                    break;
+
+                Thread.Sleep(250);
+            }
+
+            //Create the backup in a partial file first, so an interrupted backup never looks complete
+            var partialFileName = backupArchiveFileName + PartialFileExtension;
+            try
+            {
+                CreateBackupArchive(partialFileName);
+                File.Move(partialFileName, backupArchiveFileName);
+            }
+            finally
+            {
+                if (File.Exists(partialFileName))
+                    File.Delete(partialFileName);
+            }
+
+            ApplyBackupRetention();
 
             return new BackupInformation
             {
@@ -269,30 +315,372 @@ namespace ReleaseServer.WebApi
 
         public void RestoreBackup(ZipArchive backupPayload)
         {
+            var id = Guid.NewGuid().ToString("N");
+            var stagingDir = new DirectoryInfo(Path.Combine(artifactRootDir.FullName, RestoreStagingPrefix + id));
+            var previousDir = new DirectoryInfo(Path.Combine(artifactRootDir.FullName, RestorePreviousPrefix + id));
+
             try
             {
-                //Clear the whole artifact root directory or create it, if it's not existing
-                if (artifactRootDir.Exists)
-                {
-                    artifactRootDir.DeleteContent();
-                }
-                else
+                if (!artifactRootDir.Exists)
                 {
                     artifactRootDir.Create();
                 }
 
-                backupPayload.ExtractToDirectory(artifactRootDir.ToString());
+                //1. Extract the backup into a staging directory (the existing data is not touched)
+                EnsureEnoughSpaceForRestore(backupPayload);
+                stagingDir.Create();
+                try
+                {
+                    // ExtractToDirectory rejects entries that would be written outside of the directory.
+                    backupPayload.ExtractToDirectory(stagingDir.FullName);
+                }
+                catch (Exception e) when (e is IOException || e is InvalidDataException || e is UnauthorizedAccessException || e is ArgumentException)
+                {
+                    throw new BackupValidationException(new[] { "The backup archive cannot be extracted: " + e.Message });
+                }
+
+                //2. Verify the content before anything is replaced
+                RemoveNonRestorableDirectories(stagingDir);
+                var errors = ValidateBackupContent(stagingDir, out var artifactCount);
+                if (errors.Count > 0)
+                {
+                    throw new BackupValidationException(errors);
+                }
+
+                //3. Replace the existing data by the verified data
+                SwapArtifactDirectoryContent(stagingDir, previousDir);
+                logger.LogInformation("The backup with {0} artifacts was restored successfully", artifactCount);
+            }
+            catch (BackupValidationException e)
+            {
+                logger.LogError("The backup was not restored, the existing data is unchanged: {0}", e.Message);
+                throw;
             }
             catch (Exception e)
             {
                 logger.LogCritical("unexpected error during restoring the backup: {message}", e.Message);
                 throw;
             }
+            finally
+            {
+                DeleteDirectoryIfExists(stagingDir);
+            }
         }
         
         #endregion
         
         #region ---------- Private methods ----------
+
+        /// <summary>
+        /// Creates a ZIP archive of the artifact directory with the same layout as
+        /// <see cref="ZipFile.CreateFromDirectory(string, string)"/> (used by previous versions), so backups
+        /// stay exchangeable between versions. Internal directories are not included.
+        /// </summary>
+        private void CreateBackupArchive(string archiveFileName)
+        {
+            using var archive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
+            var root = artifactRootDir.FullName;
+
+            foreach (var entry in artifactRootDir.EnumerateFileSystemInfos())
+            {
+                if (entry is DirectoryInfo directory && StorageNames.IsInternalDirectory(directory.Name))
+                    continue;
+
+                AddToArchive(archive, root, entry);
+            }
+        }
+
+        private static void AddToArchive(ZipArchive archive, string root, FileSystemInfo entry)
+        {
+            var entryName = Path.GetRelativePath(root, entry.FullName).Replace(Path.DirectorySeparatorChar, '/');
+
+            if (entry is FileInfo file)
+            {
+                archive.CreateEntryFromFile(file.FullName, entryName, CompressionLevel.Optimal);
+                return;
+            }
+
+            var directory = (DirectoryInfo)entry;
+            var children = directory.EnumerateFileSystemInfos().ToList();
+
+            if (children.Count == 0)
+            {
+                // Empty directories are stored as directory entries (e.g. products without releases).
+                archive.CreateEntry(entryName + "/");
+                return;
+            }
+
+            foreach (var child in children)
+            {
+                AddToArchive(archive, root, child);
+            }
+        }
+
+        private void ApplyBackupRetention()
+        {
+            var backups = backupRootDir.EnumerateFiles(BackupFilePrefix + "*" + BackupFileExtension)
+                .OrderByDescending(file => file.Name, StringComparer.Ordinal)
+                .ToList();
+
+            foreach (var backup in backups.Skip(backupRetentionCount))
+            {
+                logger.LogInformation("Deleting the old backup {0}", backup.Name);
+                backup.Delete();
+            }
+        }
+
+        private void EnsureEnoughSpaceForRestore(ZipArchive backupPayload)
+        {
+            long requiredSpace = 0;
+            foreach (var entry in backupPayload.Entries)
+            {
+                requiredSpace += entry.Length;
+            }
+
+            long availableSpace;
+            try
+            {
+                availableSpace = new DriveInfo(artifactRootDir.FullName).AvailableFreeSpace;
+            }
+            catch (Exception e) when (e is ArgumentException || e is IOException || e is UnauthorizedAccessException)
+            {
+                logger.LogWarning("Could not determine the free disk space: {0}", e.Message);
+                return;
+            }
+
+            if (requiredSpace + RestoreSpaceReserve > availableSpace)
+            {
+                throw new BackupValidationException(new[]
+                {
+                    $"Not enough free disk space to restore the backup ({requiredSpace / (1024 * 1024)} MB required, {availableSpace / (1024 * 1024)} MB available)."
+                });
+            }
+        }
+
+        private void RemoveNonRestorableDirectories(DirectoryInfo stagingDir)
+        {
+            foreach (var directory in stagingDir.EnumerateDirectories())
+            {
+                if (StorageNames.IsInternalDirectory(directory.Name) || IsLegacyTemporaryDirectory(directory))
+                {
+                    logger.LogWarning("The directory {0} of the backup is not restored (temporary data)", directory.Name);
+                    directory.Delete(true);
+                }
+            }
+        }
+
+        private static bool IsLegacyTemporaryDirectory(DirectoryInfo directory)
+        {
+            // Previous versions used "temp/<guid>" for uploads in progress. A real product named "temp"
+            // has no GUID named sub directories.
+            return directory.Name == LegacyTemporaryDirectoryName
+                   && directory.EnumerateFileSystemInfos().All(child => child is DirectoryInfo && Guid.TryParse(child.Name, out _));
+        }
+
+        /// <summary>
+        /// Verifies the structure of an extracted backup: product/os/architecture/version directories,
+        /// readable deployment.json and release notes and existing artifact files.
+        /// </summary>
+        private static List<string> ValidateBackupContent(DirectoryInfo stagingDir, out int artifactCount)
+        {
+            var errors = new List<string>();
+            artifactCount = 0;
+
+            foreach (var file in stagingDir.EnumerateFiles())
+            {
+                errors.Add($"Unexpected file \"{file.Name}\" in the root directory of the backup.");
+            }
+
+            foreach (var productDir in stagingDir.EnumerateDirectories())
+            {
+                foreach (var osDir in EnumerateLevel(productDir, errors))
+                {
+                    foreach (var architectureDir in EnumerateLevel(osDir, errors))
+                    {
+                        foreach (var versionDir in EnumerateLevel(architectureDir, errors))
+                        {
+                            var path = $"{productDir.Name}/{osDir.Name}/{architectureDir.Name}/{versionDir.Name}";
+
+                            if (ValidateArtifactDirectory(versionDir, path, errors))
+                            {
+                                artifactCount++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (errors.Count == 0 && artifactCount == 0)
+            {
+                errors.Add("The backup does not contain any artifact.");
+            }
+
+            return errors;
+        }
+
+        private static IEnumerable<DirectoryInfo> EnumerateLevel(DirectoryInfo directory, List<string> errors)
+        {
+            foreach (var file in directory.EnumerateFiles())
+            {
+                errors.Add($"Unexpected file \"{file.Name}\" in \"{directory.Name}\".");
+            }
+
+            return directory.EnumerateDirectories().ToList();
+        }
+
+        private static bool ValidateArtifactDirectory(DirectoryInfo versionDir, string path, List<string> errors)
+        {
+            var errorCount = errors.Count;
+
+            if (!StorageNames.TryParseVersion(versionDir.Name, out _))
+            {
+                errors.Add($"\"{path}\": the directory name is not a valid version.");
+            }
+
+            if (versionDir.EnumerateDirectories().Any())
+            {
+                errors.Add($"\"{path}\": unexpected sub directories.");
+            }
+
+            var metaFile = Path.Combine(versionDir.FullName, StorageNames.DeploymentMetaFileName);
+            if (!File.Exists(metaFile))
+            {
+                errors.Add($"\"{path}\": {StorageNames.DeploymentMetaFileName} is missing.");
+                return false;
+            }
+
+            DeploymentMetaInformation meta;
+            try
+            {
+                meta = DeploymentMetaInformation.FromJsonFile(metaFile);
+            }
+            catch (Exception e)
+            {
+                errors.Add($"\"{path}\": {StorageNames.DeploymentMetaFileName} is invalid ({e.Message}).");
+                return false;
+            }
+
+            if (meta == null || !StorageNames.IsValidFileName(meta.ArtifactFileName) || !StorageNames.IsValidFileName(meta.ReleaseNotesFileName))
+            {
+                errors.Add($"\"{path}\": {StorageNames.DeploymentMetaFileName} contains invalid file names.");
+                return false;
+            }
+
+            var releaseNotesFile = Path.Combine(versionDir.FullName, meta.ReleaseNotesFileName);
+            if (!File.Exists(releaseNotesFile))
+            {
+                errors.Add($"\"{path}\": the release notes file \"{meta.ReleaseNotesFileName}\" is missing.");
+            }
+            else
+            {
+                try
+                {
+                    ReleaseNotes.FromJsonFile(releaseNotesFile);
+                }
+                catch (Exception e)
+                {
+                    errors.Add($"\"{path}\": the release notes file is invalid ({e.Message}).");
+                }
+            }
+
+            if (!File.Exists(Path.Combine(versionDir.FullName, meta.ArtifactFileName)))
+            {
+                errors.Add($"\"{path}\": the artifact file \"{meta.ArtifactFileName}\" is missing.");
+            }
+
+            return errors.Count == errorCount;
+        }
+
+        /// <summary>
+        /// Moves the current content of the artifact directory aside, moves the staged content in and
+        /// deletes the previous content afterwards. Only renames within the artifact directory are used
+        /// (the artifact directory itself may be a mount point). If moving fails, the previous content
+        /// is moved back.
+        /// </summary>
+        private void SwapArtifactDirectoryContent(DirectoryInfo stagingDir, DirectoryInfo previousDir)
+        {
+            previousDir.Create();
+            var movedAside = new List<string>();
+            var movedIn = new List<string>();
+
+            try
+            {
+                foreach (var entry in artifactRootDir.EnumerateFileSystemInfos().ToList())
+                {
+                    if (entry is DirectoryInfo && StorageNames.IsInternalDirectory(entry.Name))
+                        continue;
+
+                    MoveEntry(entry, Path.Combine(previousDir.FullName, entry.Name));
+                    movedAside.Add(entry.Name);
+                }
+
+                foreach (var entry in stagingDir.EnumerateFileSystemInfos().ToList())
+                {
+                    MoveEntry(entry, Path.Combine(artifactRootDir.FullName, entry.Name));
+                    movedIn.Add(entry.Name);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical("Restoring failed while replacing the data, the previous data is put back: {0}", e.Message);
+
+                foreach (var name in movedIn)
+                {
+                    DeleteEntryIfExists(Path.Combine(artifactRootDir.FullName, name));
+                }
+
+                foreach (var name in movedAside)
+                {
+                    MoveEntry(new DirectoryInfo(Path.Combine(previousDir.FullName, name)).Exists
+                            ? (FileSystemInfo)new DirectoryInfo(Path.Combine(previousDir.FullName, name))
+                            : new FileInfo(Path.Combine(previousDir.FullName, name)),
+                        Path.Combine(artifactRootDir.FullName, name));
+                }
+
+                DeleteDirectoryIfExists(previousDir);
+                throw;
+            }
+
+            DeleteDirectoryIfExists(previousDir);
+        }
+
+        private static void MoveEntry(FileSystemInfo entry, string destination)
+        {
+            if (entry is DirectoryInfo directory)
+            {
+                directory.MoveTo(destination);
+            }
+            else
+            {
+                ((FileInfo)entry).MoveTo(destination);
+            }
+        }
+
+        private static void DeleteEntryIfExists(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+            else if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
+        private void DeleteDirectoryIfExists(DirectoryInfo directory)
+        {
+            try
+            {
+                directory.Refresh();
+                if (directory.Exists)
+                    directory.Delete(true);
+            }
+            catch (IOException e)
+            {
+                logger.LogWarning("Could not remove the directory {0}: {1}", directory.FullName, e.Message);
+            }
+        }
 
         /// <summary>
         /// Builds the path of an artifact directory. Returns null if the path would be outside of the

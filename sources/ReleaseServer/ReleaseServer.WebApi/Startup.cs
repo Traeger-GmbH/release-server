@@ -49,15 +49,11 @@ namespace ReleaseServer.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="env">Information about the web hosting environment of the application.</param>
-        public Startup(IWebHostEnvironment env)
+        /// <param name="configuration">The configuration of the host (appsettings.json of the content root,
+        /// environment variables and command line arguments).</param>
+        public Startup(IConfiguration configuration)
         {
-            var conf = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json")
-                .Build();
-            
-            Configuration = conf;
+            Configuration = configuration;
         }
         
         #endregion

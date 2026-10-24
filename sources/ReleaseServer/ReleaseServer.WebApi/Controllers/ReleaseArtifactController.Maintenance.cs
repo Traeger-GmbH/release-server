@@ -58,11 +58,24 @@ namespace ReleaseServer.WebApi
         /// <response code="400">No body provided.</response>
         /// <response code="401">The user is not authorized (wrong credentials or missing auth header).</response>
         [HttpPut("restore")]
+        // Backups contain all artifacts and can be large; the endpoint requires authentication.
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
         public async Task<IActionResult> Restore([Required] IFormFile backupFile)
         {
             if (backupFile != null)
             {
-                await releaseArtifactService.RestoreBackup(backupFile);
+                try
+                {
+                    await releaseArtifactService.RestoreBackup(backupFile);
+                }
+                catch (BackupValidationException e)
+                {
+                    return BadRequestResponseFactory.Create(
+                        HttpContext,
+                        "Bad request",
+                        e.Message);
+                }
                 return Ok();
             }
             else

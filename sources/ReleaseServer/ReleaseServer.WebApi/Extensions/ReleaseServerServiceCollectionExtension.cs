@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseServerServiceCollectionExtension.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2019-2020.
 // </copyright>
@@ -19,8 +19,9 @@ namespace ReleaseServer.WebApi
         public static IServiceCollection AddFsReleaseArtifactService(this IServiceCollection services, IConfiguration configuration)
         {
             //Check file permissions
-            var artifactRootDir = new DirectoryInfo(configuration["ArtifactRootDirectory"]);
-            var backupRootDir = new DirectoryInfo(configuration["BackupRootDirectory"]);
+            var artifactRootDir = new DirectoryInfo(configuration["ArtifactRootDirectory"] ?? "./artifacts");
+            var backupRootDir = new DirectoryInfo(configuration["BackupRootDirectory"] ?? "./backups");
+            var backupRetentionCount = configuration.GetValue("BackupRetentionCount", FsReleaseArtifactRepository.DefaultBackupRetentionCount);
 
             if (!artifactRootDir.Exists) {
                 artifactRootDir.Create();
@@ -37,7 +38,8 @@ namespace ReleaseServer.WebApi
                 var releaseArtifactRepository = new FsReleaseArtifactRepository(
                     serviceProvider.GetRequiredService<ILogger<FsReleaseArtifactRepository>>(),
                     artifactRootDir,
-                    backupRootDir
+                    backupRootDir,
+                    backupRetentionCount
                 );
                 return new FsReleaseArtifactService(
                     releaseArtifactRepository,

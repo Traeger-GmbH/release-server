@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseServerTestHost.cs" company="Traeger Industry Components GmbH">
 //     This file is protected by Traeger Industry Components GmbH Copyright © 2026.
 // </copyright>
@@ -12,12 +12,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 using Xunit;
 
@@ -70,19 +66,8 @@ namespace ReleaseServer.WebApi.Test.Integration
 
             factory = new WebApplicationFactory<Startup>().WithWebHostBuilder(builder =>
             {
+                // The settings are applied like environment variables of a container.
                 builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(settings));
-                builder.ConfigureTestServices(services =>
-                {
-                    // Point the service to the private test directories, independent of how the
-                    // application reads its configuration.
-                    services.AddSingleton<IReleaseArtifactService>(serviceProvider =>
-                        new FsReleaseArtifactService(
-                            new FsReleaseArtifactRepository(
-                                serviceProvider.GetRequiredService<ILogger<FsReleaseArtifactRepository>>(),
-                                new DirectoryInfo(ArtifactDirectory),
-                                new DirectoryInfo(BackupDirectory)),
-                            serviceProvider.GetRequiredService<ILogger<FsReleaseArtifactService>>()));
-                });
             });
         }
 
