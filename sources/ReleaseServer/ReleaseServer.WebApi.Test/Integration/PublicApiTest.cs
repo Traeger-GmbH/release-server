@@ -50,6 +50,23 @@ namespace ReleaseServer.WebApi.Test.Integration
         }
 
         [Fact]
+        public async Task GetProductList_SkipsDirectorySkeletonsWithoutReleases()
+        {
+            // Deliberate change compared to the 3.1 server: product directories without any release (e.g. the
+            // skeleton left behind by deleting all releases, like "pc-s7-link-demo2" in production) were listed
+            // as products, although /info returned 404. They are no longer listed; /info is unchanged (404).
+            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(host.ArtifactDirectory, "skeleton", "windows", "x64"));
+
+            var products = await client.GetStringAsync("/artifacts/");
+            var info = await client.GetAsync("/artifacts/pc-s7-link-demo2/info");
+
+            Assert.DoesNotContain("pc-s7-link-demo2", products);
+            Assert.DoesNotContain("skeleton", products);
+            Assert.Equal(HttpStatusCode.NotFound, info.StatusCode);
+            Golden.AssertJson("info-empty-product", await info.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
         public async Task GetProductList_WithoutTrailingSlash_ReturnsProducts()
         {
             var response = await client.GetAsync("/artifacts");

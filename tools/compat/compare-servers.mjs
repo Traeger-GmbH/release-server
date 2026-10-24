@@ -64,8 +64,32 @@ async function compare (path, download = false) {
   return a;
 }
 
-const list = await compare('/artifacts/');
-const products = JSON.parse(list.json).products;
+// Deliberate change in version 1.0: products without any release (directory skeletons, /info 404) are
+// no longer listed. They are removed from both lists before comparing and reported separately.
+async function productsWithReleases (base) {
+  const listed = JSON.parse((await get(base, '/artifacts/')).json).products;
+  const result = [];
+  for (const product of listed) {
+    if ((await fetch(`${base}/artifacts/${encodeURIComponent(product)}/info`)).status !== 404) {
+      result.push(product);
+    }
+  }
+  return { listed, withReleases: result.sort() };
+}
+
+const [listA, listB] = await Promise.all([productsWithReleases(args.a), productsWithReleases(args.b)]);
+compared++;
+if (!isDeepStrictEqual(listA.withReleases, listB.withReleases)) {
+  differences.push('/artifacts/');
+  console.log(`DIFF  /artifacts/\n  a: ${JSON.stringify(listA.withReleases)}\n  b: ${JSON.stringify(listB.withReleases)}`);
+}
+for (const [name, list] of [['a', listA], ['b', listB]]) {
+  const skeletons = list.listed.filter(product => !list.withReleases.includes(product));
+  if (skeletons.length > 0) {
+    console.log(`INFO  ${name} lists products without releases (expected only for versions before 1.0): ${skeletons.join(', ')}`);
+  }
+}
+const products = listA.withReleases;
 
 for (const product of products) {
   const base = `/artifacts/${encodeURIComponent(product)}`;

@@ -228,7 +228,26 @@ namespace ReleaseServer.WebApi
 
             Directory.Delete(path, true);
 
+            // Remove the architecture, operating system and product directories if they are empty now, so
+            // no product without releases remains
+            RemoveIfEmpty(ResolveInsideRoot(productName, os, architecture));
+            RemoveIfEmpty(ResolveInsideRoot(productName, os));
+            RemoveIfEmpty(ResolveInsideRoot(productName));
+
             return true;
+        }
+
+        private void RemoveIfEmpty(string directory)
+        {
+            try
+            {
+                if (directory != null && Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                    Directory.Delete(directory);
+            }
+            catch (IOException e)
+            {
+                logger.LogWarning("Could not remove the empty directory {0}: {1}", directory, e.Message);
+            }
         }
 
         public bool DeleteProductIfExists(string productName)
@@ -767,6 +786,18 @@ namespace ReleaseServer.WebApi
         }
 
         /// <summary>
+        /// Checks whether a product directory contains at least one release directory
+        /// (product/os/architecture/version). Empty directory skeletons, e.g. left behind by previous versions
+        /// after deleting all releases, are no products.
+        /// </summary>
+        private static bool HasReleaseDirectories(DirectoryInfo productDir)
+        {
+            return productDir.EnumerateDirectories()
+                .SelectMany(osDir => osDir.EnumerateDirectories())
+                .Any(architectureDir => architectureDir.EnumerateDirectories().Any());
+        }
+
+        /// <summary>
         /// Enumerates the product directories (internal directories like the temporary directory are skipped).
         /// </summary>
         private IEnumerable<DirectoryInfo> EnumerateProductDirectories()
@@ -801,6 +832,7 @@ namespace ReleaseServer.WebApi
         public List<string> GetProductList()
         {
             var productList = EnumerateProductDirectories()
+                .Where(HasReleaseDirectories)
                 .Select( directoryInfo => directoryInfo.Name )
                 .ToList();
             return productList;
@@ -820,7 +852,7 @@ namespace ReleaseServer.WebApi
 
         public int GetNumberOfProducts()
         {
-            return EnumerateProductDirectories().Count();
+            return EnumerateProductDirectories().Count(HasReleaseDirectories);
         }
 
         public int GetNumberOfArtifacts()

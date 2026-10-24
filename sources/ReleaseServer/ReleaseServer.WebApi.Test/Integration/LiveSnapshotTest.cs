@@ -59,9 +59,14 @@ namespace ReleaseServer.WebApi.Test.Integration
 
             var response = await client.GetAsync("/artifacts/");
 
+            // Deliberate change: products without any release (/info 404 in production) are no longer listed
+            var expected = (JObject)ReadJson(File.ReadAllText(Path.Combine(SnapshotDirectory, "products.json")));
+            expected["products"] = new JArray(((JArray)expected["products"]).Select(product => (string)product)
+                .Where(product => ReadJson(File.ReadAllText(Path.Combine(SnapshotDirectory, "info", product + ".json")))["releases"] != null));
             Assert.Equal(
-                Golden.NormalizeJson(File.ReadAllText(Path.Combine(SnapshotDirectory, "products.json"))),
+                Golden.NormalizeJson(expected.ToString()),
                 Golden.NormalizeJson(await response.Content.ReadAsStringAsync()));
+            Assert.Equal(29, ((JArray)expected["products"]).Count);
         }
 
         [Theory]

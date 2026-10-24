@@ -208,7 +208,7 @@ namespace ReleaseServer.WebApi.Test.Integration
 
             Golden.AssertJson("products", await client.GetStringAsync("/artifacts/"));
             var statistics = JObject.Parse(await client.GetStringAsync("/artifacts/statistics"));
-            Assert.Equal(4, (int)statistics["numberOfProducts"]);
+            Assert.Equal(3, (int)statistics["numberOfProducts"]);
             Assert.Equal(10, (int)statistics["numberOfArtifacts"]);
         }
 

@@ -117,7 +117,8 @@ namespace ReleaseServer.WebApi.Test.Integration
             var statistics = JObject.Parse(await response.Content.ReadAsStringAsync());
             Assert.Equal(new[] { "disk", "numberOfProducts", "numberOfArtifacts" }, PropertyNames(statistics));
             Assert.Equal(new[] { "totalSize", "usedDiskSpace", "availableFreeSpace" }, PropertyNames((JObject)statistics["disk"]));
-            Assert.Equal(4, (int)statistics["numberOfProducts"]);
+            // The empty product directory "pc-s7-link-demo2" has no releases and is no product
+            Assert.Equal(3, (int)statistics["numberOfProducts"]);
             Assert.Equal(10, (int)statistics["numberOfArtifacts"]);
         }
 
@@ -312,6 +313,50 @@ namespace ReleaseServer.WebApi.Test.Integration
             var again = await client.DeleteAsync("/artifacts/alpha/windows/x86/1.0");
             Assert.Equal(HttpStatusCode.NotFound, again.StatusCode);
             Golden.AssertJson("delete-artifact-not-found", await again.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task DeleteSpecificArtifact_LastRelease_RemovesEmptyParentDirectories()
+        {
+            using var client = host.CreateAuthenticatedClient();
+
+            Assert.Equal(HttpStatusCode.OK, (await client.DeleteAsync("/artifacts/s5-lan-3964R-lan-manager/Windows/X86/1.36")).StatusCode);
+            Assert.False(Directory.Exists(Path.Combine(host.ArtifactDirectory, "s5-lan-3964R-lan-manager", "Windows")));
+            Assert.True(Directory.Exists(Path.Combine(host.ArtifactDirectory, "s5-lan-3964R-lan-manager", "windows-xp", "any", "1.7")));
+
+            Assert.Equal(HttpStatusCode.OK, (await client.DeleteAsync("/artifacts/s5-lan-3964R-lan-manager/windows-xp/any/1.7")).StatusCode);
+            Assert.False(Directory.Exists(Path.Combine(host.ArtifactDirectory, "s5-lan-3964R-lan-manager")));
+            Assert.DoesNotContain("s5-lan-3964R-lan-manager", await client.GetStringAsync("/artifacts/"));
+            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/artifacts/s5-lan-3964R-lan-manager/info")).StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteSpecificArtifact_KeepsDirectoriesWithOtherContent()
+        {
+            File.WriteAllText(Path.Combine(host.ArtifactDirectory, "alpha", "windows", "x86", "notes.txt"), "kept");
+            using var client = host.CreateAuthenticatedClient();
+
+            await client.DeleteAsync("/artifacts/alpha/windows/x86/1.0");
+
+            Assert.True(File.Exists(Path.Combine(host.ArtifactDirectory, "alpha", "windows", "x86", "notes.txt")));
+            Assert.True(Directory.Exists(Path.Combine(host.ArtifactDirectory, "alpha", "windows", "x64", "1.0")));
+        }
+
+        [Fact]
+        public async Task UploadPackage_ThenDeleteAllPlatforms_LeavesNoPhantomProduct()
+        {
+            // The flow of the client: upload a package, delete the release on every platform
+            using var client = host.CreateAuthenticatedClient();
+            var platforms = new Dictionary<string, string> { ["windows/x64"] = "a.exe", ["windows/arm64"] = "b.exe", ["linux/arm32"] = "c.tar.gz" };
+            await client.PutAsync("/artifacts", Zip.CreateFormContent("package", Zip.CreatePackagePayload("foobar", "2.0.0-preview-2", platforms), "package.zip"));
+
+            foreach (var platform in platforms.Keys)
+            {
+                Assert.Equal(HttpStatusCode.OK, (await client.DeleteAsync($"/artifacts/foobar/{platform}/2.0.0-preview-2")).StatusCode);
+            }
+
+            Assert.False(Directory.Exists(Path.Combine(host.ArtifactDirectory, "foobar")));
+            Assert.DoesNotContain("foobar", await client.GetStringAsync("/artifacts/"));
         }
 
         [Fact]

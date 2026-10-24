@@ -193,8 +193,16 @@ async function request (path, options = {}) {
 async function snapshot () {
   const result = {};
   const list = await request('/artifacts/');
-  result['GET /artifacts/'] = list;
-  const products = JSON.parse(list.json).products;
+  // Deliberate change in version 1.0: products without any release (directory skeletons, /info 404)
+  // are no longer listed. They are removed from the list of both servers before comparing.
+  const listed = JSON.parse(list.json).products;
+  const products = [];
+  for (const product of listed) {
+    if ((await fetch(`${baseUrl}/artifacts/${encodeURIComponent(product)}/info`)).status !== 404) {
+      products.push(product);
+    }
+  }
+  result['GET /artifacts/'] = { ...list, json: JSON.stringify({ products: [...products].sort() }) };
 
   for (const product of products) {
     const base = `/artifacts/${encodeURIComponent(product)}`;
@@ -215,7 +223,12 @@ async function snapshot () {
   }
 
   const statistics = await fetch(`${baseUrl}/artifacts/statistics`, { headers: { Authorization: authHeader } }).then(r => r.json());
-  result['GET /artifacts/statistics (counters)'] = { numberOfProducts: statistics.numberOfProducts, numberOfArtifacts: statistics.numberOfArtifacts };
+  // Products without releases are counted by versions before 1.0 only (see above)
+  const productsWithoutReleases = listed.length - products.length;
+  result['GET /artifacts/statistics (counters)'] = {
+    numberOfProducts: statistics.numberOfProducts - productsWithoutReleases,
+    numberOfArtifacts: statistics.numberOfArtifacts
+  };
   result['DELETE /artifacts/unknown (unauthenticated)'] = (await request('/artifacts/unknown', { method: 'DELETE' })).status;
   return result;
 }

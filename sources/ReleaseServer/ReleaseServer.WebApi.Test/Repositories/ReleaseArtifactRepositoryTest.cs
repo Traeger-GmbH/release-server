@@ -298,9 +298,11 @@ namespace ReleaseServer.WebApi.Test
             //Assert
             Assert.True(productFound);
             Assert.False(Directory.Exists(Path.Combine(projectDirectory, "TestData", "producty", "ubuntu", "amd64", "1.1")));
+            //The product had only this release, so the empty parent directories are removed as well
+            Assert.False(Directory.Exists(Path.Combine(projectDirectory, "TestData", "producty")));
             
             //Cleanup
-            Directory.Delete(Path.Combine(projectDirectory, "TestData", "producty"), true);
+            TestUtils.CleanupDirIfExists(Path.Combine(projectDirectory, "TestData", "producty"));
         }
         
         [Fact]
