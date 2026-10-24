@@ -2,200 +2,165 @@
 
 # Release server
 
-An application for managing your own release artifacts. The release server provides several REST endpoints for the following operations:
+A server for publishing your own release artifacts. It provides REST endpoints to
 
-- Upload the release artifacts
-- Download the release artifacts
-- Get information about the release artifacts (e.g. which version is the latest etc.)
+- list products and their releases (version, release date, platforms, change log),
+- download releases (a specific version or the latest one per platform),
+- upload, delete, back up and restore releases (authenticated).
 
-## Setup
+The repository contains the server (`sources/ReleaseServer`, ASP.NET Core / .NET 10) and an
+administration UI (`sources/release-client`, Vue 3, served by nginx).
 
-You have two options to setup the release server.
+The API is documented with Swagger: `http://<server>:5000/swagger` (the document is also available
+in [docs/api/swagger.json](docs/api/swagger.json)).
 
-### Run with Docker-compose
+## Setup with Docker Compose
 
-1. Download the [docker-compose.yml](https://github.com/Traeger-GmbH/release-server/blob/master/docker-compose.yml) and put it in a directory of your choice.
+Use the [docker-compose.yml](docker-compose.yml) of this repository as a template:
 
-2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/examples) and put it in the same directory of 1.
+1. Set your own `CREDENTIALS_USERNAME` and `CREDENTIALS_PASSWORD`.
+2. Start the stack: `docker compose up -d`
 
-3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and password.
+The server is reachable at http://localhost:5000 (Swagger UI at http://localhost:5000/swagger), the
+administration UI at http://localhost:3000.
 
-4. Run the application with docker-compose: `docker-compose -f "docker-compose.yml" up -d`
+### Images
 
-Now, the release server is reachable at http://localhost:5001.
-The Swagger UI can be found at http://localhost:5001/swagger.
+| Image | Description |
+|---|---|
+| `ghcr.io/traeger-gmbh/release-server:<version>` | Release server, listens on port 5000 |
+| `ghcr.io/traeger-gmbh/release-client:<version>` | Administration UI, listens on port 3000 |
 
-### Run with Docker
+### Data
 
-1. Pull the Docker image: `docker pull traeger/release-server:latest`
+The server stores all data relative to its working directory `/app`:
 
-2. Download the appsettings.json from the [configuration examples](https://github.com/Traeger-GmbH/release-server/tree/master/examples) and put it into a directory of your choice.
+| Path in the container | Content |
+|---|---|
+| `/app/artifacts` | All products and releases. **Mount a volume, otherwise the data is lost when the container is recreated.** |
+| `/app/backups` | Backups created with `GET /artifacts/backup` (the newest ones are kept). |
 
-3. Replace the placeholder in the "Credentials" object in the appsettings.json with your own username and password.
+Layout of the artifact directory (unchanged since the first version):
 
-4. Run the application with docker run: `docker run -d -v <path_to_your_directory>/appsettings.json:/app/appsettings.json -v <path_to_your_directory>/artifacts:/app/artifacts -v <path_to_your_directory>/backups:/app/backups -p 5001:5001  traeger/release-server:latest`
- 
-    __Note:__ You have to replace the placeholder of the docker run command!  
+```
+artifacts/<product>/<os>/<architecture>/<version>/
+    deployment.json      { "ArtifactFileName": "...", "ReleaseNotesFileName": "releaseNotes.json" }
+    releaseNotes.json    release date, preview and security flags, change log per language
+    <artifact file>
+```
 
-Now, the release server is reachable at http://localhost:5001.
-The Swagger UI can be found at http://localhost:5001/swagger.
+The server runs as `root` in the container, like previous versions, so existing volumes stay
+writable.
+
+### Configuration
+
+| Setting | Description | Default |
+|---|---|---|
+| `CREDENTIALS_USERNAME`, `CREDENTIALS_PASSWORD` | Credentials for all authenticated endpoints (HTTP Basic). Without them, all write access is denied. | none |
+| `ArtifactRootDirectory` | Directory of the artifacts | `./artifacts` |
+| `BackupRootDirectory` | Directory of the backups | `./backups` |
+| `BackupRetentionCount` | Number of backups kept in the backup directory | `5` |
+| `Cors__WriteOrigins__0`, `__1`, ... | Origins that may call the authenticated endpoints from a browser (CORS). The public endpoints can be read by any website. | none |
+
+The settings are read from `/app/appsettings.json` and can be overridden by environment variables.
+
+Client:
+
+| Setting | Description | Default |
+|---|---|---|
+| `RELEASE_SERVER_URL` | Address of the release server as seen from the client container | `http://localhost:5000` |
 
 ## Usage
 
-The first two REST endpoint examples are documented in the following paragraphs. 
+The public endpoints do not need authentication:
 
-For more information about the other endpoints and their usage, read the [Swagger documentation](https://github.com/Traeger-GmbH/release-server/blob/master/Docs/api/swagger.json) .
+```bash
+# List all products
+curl http://localhost:5000/artifacts
 
-### Uploading an Artifact
+# List the releases of a product (newest first; filter, sort and paging see Swagger)
+curl "http://localhost:5000/artifacts/<product>/info"
+curl "http://localhost:5000/artifacts/<product>/info?operatingSystems=windows&architectures=x64"
 
-__Structure of the artifact payload:__
+# Download a specific release or the latest release for a platform
+curl -OJ http://localhost:5000/artifacts/<product>/<os>/<architecture>/<version>
+curl -OJ http://localhost:5000/artifacts/<product>/<os>/<architecture>/latest
+```
 
-The payload has to be a zip file and has to contain the following elements:
-
-- the artifact itself (exe, zip or something else)
-- the meta information in form of the deployment.json
-- a changelog
-
-You can find an example artifact payload in form of a zip file here: [Example artifact payload](https://github.com/Traeger-GmbH/release-server/tree/master/examples)
-
-__`PUT` request to upload an artifact__:
-
-`curl -k -X PUT http://localhost:5000/artifacts/<product_name>/<operatingSystem>/<architecture>/<version> -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'artifact=@<path/to/artifact-zipFile>;type=application/zip'`
-
-> __Note:__ You have replace the placeholders in the `PUT` request (`<product_name>`, `<operatingSystem>`, `<architecture>`, `<version>`, `<username:password>`, `<path/to/artifact-zipFile>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
-
-__Example response:__
-
-Status: `200 OK`
-
-__`PUT` request to upload a package__:
-
-`curl -k -X PUT http://localhost:5000/artifacts/ -H 'Authorization: Basic <username:password>' -H 'content-type: multipart/form-data' -F 'package=@<path/to/package-zipFile>;type=application/zip'`
-
-> __Note:__ You have replace the placeholders in the `PUT` request (`<username:password>` and `<path/to/artifact-zipFile>`). The value in the authorization header (`<username:password>`) has to be base64 encoded.
-
-__Example response:__
-
-Status: `200 OK`
-
-### Listing all available deployments of a specific product
-
-__`GET` request to list the deployments__:
-
-`curl -k -X GET http://localhost:5000/artifacts/<product_name>/info`
-
-
-__Example response:__
-
-Status: `200 (OK)`
-
-Body:
+Example response of `GET /artifacts/<product>/info`:
 
 ```json
 {
-  "identifier": "softwareX",
-  "releases": [{
-      "version": "2.0.0-preview-2",
-      "platforms": [
-        "linux/arm32",
-        "linux/arm64",
-        "linux/x64",
-        "windows/arm64",
-        "windows/x64",
-        "windows/x86"
-      ],
-      "releaseDate": "2021-10-28",
-      "isPreviewRelease": true,
-      "isSecurityPatch": false,
-      "changes": {
-        "de": [
-          {
-            "platforms": null,
-            "added": [
-              
-            ],
-            "fixed": [
-              
-            ],
-            "breaking": [
-              
-            ],
-            "deprecated": [
-              
-            ]
-          }
-        ],
-        "en": [
-          {
-            "platforms": null,
-            "added": [
-              
-            ],
-            "fixed": [
-              
-            ],
-            "breaking": [
-              
-            ],
-            "deprecated": [
-              
-            ]
-          }
-        ]
-      }
-    },
+  "identifier": "example-product",
+  "releases": [
     {
-      "version": "2.0.0",
-      "platforms": [
-        "linux/arm32",
-        "linux/arm64",
-        "linux/x64",
-        "windows/arm64",
-        "windows/x64",
-        "windows/x86"
-      ],
-      "releaseDate": "2021-11-28",
-      "isPreviewRelease": true,
+      "version": "1.2.0",
+      "platforms": [ "windows/x64", "linux/arm64" ],
+      "releaseDate": "2026-01-31T00:00:00",
+      "isPreviewRelease": false,
       "isSecurityPatch": false,
       "changes": {
-        "de": [
-          {
-            "platforms": null,
-            "added": [
-              
-            ],
-            "fixed": [
-              
-            ],
-            "breaking": [
-              
-            ],
-            "deprecated": [
-              
-            ]
-          }
-        ],
-        "en": [
-          {
-            "platforms": null,
-            "added": [
-              
-            ],
-            "fixed": [
-              
-            ],
-            "breaking": [
-              
-            ],
-            "deprecated": [
-              
-            ]
-          }
-        ]
+        "en": [ { "platforms": null, "added": [ "New feature" ], "fixed": [], "breaking": [], "deprecated": [] } ]
       }
-    },
+    }
   ],
-  "totalReleaseCount": 2,
+  "totalReleaseCount": 1,
   "nextOffset": null
 }
 ```
+
+### Uploading a package (several platforms)
+
+A package is a ZIP file containing a folder with a `package.json` and the files of all platforms. See
+the [example package](examples/package-foobar-v2.0.0-preview-2).
+
+```bash
+curl -X PUT http://localhost:5000/artifacts -u '<user>:<password>' \
+  -F 'package=@<path/to/package.zip>;type=application/zip'
+```
+
+If the version already exists, the upload is rejected; add `?force=true` to replace it. You can also
+use [tools/uploadPackage.sh](tools/uploadPackage.sh).
+
+### Uploading a single artifact (one platform)
+
+The ZIP file contains `deployment.json`, the release notes and the artifact. See the
+[example artifact](examples/artifact-foobar-v2.0.0-preview-2_windows-x64).
+
+```bash
+curl -X PUT http://localhost:5000/artifacts/<product>/<os>/<architecture>/<version> -u '<user>:<password>' \
+  -F 'artifact=@<path/to/artifact.zip>;type=application/zip'
+```
+
+Names of products, operating systems and architectures may contain letters, digits, `-`, `_` and `.`.
+Use `any` for platform independent files (e.g. `any/any`).
+
+### Backup and restore
+
+```bash
+curl -OJ -u '<user>:<password>' http://localhost:5000/artifacts/backup
+curl -X PUT -u '<user>:<password>' -F 'backupFile=@backup.zip' http://localhost:5000/artifacts/restore
+```
+
+A restore verifies the backup before it replaces any data. If the backup is invalid, the existing data
+stays unchanged and the response describes the problems.
+
+## Development
+
+```bash
+# Server and tests (.NET 10 SDK)
+cd sources/ReleaseServer && dotnet test
+
+# Client (Node.js 22.12 or newer), see sources/release-client/README.md
+cd sources/release-client && npm install && npm test
+
+# End-to-end checks with Docker: compatibility with a previous image and the complete stack
+docker build -t release-server:local . && docker build -t release-client:local sources/release-client
+node tools/compat/compat-check.mjs --old ghcr.io/traeger-gmbh/release-server:<previous version> --new release-server:local
+node tools/compat/stack-check.mjs --server release-server:local --client release-client:local
+```
+
+The integration tests pin the public API with golden files (`Integration/Golden`) and with a snapshot
+of the production API (`Integration/LiveSnapshot`). Changing them requires a deliberate decision,
+because customers and websites use the API. Record changed golden files with
+`RELEASE_SERVER_UPDATE_GOLDEN=1 dotnet test`.

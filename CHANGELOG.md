@@ -1,3 +1,27 @@
+## Unreleased
+
+Server (now .NET 10, ASP.NET Core 10 runtime image):
+
+* [CHANGE] Upgrade from .NET Core 3.1 to .NET 10; the public API, the storage layout and the backup format are unchanged
+* [FIX] Prevent writing, reading and deleting outside of the artifact directory (path traversal via names in uploads)
+* [FIX] Restore verifies the backup before replacing any data; an invalid backup no longer deletes the existing data
+* [FIX] Passwords may contain ':'; requests are denied (401) if no credentials are configured
+* [FIX] Uploads above 128 MB and restores above 30 MB failed because of framework limits
+* [FIX] Incomplete or broken artifact directories no longer break /info and latest of the whole product
+* [FIX] Failed uploads no longer leave a "temp" product behind
+* [FEATURE] Keep the newest backups (BackupRetentionCount, default 5) instead of only the latest one
+* [FEATURE] Downloads are streamed from disk and support range requests (resume)
+* [CHANGE] A package upload is only rejected if its version already exists (new versions no longer need force=true)
+* [CHANGE] Browsers may only call authenticated endpoints from configured origins (Cors:WriteOrigins); public endpoints stay open
+* [CHANGE] Remove the query endpoints that were disabled in 2021 (replaced by /artifacts/{product}/info)
+* [DOCS] Swagger documentation for external users
+
+Client:
+
+* [CHANGE] Replace the Nuxt 2 client by a Vue 3 single page application served by nginx (port and RELEASE_SERVER_URL unchanged)
+* [FIX] Corrupted downloads, missing change logs without English entries, truncated release lists, repeated uploads
+* [SECURITY] The password is no longer stored in the local storage of the browser
+
 ## v0.2.0
 
 * [FEATURE] Proof & apply code style and conventions #34 
