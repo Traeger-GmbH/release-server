@@ -1,0 +1,860 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Release Server API",
+    "description": "An application for managing your own release artifacts. The release server provides several REST endpoints for the following operations.",
+    "contact": {
+      "name": "Traeger Industry Components GmbH",
+      "url": "https://www.traeger.de",
+      "email": "info@traeger.de"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/artifacts/{product}/{os}/{architecture}/{version}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified artifact got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified parameters."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "There exists an artifact with the specified parameters."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified parameters."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Uploads a specific release artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The version of the uploaded artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "artifact"
+                ],
+                "type": "object",
+                "properties": {
+                  "artifact": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "artifact": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload of the artifact was successful."
+          },
+          "400": {
+            "description": "No or invalid body provided (must be a Zip file)."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/artifacts/{product}": {
+      "delete": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Deletes all artifacts of a specific product name.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the artifacts, that have to be deleted.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All artifacts of the specified product name got deleted successfully."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "404": {
+            "description": "There exists no artifact with the specified product name."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/artifacts/{product}/{os}/{architecture}/latest": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves the latest version of a specific artifact.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The product name of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "os",
+            "in": "path",
+            "description": "The operating system of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "architecture",
+            "in": "path",
+            "description": "The hardware architecture of the specified artifact.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified artifact exists (the ZIP file with the artifact will be retrieved)"
+          },
+          "404": {
+            "description": "The artifact is not available for the specified platform (OS + arch)"
+          }
+        }
+      }
+    },
+    "/artifacts/backup": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Backups the whole artifact directory and retrieves it as a ZIP file.",
+        "responses": {
+          "200": {
+            "description": "The artifact directory backup was successful."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/artifacts/restore": {
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Restores the uploaded backup file.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "backupFile"
+                ],
+                "type": "object",
+                "properties": {
+                  "backupFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "backupFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The restore process was successful."
+          },
+          "400": {
+            "description": "No body provided."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/artifacts/statistics": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Gets statistics of the server like disk usage, number of products and artifacts.",
+        "responses": {
+          "200": {
+            "description": "The restore process was successful.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statistics"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statistics"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statistics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    },
+    "/artifacts/{product}/info": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves a list with deployment information objects of all available releases of a product that can be filtered, ordered and paginated.",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "description": "The name/identifier of the product to get.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "architectures",
+            "in": "query",
+            "description": "A comma separated list of architectures to filter for. If this parameter is not set no filter will be applied.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "operatingSystems",
+            "in": "query",
+            "description": "A comma separated list of operating systems to filter for. If this parameter is not set no filter will be applied.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Defines how the results will be ordered by their version numbers.",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Paging parameter: Maximum number of elements that will be returned.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Paging parameter: Offset of the first element to be returned.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "Can be used to select a specific version of the product (for e.g. obtaining the changelog of this version).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A product with the specified product name exists.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductInformation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified product does not exist."
+          }
+        }
+      }
+    },
+    "/artifacts": {
+      "get": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Retrieves a list of all products stored in the server.",
+        "responses": {
+          "200": {
+            "description": "List of all products.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ReleaseArtifact"
+        ],
+        "summary": "Uploads a specific release artifact.",
+        "parameters": [
+          {
+            "name": "force",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "package"
+                ],
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "package": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload of the artifact was successful."
+          },
+          "400": {
+            "description": "No or invalid body provided (must be a Zip file)."
+          },
+          "401": {
+            "description": "The user is not authorized (wrong credentials or missing auth header)."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        },
+        "security": [
+          {
+            "basic": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChangeSet": {
+        "type": "object",
+        "properties": {
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the platforms, which are affected by the changes.",
+            "nullable": true
+          },
+          "added": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the added features of the release.",
+            "nullable": true
+          },
+          "fixed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the issues, that have been fixed",
+            "nullable": true
+          },
+          "breaking": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the breaking changes of the release.",
+            "nullable": true
+          },
+          "deprecated": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the deprecated components.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides the information of the code changes of a certain release."
+      },
+      "DiskUsage": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "description": "Gets or sets the total disk size of the server.",
+            "format": "int32"
+          },
+          "usedDiskSpace": {
+            "type": "integer",
+            "description": "Gets or sets the space used by the server.",
+            "format": "int32"
+          },
+          "availableFreeSpace": {
+            "type": "integer",
+            "description": "Gets or sets the available disk space on the server.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides information about the disk usage in the server."
+      },
+      "Platform": {
+        "type": "object",
+        "properties": {
+          "operatingSystem": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          },
+          "architecture": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a platform that consists of combination of operating system and architecture."
+      },
+      "ProductInformation": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Gets the identifier of the product",
+            "nullable": true,
+            "readOnly": true
+          },
+          "releases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseInformation"
+            },
+            "description": "Gets the available releases of the product",
+            "nullable": true,
+            "readOnly": true
+          },
+          "totalReleaseCount": {
+            "type": "integer",
+            "description": "Gets the total count of releases for the product.",
+            "format": "int32",
+            "readOnly": true
+          },
+          "nextOffset": {
+            "type": "integer",
+            "description": "Gets the offset of the next release.",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides a list of product information for several artifacts."
+      },
+      "ProductList": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets the list of products.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides the information of the available platforms for a specific artifact."
+      },
+      "ProductVersion": {
+        "type": "object",
+        "properties": {
+          "versionNumber": {
+            "$ref": "#/components/schemas/Version"
+          },
+          "versionSuffix": {
+            "type": "string",
+            "description": "Gets or sets the version suffix of the artifact (e.g. -alpha, -beta).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides the information of an artifact product version and implements several operations for\r\nthe ReleaseServer.WebApi.Models.ProductVersion."
+      },
+      "ReleaseInformation": {
+        "type": "object",
+        "properties": {
+          "releaseDate": {
+            "type": "string",
+            "description": "Gets or sets the release date (required).",
+            "format": "date-time"
+          },
+          "isPreviewRelease": {
+            "type": "boolean",
+            "description": ""
+          },
+          "isSecurityPatch": {
+            "type": "boolean",
+            "description": ""
+          },
+          "changes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ChangeSet"
+              },
+              "nullable": true
+            },
+            "description": "Gets or sets the code / product changes with this release (required).",
+            "nullable": true
+          },
+          "version": {
+            "$ref": "#/components/schemas/ProductVersion"
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Platform"
+            },
+            "description": "Gets or sets the platforms this release is available for.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides a list of product information for several artifacts."
+      },
+      "SortOrder": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "description": "",
+        "format": "int32"
+      },
+      "Statistics": {
+        "type": "object",
+        "properties": {
+          "disk": {
+            "$ref": "#/components/schemas/DiskUsage"
+          },
+          "numberOfProducts": {
+            "type": "integer",
+            "description": "Gets or sets the number of products.",
+            "format": "int32"
+          },
+          "numberOfArtifacts": {
+            "type": "integer",
+            "description": "Gets or sets the number of artifacts.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides statistical information about the server."
+      },
+      "Version": {
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "minor": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "build": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "majorRevision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "minorRevision": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "description": "Input your username and password to access this API",
+        "scheme": "basic"
+      }
+    }
+  }
+}
