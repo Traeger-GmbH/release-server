@@ -65,6 +65,9 @@ namespace ReleaseServer.WebApi
                 return AuthenticateResult.Fail("Invalid Authorization Header");
             }
 
+            if (sentCredentials == null)
+                return AuthenticateResult.Fail("Invalid Authorization Header");
+
             var authenticatedUser = await CheckCredentials(sentCredentials);
            
             if (authenticatedUser != null)
@@ -88,16 +91,23 @@ namespace ReleaseServer.WebApi
         
         private static Credentials ExtractCredentialsFromHeader(AuthenticationHeaderValue authHeader)
         {
+            if (!string.Equals(authHeader.Scheme, "Basic", StringComparison.OrdinalIgnoreCase) || authHeader.Parameter == null)
+                return null;
+
             //Extract base 64 encoded credentials from the header
             var authPayload = Convert.FromBase64String(authHeader.Parameter);
             
             var readableAuthPayload = Encoding.UTF8.GetString(authPayload);
-            var credentials = readableAuthPayload.Split(":", StringSplitOptions.None);
-            
+
+            // The user name must not contain a colon (RFC 7617), the password may contain any character.
+            var separatorIndex = readableAuthPayload.IndexOf(':');
+            if (separatorIndex < 0)
+                return null;
+
             return new Credentials
             {
-                Username = credentials[0],
-                Password = credentials[1]
+                Username = readableAuthPayload.Substring(0, separatorIndex),
+                Password = readableAuthPayload.Substring(separatorIndex + 1)
             };
         }
 
@@ -108,9 +118,19 @@ namespace ReleaseServer.WebApi
                 new Credentials{
                     Username = configuration["CREDENTIALS_USERNAME"],
                     Password = configuration["CREDENTIALS_PASSWORD"]});
+
+            // Without configured credentials, nobody is authenticated.
+            if (string.IsNullOrEmpty(validCredentials.Username) || string.IsNullOrEmpty(validCredentials.Password))
+            {
+                Logger.LogError("No credentials configured (CREDENTIALS_USERNAME / CREDENTIALS_PASSWORD). All write access is denied.");
+                return null;
+            }
             
-            if (CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username)) && 
-                CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), Encoding.UTF8.GetBytes(validCredentials.Password)))
+            // Compare both values completely (no short circuit), so the response time does not reveal which one was wrong.
+            var usernameMatches = CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Username), Encoding.UTF8.GetBytes(validCredentials.Username));
+            var passwordMatches = CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(credentials.Password), Encoding.UTF8.GetBytes(validCredentials.Password));
+
+            if (usernameMatches && passwordMatches)
                 return validCredentials.Username;
             
             return null;
