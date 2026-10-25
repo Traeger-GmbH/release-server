@@ -55,6 +55,8 @@ namespace ReleaseServer.WebApi
         [Route("{*url}", Order = 999)]
         public IActionResult CatchAll()
         {
+            // Explicit, so HEAD requests get the same headers as GET (Kestrel only adds it for a sent body)
+            Response.ContentLength = 0;
             return NotFound("");
         }
 

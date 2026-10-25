@@ -1,3 +1,10 @@
+## v1.1.1 (2026-10-25)
+
+Server:
+
+* [FEATURE] All public GET endpoints answer HEAD requests with the status and headers of GET and without body (downloads, product list, /info and the NuGet feed), e.g. for link checkers and crawlers; previous versions answered HEAD with 404
+* [FIX] Checksums of existing artifacts are stored even if deployment.json is read at the same moment (Windows hosts); remaining ones are tried again after 30 seconds
+
 ## v1.1.0 (2026-10-25)
 
 Server:

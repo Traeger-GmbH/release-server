@@ -2,7 +2,7 @@
   "openapi": "3.0.4",
   "info": {
     "title": "Release Server API",
-    "description": "Download server for released software. Products are published as releases (version, release date, change log) for one or more platforms (operating system and architecture).\n\n**Public endpoints** (no authentication):\n- `GET /artifacts` lists all products\n- `GET /artifacts/{product}/info` lists the releases of a product (filter, sort and paging)\n- `GET /artifacts/{product}/{os}/{architecture}/{version}` downloads a release\n- `GET /artifacts/{product}/{os}/{architecture}/latest` downloads the latest release\n\nAll other endpoints maintain the server and **require authentication** (HTTP Basic).\n\nErrors are returned as problem details (RFC 7807) with the fields title, status and detail.",
+    "description": "Download server for released software. Products are published as releases (version, release date, change log) for one or more platforms (operating system and architecture).\n\n**Public endpoints** (no authentication):\n- `GET /artifacts` lists all products\n- `GET /artifacts/{product}/info` lists the releases of a product (filter, sort and paging)\n- `GET /artifacts/{product}/{os}/{architecture}/{version}` downloads a release\n- `GET /artifacts/{product}/{os}/{architecture}/latest` downloads the latest release\n\nAll other endpoints maintain the server and **require authentication** (HTTP Basic).\n\nAll public GET endpoints also answer HEAD requests (same status and headers, no body), e.g. for link checkers.\n\nErrors are returned as problem details (RFC 7807) with the fields title, status and detail.",
     "contact": {
       "name": "Traeger Industry Components GmbH",
       "url": "https://www.traeger.de",

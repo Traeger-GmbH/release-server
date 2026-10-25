@@ -90,6 +90,8 @@ namespace ReleaseServer.WebApi
                                   "- `GET /artifacts/{product}/{os}/{architecture}/{version}` downloads a release\n" +
                                   "- `GET /artifacts/{product}/{os}/{architecture}/latest` downloads the latest release\n\n" +
                                   "All other endpoints maintain the server and **require authentication** (HTTP Basic).\n\n" +
+                                  "All public GET endpoints also answer HEAD requests (same status and headers, no body), " +
+                                  "e.g. for link checkers.\n\n" +
                                   "Errors are returned as problem details (RFC 7807) with the fields title, status and detail.",
                     Contact = new OpenApiContact
                     {
@@ -112,6 +114,7 @@ namespace ReleaseServer.WebApi
 
                 // Registered after the XML comments, so it can extend the summaries and descriptions
                 c.OperationFilter<BasicAuthOperationsFilter>();
+                c.DocumentFilter<HideHeadOperationsFilter>();
                 c.ExampleFilters();
             });
             

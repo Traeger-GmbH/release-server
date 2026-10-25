@@ -276,6 +276,46 @@ async function checkArtifacts (name) {
   check(`${name}: ${artifacts.length} artifacts with matching size and SHA-256`, 0, mismatches + artifacts.filter(a => !a.sha256).length);
 }
 
+// Version 1.1.1+: HEAD returns the status and the headers of GET, without body
+const HEAD_COMPARED_HEADERS = ['content-type', 'content-length', 'content-disposition', 'etag', 'repr-digest', 'accept-ranges', 'last-modified'];
+
+async function headDifference (base, path) {
+  const get = await fetch(base + path);
+  const getBody = Buffer.from(await get.arrayBuffer());
+  const head = await fetch(base + path, { method: 'HEAD' });
+  const headBody = Buffer.from(await head.arrayBuffer());
+  const differences = [];
+  if (get.status !== head.status) differences.push(`status GET ${get.status}, HEAD ${head.status}`);
+  for (const name of HEAD_COMPARED_HEADERS) {
+    // The length of problem details differs by the trace id
+    if (name === 'content-length' && (get.headers.get('content-type') ?? '').includes('problem+json')) continue;
+    if (get.headers.get(name) !== head.headers.get(name)) differences.push(`${name}: GET ${get.headers.get(name)}, HEAD ${head.headers.get(name)}`);
+  }
+  if (headBody.length > 0) differences.push(`HEAD has a body of ${headBody.length} bytes`);
+  if (get.headers.get('content-length') !== null && Number(get.headers.get('content-length')) !== getBody.length) differences.push('GET content-length does not match its body');
+  return differences;
+}
+
+async function checkHead (name) {
+  const products = (await fetch(`${baseUrl}/artifacts/`).then(r => r.json())).products;
+  const paths = ['/artifacts/', '/artifacts/unknown/info', '/artifacts/a/b/c/d/e/f', '/nuget/v3/index.json'];
+  for (const product of products) {
+    const info = await fetch(`${baseUrl}/artifacts/${encodeURIComponent(product)}/info?limit=1000`).then(r => r.json());
+    paths.push(`/artifacts/${encodeURIComponent(product)}/info`);
+    for (const release of info.releases) {
+      for (const artifact of release.artifacts) {
+        paths.push(artifact.downloadUrl);
+        paths.push(artifact.downloadUrl.replace(/\/[^/]+$/, '/latest'));
+      }
+    }
+  }
+  const problems = [];
+  for (const path of [...new Set(paths)]) {
+    for (const difference of await headDifference(baseUrl, path)) problems.push(`${path}: ${difference}`);
+  }
+  check(`${name}: HEAD equals GET for ${new Set(paths).size} public URLs`, [], problems);
+}
+
 async function backup () {
   const response = await fetch(`${baseUrl}/artifacts/backup`, { headers: { Authorization: authHeader } });
   check('backup status', 200, response.status);
@@ -302,6 +342,7 @@ async function main () {
   await startServer(args.new, `${prefix}-new`);
   compareSnapshots('new reads old data', oldSnapshot, await snapshot());
   await checkArtifacts('new adds checksums to old data');
+  await checkHead('new server');
 
   // 3. Restore of an old backup and of an own backup.
   check('new: restore old backup', 200, await upload('/artifacts/restore', 'backupFile', oldBackup));

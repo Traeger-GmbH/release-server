@@ -125,6 +125,11 @@ namespace ReleaseServer.WebApi
         /// Idempotent; nothing is removed. Returns the number of added checksums.
         /// </summary>
         Task<int> AddMissingArtifactHashes(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Checks whether existing artifacts still have no checksum.
+        /// </summary>
+        bool HasMissingArtifactHashes();
         
         /// <summary>
         /// Validates the uploaded payload, if it fulfills the specified criteria.

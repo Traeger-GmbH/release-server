@@ -305,6 +305,11 @@ namespace ReleaseServer.WebApi
             return added;
         }
 
+        public bool HasMissingArtifactHashes()
+        {
+            return fsReleaseArtifactRepository.FindReleaseDirectoriesWithoutHash().Count > 0;
+        }
+
         public ValidationResult ValidateUploadPayload(IFormFile payload)
         {
             DeploymentMetaInformation deploymentMetaInfo;
