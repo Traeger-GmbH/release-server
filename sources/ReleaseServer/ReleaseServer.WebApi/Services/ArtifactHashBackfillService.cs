@@ -22,7 +22,11 @@ namespace ReleaseServer.WebApi
     {
         private readonly IReleaseArtifactService releaseArtifactService;
         private readonly ILogger<ArtifactHashBackfillService> logger;
+        private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
+        private const int MaximumRetries = 10;
+
         private readonly SemaphoreSlim trigger = new SemaphoreSlim(1);
+        private int retries;
 
         public ArtifactHashBackfillService(IReleaseArtifactService releaseArtifactService, ILogger<ArtifactHashBackfillService> logger)
         {
@@ -50,6 +54,14 @@ namespace ReleaseServer.WebApi
                 try
                 {
                     await releaseArtifactService.AddMissingArtifactHashes(stoppingToken);
+
+                    // Checksums that could not be stored (e.g. a file in use) are tried again later, a limited
+                    // number of times per start (a permanently unreadable file is not hashed again and again)
+                    if (retries < MaximumRetries && releaseArtifactService.HasMissingArtifactHashes())
+                    {
+                        retries++;
+                        _ = Task.Delay(RetryDelay, stoppingToken).ContinueWith(_ => Trigger(), TaskScheduler.Default);
+                    }
                 }
                 catch (OperationCanceledException)
                 {

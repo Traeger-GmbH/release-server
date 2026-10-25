@@ -63,12 +63,32 @@ namespace ReleaseServer.WebApi
             try
             {
                 File.WriteAllText(temporaryFile, json.ToString(Formatting.Indented), new UTF8Encoding(false));
-                File.Move(temporaryFile, deploymentFile, true);
+                ReplaceWithRetry(temporaryFile, deploymentFile);
             }
             finally
             {
                 if (File.Exists(temporaryFile))
                     File.Delete(temporaryFile);
+            }
+        }
+
+        /// <summary>
+        /// Replaces the file. On Windows a file cannot be replaced while it is read (e.g. by a concurrent /info
+        /// request), so the replacement is retried for a short time.
+        /// </summary>
+        private static void ReplaceWithRetry(string source, string destination)
+        {
+            for (var attempt = 1; ; attempt++)
+            {
+                try
+                {
+                    File.Move(source, destination, true);
+                    return;
+                }
+                catch (Exception e) when ((e is IOException || e is UnauthorizedAccessException) && attempt < 20)
+                {
+                    System.Threading.Thread.Sleep(50 * attempt);
+                }
             }
         }
     }
