@@ -6,9 +6,10 @@ permissions:
   contents: read
 
 env:
-  # Reference images for the compatibility checks: the server before version 1.0 (2022-04-26) and 1.0.0
+  # Reference images for the compatibility checks: the server before version 1.0 (2022-04-26) and the
+  # released version currently in production (1.1.0)
   REFERENCE_IMAGE: ghcr.io/traeger-gmbh/release-server@sha256:39934dd4a42a73ccdd5600a5726f9808ea6dedb123d4c5bf877137039a24ee05
-  REFERENCE_IMAGE_1_0: ghcr.io/traeger-gmbh/release-server@sha256:c039ba8a0f78d6e8972cc17d01132ab338456fbc7c47dab24b28c4904e679089
+  REFERENCE_IMAGE_RELEASED: ghcr.io/traeger-gmbh/release-server@sha256:0571cd66549986738dd9442b19b64d212ca18c6de86d03246e878152ab54a4f9
 
 jobs:
   server:
@@ -78,7 +79,7 @@ jobs:
       run: docker build -t release-client:ci ./sources/release-client/
     - name: Compare server with the image before version 1.0
       run: node tools/compat/compat-check.mjs --old "$REFERENCE_IMAGE" --new release-server:ci
-    - name: Compare server with version 1.0.0
-      run: node tools/compat/compat-check.mjs --old "$REFERENCE_IMAGE_1_0" --new release-server:ci
+    - name: Compare server with the released version 1.1.0
+      run: node tools/compat/compat-check.mjs --old "$REFERENCE_IMAGE_RELEASED" --new release-server:ci
     - name: Check server and client together
       run: node tools/compat/stack-check.mjs --server release-server:ci --client release-client:ci

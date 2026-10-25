@@ -53,6 +53,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// The service index of the feed (the URL configured as package source).
         /// </summary>
         [HttpGet("index.json")]
+        [HttpHead("index.json")]
         public IActionResult GetServiceIndex()
         {
             var resources = new JArray();
@@ -73,6 +74,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// All versions of a package (PackageBaseAddress).
         /// </summary>
         [HttpGet("flatcontainer/{id}/index.json")]
+        [HttpHead("flatcontainer/{id}/index.json")]
         public async Task<IActionResult> GetVersions(string id)
         {
             var versions = (await FindPackages(id)).Select(package => Normalized(package.Version)).ToList();
@@ -83,6 +85,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// The .nupkg or .nuspec of a package version (PackageBaseAddress).
         /// </summary>
         [HttpGet("flatcontainer/{id}/{version}/{fileName}")]
+        [HttpHead("flatcontainer/{id}/{version}/{fileName}")]
         public async Task<IActionResult> GetPackageContent(string id, string version, string fileName)
         {
             var package = await FindPackage(id, version);
@@ -102,6 +105,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// The metadata of all versions of a package (RegistrationsBaseUrl, all versions inline in one page).
         /// </summary>
         [HttpGet("registration/{id}/index.json")]
+        [HttpHead("registration/{id}/index.json")]
         public async Task<IActionResult> GetRegistrationIndex(string id)
         {
             var packages = await FindPackages(id);
@@ -125,6 +129,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// The registration leaf of a package version (RegistrationsBaseUrl).
         /// </summary>
         [HttpGet("registration/{id}/{version}.json")]
+        [HttpHead("registration/{id}/{version}.json")]
         public async Task<IActionResult> GetRegistrationLeaf(string id, string version)
         {
             var package = await FindPackage(id, version);
@@ -147,6 +152,7 @@ namespace ReleaseServer.WebApi.NuGet
         /// only included with prerelease=true, SemVer 2.0.0 versions only with semVerLevel=2.0.0.
         /// </summary>
         [HttpGet("search")]
+        [HttpHead("search")]
         public async Task<IActionResult> Search([FromQuery] string q = null, [FromQuery] int skip = 0, [FromQuery] int take = 20,
             [FromQuery] bool prerelease = false, [FromQuery] string semVerLevel = null)
         {

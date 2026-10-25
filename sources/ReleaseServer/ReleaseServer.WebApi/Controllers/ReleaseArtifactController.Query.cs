@@ -66,6 +66,7 @@ namespace ReleaseServer.WebApi
         [ProducesResponseType(typeof(ProblemDetails), 404)]
         [SeparatedQueryString]
         [HttpGet("{product}/info")]
+        [HttpHead("{product}/info")]
         public async Task<ActionResult<ProductInformation>> GetProduct(
             [Required] string product,
             [FromQuery] List<string> architectures,
@@ -136,6 +137,7 @@ namespace ReleaseServer.WebApi
         [ProducesResponseType(typeof(ProductList), 200)]
         [SeparatedQueryString]
         [HttpGet("")]
+        [HttpHead("")]
         public async Task<ActionResult<ProductList>> GetProductList()
         {
             var products = (await this.releaseArtifactService.GetProductList());

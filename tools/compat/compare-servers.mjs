@@ -8,6 +8,8 @@
 // With --downloads, every artifact is downloaded from both servers and compared by SHA-256 (this
 // transfers all files twice). No authentication is used and nothing is changed on either server.
 // The field "artifacts" (version 1.1) is only compared with --compare-artifacts.
+// With --check-head, every compared URL is also requested with HEAD on both servers (version 1.1.1+):
+// HEAD must return the status and headers of GET without body.
 
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
@@ -55,10 +57,36 @@ async function get (base, path, download = false) {
   return result;
 }
 
+// Version 1.1.1+: HEAD returns the status and the headers of GET, without body
+const HEAD_COMPARED_HEADERS = ['content-type', 'content-length', 'content-disposition', 'etag', 'repr-digest', 'accept-ranges', 'last-modified'];
+
+async function headDifference (base, path) {
+  const get = await fetch(base + path);
+  const getBody = Buffer.from(await get.arrayBuffer());
+  const head = await fetch(base + path, { method: 'HEAD' });
+  const headBody = Buffer.from(await head.arrayBuffer());
+  const differences = [];
+  if (get.status !== head.status) differences.push(`status GET ${get.status}, HEAD ${head.status}`);
+  for (const name of HEAD_COMPARED_HEADERS) {
+    // The length of problem details differs by the trace id
+    if (name === 'content-length' && (get.headers.get('content-type') ?? '').includes('problem+json')) continue;
+    if (get.headers.get(name) !== head.headers.get(name)) differences.push(`${name}: GET ${get.headers.get(name)}, HEAD ${head.headers.get(name)}`);
+  }
+  if (headBody.length > 0) differences.push(`HEAD has a body of ${headBody.length} bytes`);
+  if (get.headers.get('content-length') !== null && Number(get.headers.get('content-length')) !== getBody.length) differences.push('GET content-length does not match its body');
+  return differences;
+}
+
 let compared = 0;
 const differences = [];
+const headProblems = [];
 
 async function compare (path, download = false) {
+  if (args['check-head']) {
+    for (const [name, base] of [['a', args.a], ['b', args.b]]) {
+      for (const difference of await headDifference(base, path)) headProblems.push(`${name} ${path}: ${difference}`);
+    }
+  }
   const [a, b] = await Promise.all([get(args.a, path, download), get(args.b, path, download)]);
   compared++;
   if (!isDeepStrictEqual(a, b)) {
@@ -116,4 +144,8 @@ for (const path of ['/artifacts/unknown/info', '/artifacts/unknown/windows/x64/1
 }
 
 console.log(`${compared} responses compared for ${products.length} products, ${differences.length} difference(s)`);
-process.exit(differences.length > 0 ? 1 : 0);
+if (args['check-head']) {
+  headProblems.forEach(problem => console.log(`HEAD  ${problem}`));
+  console.log(`HEAD checked for ${compared} URLs on both servers, ${headProblems.length} problem(s)`);
+}
+process.exit(differences.length > 0 || headProblems.length > 0 ? 1 : 0);

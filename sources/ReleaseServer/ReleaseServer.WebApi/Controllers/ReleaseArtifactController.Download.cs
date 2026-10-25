@@ -50,6 +50,7 @@ namespace ReleaseServer.WebApi
         [ProducesResponseType(typeof(FileResult), 200, "application/octet-stream")]
         [ProducesResponseType(typeof(ProblemDetails), 404)]
         [HttpGet("{product}/{os}/{architecture}/{version}")]
+        [HttpHead("{product}/{os}/{architecture}/{version}")]
         public async Task<IActionResult> GetSpecificArtifact([Required] string product, [Required] string os, [Required] string architecture, string version)
         {
 
@@ -103,6 +104,7 @@ namespace ReleaseServer.WebApi
         [ProducesResponseType(typeof(FileResult), 200, "application/octet-stream")]
         [ProducesResponseType(typeof(ProblemDetails), 404)]
         [HttpGet("{product}/{os}/{architecture}/latest")]
+        [HttpHead("{product}/{os}/{architecture}/latest")]
         public async Task<IActionResult>  GetLatestArtifact([Required] string product, [Required] string os, [Required] string architecture)
         {
 
