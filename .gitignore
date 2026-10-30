@@ -48,3 +48,6 @@ bin/
 # Directories of the Release Server
 TestBackup
 TestArtifactRoot
+
+# Python bytecode cache
+__pycache__/
