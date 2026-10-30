@@ -15,7 +15,8 @@ this repository.
    (OPC UA: from 2.50).
 2. `upload-envelopes.py` uploads the envelopes as packages (`PUT /artifacts`), skips product versions
    that already exist, and verifies `/info` and the SHA-256 of every download. It asks for the
-   credentials (password without echo) and writes a log file into the staging folder.
+   credentials (password without echo) and writes a log file into the staging folder. The column
+   `size` of `overview.csv` is optional; without it, the size is read from the envelope.
 
 ```bash
 python3 tools/opcua/build-envelopes.py [--sdk opcua|s7] --source <download folder> --output <new staging folder> [--all-patches]

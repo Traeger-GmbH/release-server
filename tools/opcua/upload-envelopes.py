@@ -7,6 +7,8 @@ Uploads the envelopes created by build-envelopes.py to a release server and veri
 - --dry-run only checks which envelopes would be uploaded (read-only requests).
 - After every upload: /info must contain the release with the expected platform, file name, size and
   SHA-256, and a download must have the same SHA-256 as the source file.
+- The column "size" of overview.csv is optional: if it is missing or empty, the size of the original
+  file is read from the envelope.
 - Stops at the first failed upload or check. Everything is logged to a file in the staging folder.
 
 Usage:
@@ -28,6 +30,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+import zipfile
 
 DEFAULT_SERVER = 'https://releases.traeger.de'
 
@@ -77,6 +80,21 @@ def find_release(server, product, version):
         raise RuntimeError(f'/info returned {status}: {body[:300]!r}')
     releases = json.loads(body)['releases']
     return releases[0] if releases else None
+
+
+def original_size(envelope_path, platform):
+    """Returns the size of the original file of the platform, read from the package.json of the envelope."""
+    with zipfile.ZipFile(envelope_path) as envelope:
+        names = [n for n in envelope.namelist() if n == 'package.json' or n.endswith('/package.json')]
+        if len(names) != 1:
+            raise RuntimeError(f'envelope contains {len(names)} package.json files')
+        package = json.loads(envelope.read(names[0]).decode('utf-8-sig'))
+        path = package.get('deployments', {}).get(platform)
+        if path is None:
+            raise RuntimeError(f'package.json has no deployment for {platform}')
+        # Paths in deployments are relative to the folder of package.json
+        folder = names[0][:-len('package.json')]
+        return envelope.getinfo(folder + path).file_size
 
 
 def upload(server, envelope_path, authorization):
@@ -141,6 +159,12 @@ def main():
             log.write(f'SKIP     {name}: version exists already')
             counts['skipped'] += 1
             continue
+        if not (row.get('size') or '').strip():
+            try:
+                row['size'] = str(original_size(os.path.join(staging, row['envelope']), row['platform']))
+            except (OSError, KeyError, ValueError, RuntimeError, zipfile.BadZipFile) as error:
+                log.write(f'FAILED   {name}: size not in overview.csv and not readable from the envelope: {error}')
+                sys.exit(1)
         if args.dry_run:
             log.write(f'PLANNED  {name}')
             counts['planned'] += 1
