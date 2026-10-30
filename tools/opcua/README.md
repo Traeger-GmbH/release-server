@@ -17,6 +17,9 @@ this repository.
    that already exist, and verifies `/info` and the SHA-256 of every download. It asks for the
    credentials (password without echo) and writes a log file into the staging folder. The column
    `size` of `overview.csv` is optional; without it, the size is read from the envelope.
+   Open point: envelopes with more than one platform in `deployments` are not tested with
+   `upload-envelopes.py` (the SDK envelopes have exactly one platform). A test would upload such an
+   envelope without `size` and verify the size and SHA-256 of every platform.
 
 ```bash
 python3 tools/opcua/build-envelopes.py [--sdk opcua|s7] --source <download folder> --output <new staging folder> [--all-patches]
