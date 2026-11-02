@@ -59,7 +59,7 @@ namespace ReleaseServer.WebApi.Test.Integration
 
         /// <summary>
         /// Normalizes a JSON body: values that change with every request (traceId) are replaced and arrays
-        /// whose order depends on the file system enumeration ("products", "platforms") are sorted.
+        /// whose order depends on the file system enumeration ("products", "platforms", "artifacts") are sorted.
         /// The property order is kept, because clients may depend on it.
         /// </summary>
         public static string NormalizeJson(string body)
@@ -86,6 +86,14 @@ namespace ReleaseServer.WebApi.Test.Integration
                             && array.All(item => item.Type == JTokenType.String))
                         {
                             property.Value = new JArray(array.Select(item => (string)item).OrderBy(item => item, StringComparer.Ordinal));
+                        }
+                        else if (property.Name == "artifacts" && property.Value is JArray artifacts
+                            && artifacts.All(item => item.Type == JTokenType.Object))
+                        {
+                            // Same order as "platforms", so it depends on the file system enumeration as well
+                            var sorted = artifacts.OrderBy(item => (string)item["platform"], StringComparer.Ordinal).ToList();
+                            sorted.ForEach(Normalize);
+                            property.Value = new JArray(sorted);
                         }
                         else
                         {

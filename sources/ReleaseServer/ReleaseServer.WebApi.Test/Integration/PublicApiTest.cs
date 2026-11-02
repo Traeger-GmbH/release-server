@@ -108,6 +108,22 @@ namespace ReleaseServer.WebApi.Test.Integration
             Golden.AssertText("info-s5-upper-case.raw.txt", await response.Content.ReadAsStringAsync());
         }
 
+        [Fact]
+        public async Task GetProductInfo_ArtifactsHaveSameOrderAsPlatforms()
+        {
+            // The golden comparisons sort both arrays, so the raw (unsorted) body pins that they correspond
+            var info = JObject.Parse(await client.GetStringAsync("/artifacts/alpha/info"));
+            var releases = info["releases"].ToList();
+
+            Assert.Contains(releases, release => release["platforms"].Count() > 1);
+            foreach (var release in releases)
+            {
+                var platforms = release["platforms"].Select(platform => (string)platform);
+                var artifactPlatforms = release["artifacts"].Select(artifact => (string)artifact["platform"]);
+                Assert.Equal(platforms, artifactPlatforms);
+            }
+        }
+
         [Theory]
         [InlineData("info-unknown-product", "/artifacts/unknown/info")]
         [InlineData("info-empty-product", "/artifacts/pc-s7-link-demo2/info")]
