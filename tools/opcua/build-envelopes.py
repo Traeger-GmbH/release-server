@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Builds upload envelopes for the release server from the OPC UA SDK download folder (former FTP folder
-of the documentation). The source folder is only read.
+Builds upload envelopes for the release server from the download folder of an SDK (former FTP folder of
+the documentation): OPC UA SDK (--sdk opcua, default) or S7 SDK / TLX-S LINK .NET (--sdk s7). The source
+folder is only read.
 
 Every envelope is a package upload for PUT /artifacts: a ZIP file with
     <Product>-v<version>/package.json
@@ -13,7 +14,8 @@ guessed but listed in unassigned-notes.md.
 
 Usage:
     python3 tools/opcua/build-envelopes.py --source ~/Desktop/opc-ua/net --output ~/Desktop/opc-ua-release-server
-    python3 tools/opcua/build-envelopes.py ... --all-patches     # all patches from 2.50 instead of the latest per minor
+    python3 tools/opcua/build-envelopes.py --sdk s7 --source ~/Desktop/releases/s7/net --output ~/Desktop/s7-release-server
+    python3 tools/opcua/build-envelopes.py ... --all-patches     # all patches instead of the latest per minor version
 
 Output: one envelope per product and version, overview.csv / overview.md and unassigned-notes.md.
 """
@@ -32,37 +34,51 @@ import zipfile
 DATE = r'(\d{4}-\d{2}-\d{2})'
 FILE_VERSION = r'(\d+\.\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)'
 
-# Product IDs, platforms and file name patterns (decision of the management, see the release server docs).
-# "line" groups the ZIP and NuGet products of the same SDK, so the NuGet package gets the release notes of
-# the ZIP with the same version. "policy" selects the versions.
-PRODUCTS = [
-    {'id': 'Opc.UaFx.Advanced', 'platform': 'any/any', 'line': 'advanced', 'kind': 'zip', 'policy': 'sdk',
+# Product IDs, platforms and file name patterns per SDK (decision of the management, see the release server
+# docs). "line" groups the ZIP and NuGet products of the same SDK, so the NuGet package gets the release notes
+# of the ZIP with the same version. "policy" selects the versions, "notes" says whether the ZIP of the product
+# (or of its line for NuGet packages) contains a Version.txt with release notes.
+OPCUA_PRODUCTS = [
+    {'id': 'Opc.UaFx.Advanced', 'platform': 'any/any', 'line': 'advanced', 'kind': 'zip', 'policy': 'sdk', 'notes': True,
      'pattern': rf'^opc\.uafx\.advanced\.{DATE}-{FILE_VERSION}\.zip$'},
-    {'id': 'Opc.UaFx.Advanced.nupkg', 'platform': 'any/any', 'line': 'advanced', 'kind': 'nupkg', 'policy': 'sdk',
+    {'id': 'Opc.UaFx.Advanced.nupkg', 'platform': 'any/any', 'line': 'advanced', 'kind': 'nupkg', 'policy': 'sdk', 'notes': True,
      'pattern': rf'^opc\.uafx\.advanced\.[0-9A-Za-z.\-]+?\.{DATE}-{FILE_VERSION}\.nupkg$'},
-    {'id': 'Opc.UaFx.Client', 'platform': 'any/any', 'line': 'client', 'kind': 'zip', 'policy': 'sdk',
+    {'id': 'Opc.UaFx.Client', 'platform': 'any/any', 'line': 'client', 'kind': 'zip', 'policy': 'sdk', 'notes': True,
      'pattern': rf'^opc\.uafx\.client\.{DATE}-{FILE_VERSION}\.zip$'},
-    {'id': 'Opc.UaFx.Client.nupkg', 'platform': 'any/any', 'line': 'client', 'kind': 'nupkg', 'policy': 'sdk',
+    {'id': 'Opc.UaFx.Client.nupkg', 'platform': 'any/any', 'line': 'client', 'kind': 'nupkg', 'policy': 'sdk', 'notes': True,
      'pattern': rf'^opc\.uafx\.client\.[0-9A-Za-z.\-]+?\.{DATE}-{FILE_VERSION}\.nupkg$'},
-    {'id': 'Opc.UaFx.Client.Unity', 'platform': 'any/any', 'line': 'unity', 'kind': 'unitypackage', 'policy': 'all',
+    {'id': 'Opc.UaFx.Client.Unity', 'platform': 'any/any', 'line': 'unity', 'kind': 'unitypackage', 'policy': 'all', 'notes': False,
      'pattern': rf'^opc\.uafx\.client\.[0-9.]+\.{DATE}-{FILE_VERSION}\.unitypackage$'},
-    {'id': 'Opc.UaFx.Client.LabVIEW', 'platform': 'windows/any', 'line': 'labview', 'kind': 'zip', 'policy': 'all',
+    {'id': 'Opc.UaFx.Client.LabVIEW', 'platform': 'windows/any', 'line': 'labview', 'kind': 'zip', 'policy': 'all', 'notes': True,
      'pattern': rf'^opc\.uafx\.client\.labview\.{DATE}-{FILE_VERSION}\.zip$'},
-    {'id': 'OpcWatch', 'platform': 'windows/any', 'line': 'opcwatch', 'kind': 'zip', 'policy': 'sdk',
+    {'id': 'OpcWatch', 'platform': 'windows/any', 'line': 'opcwatch', 'kind': 'zip', 'policy': 'sdk', 'notes': False,
      'pattern': rf'^opcwatch\.{DATE}-{FILE_VERSION}\.zip$'},
-    {'id': 'opc-core-components-redistributables', 'platform': 'windows/any', 'line': 'core', 'kind': 'zip', 'policy': 'all',
+    {'id': 'opc-core-components-redistributables', 'platform': 'windows/any', 'line': 'core', 'kind': 'zip', 'policy': 'all', 'notes': False,
      'pattern': r'^opc-core-components-redistributables-(\d+\.\d+\.\d+)-(\d{8})\.zip$'},
 ]
 
-# Versions before 2.50 that are uploaded nevertheless: the legacy .NET 3.5 SDK (sub folder net35)
-LEGACY_VERSIONS = {'advanced': ['2.0.1.1']}
+S7_PRODUCTS = [
+    {'id': 'IPS7LnkNet.Advanced', 'platform': 'any/any', 'line': 'advanced', 'kind': 'zip', 'policy': 'sdk', 'notes': True,
+     'pattern': rf'^ips7lnknet\.advanced\.{DATE}-{FILE_VERSION}\.zip$'},
+    {'id': 'IPS7LnkNet.Advanced.nupkg', 'platform': 'any/any', 'line': 'advanced', 'kind': 'nupkg', 'policy': 'sdk', 'notes': True,
+     'pattern': rf'^ips7lnknet\.advanced\.[0-9A-Za-z.\-]+?\.{DATE}-{FILE_VERSION}\.nupkg$'},
+    {'id': 'S7Watch', 'platform': 'windows/any', 'line': 's7watch', 'kind': 'zip', 'policy': 'sdk', 'notes': False,
+     'pattern': rf'^s7watch\.{DATE}-{FILE_VERSION}\.zip$'},
+]
 
-SDK_MINIMUM = (2, 50)
+# "minimum": lowest minor version of the "sdk" policy (None: all versions). "legacy_folders": sub folders with
+# legacy SDKs, of which only the "legacy_versions" (per line) are uploaded, here the .NET 3.5 SDK (net35).
+SDKS = {
+    'opcua': {'products': OPCUA_PRODUCTS, 'minimum': (2, 50), 'legacy_folders': ['net35'],
+              'legacy_versions': {'advanced': ['2.0.1.1']}},
+    's7': {'products': S7_PRODUCTS, 'minimum': None, 'legacy_folders': [], 'legacy_versions': {}},
+}
 
 ASSIGNMENT = {'NEW': 'added', 'FIXED': 'fixed', 'CHANGED': 'breaking'}
 
 MODERN_HEADER = re.compile(r'^= (\d+\.\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?) \(released ([^)]*)\) =\s*$')
-LEGACY_HEADER = re.compile(r'^= (\d{2}\.\d{2}\.\d{4}) - V(\d+\.\d+\.\d+\.\d+) =\s*$')
+# The closing " =" is missing in some files (e.g. S7 SDK 1.9.1.1: "= 13.09.2019 - V1.9.1.1")
+LEGACY_HEADER = re.compile(r'^= (\d{2}\.\d{2}\.\d{4}) - V(\d+\.\d+\.\d+\.\d+)(?: =)?\s*$')
 MODERN_ENTRY = re.compile(r'^([A-Z][A-Z ]*[A-Z]):\s*(.*)$')
 LEGACY_ENTRY = re.compile(r'^\* (New|Fixed|Changed|Renamed|Moved|Removed|Added)\s+(.*)$')
 LEGACY_ASSIGNMENT = {'New': 'added', 'Fixed': 'fixed', 'Changed': 'breaking'}
@@ -106,16 +122,16 @@ def check_archive(path, kind):
     return None
 
 
-def find_files(source):
+def find_files(source, sdk):
     found = []
-    for directory in (source, os.path.join(source, 'net35')):
+    for directory in [source] + [os.path.join(source, folder) for folder in sdk['legacy_folders']]:
         if not os.path.isdir(directory):
             continue
         for name in sorted(os.listdir(directory)):
             path = os.path.join(directory, name)
             if not os.path.isfile(path):
                 continue
-            for product in PRODUCTS:
+            for product in sdk['products']:
                 match = re.match(product['pattern'], name, re.IGNORECASE)
                 if not match:
                     continue
@@ -131,9 +147,9 @@ def find_files(source):
     return found
 
 
-def select(files, all_patches):
+def select(files, sdk, all_patches):
     selected, skipped = [], []
-    for product in PRODUCTS:
+    for product in sdk['products']:
         candidates = [f for f in files if f['product'] is product]
         releases = [f for f in candidates if '-' not in f['file_version']]
         skipped += [(f, 'preview') for f in candidates if '-' in f['file_version']]
@@ -142,9 +158,10 @@ def select(files, all_patches):
             selected += releases
             continue
 
-        legacy = LEGACY_VERSIONS.get(product['line'], [])
+        legacy = sdk['legacy_versions'].get(product['line'], [])
+        minimum = sdk['minimum'] or (0, 0)
         chosen = [f for f in releases if f['legacy'] and server_version(f['file_version']) in legacy]
-        modern = [f for f in releases if not f['legacy'] and version_tuple(f['file_version'])[:2] >= SDK_MINIMUM]
+        modern = [f for f in releases if not f['legacy'] and version_tuple(f['file_version'])[:2] >= minimum]
         if all_patches:
             chosen += modern
         else:
@@ -217,9 +234,9 @@ def build_release_notes(item, zips_by_line_version, unassigned):
     product = item['product']
     context = f"{product['id']} {server_version(item['file_version'])}"
     source_zip = None
-    if product['kind'] == 'zip' and product['line'] not in ('opcwatch', 'core'):
+    if product['kind'] == 'zip' and product['notes']:
         source_zip = item['path']
-    elif product['kind'] == 'nupkg':
+    elif product['kind'] == 'nupkg' and product['notes']:
         source_zip = zips_by_line_version.get((product['line'], version_tuple(item['file_version'])))
 
     changes, info = None, 'no Version.txt'
@@ -265,9 +282,10 @@ def write_envelope(output, item, notes):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--sdk', choices=sorted(SDKS), default='opcua', help='SDK of the download folder (default opcua)')
     parser.add_argument('--source', required=True, help='download folder (only read)')
     parser.add_argument('--output', required=True, help='new or empty staging folder outside of the repository')
-    parser.add_argument('--all-patches', action='store_true', help='all patches from 2.50 instead of the latest per minor version')
+    parser.add_argument('--all-patches', action='store_true', help='all patches instead of the latest per minor version (OPC UA: from 2.50)')
     args = parser.parse_args()
 
     source = os.path.expanduser(args.source)
@@ -276,8 +294,9 @@ def main():
         sys.exit(f'The output folder {output} is not empty.')
     os.makedirs(output, exist_ok=True)
 
-    files = find_files(source)
-    selected, skipped = select(files, args.all_patches)
+    sdk = SDKS[args.sdk]
+    files = find_files(source, sdk)
+    selected, skipped = select(files, sdk, args.all_patches)
     zips_by_line_version = {(f['product']['line'], version_tuple(f['file_version'])): f['path']
                             for f in files if f['product']['kind'] == 'zip'}
 
