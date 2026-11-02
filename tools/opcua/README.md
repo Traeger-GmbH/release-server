@@ -13,13 +13,13 @@ this repository.
    `* New/Fixed/Changed`). By default only the latest patch per minor version is selected (OPC UA: from
    2.50, plus the .NET 3.5 SDK 2.0.1.1); `--all-patches` selects all patches
    (OPC UA: from 2.50).
-2. `upload-envelopes.py` uploads the envelopes as packages (`PUT /artifacts`), skips product versions
-   that already exist, and verifies `/info` and the SHA-256 of every download. It asks for the
-   credentials (password without echo) and writes a log file into the staging folder. The column
-   `size` of `overview.csv` is optional; without it, the size is read from the envelope.
-   Open point: envelopes with more than one platform in `deployments` are not tested with
-   `upload-envelopes.py` (the SDK envelopes have exactly one platform). A test would upload such an
-   envelope without `size` and verify the size and SHA-256 of every platform.
+2. `upload-envelopes.py` finds the envelopes (every .zip in the staging folder and its subfolders) and
+   reads product, version and platforms from their package.json; `overview.csv` is not needed. It
+   uploads them as packages (`PUT /artifacts`), skips product versions that already exist, and verifies
+   `/info` and the SHA-256 of every download against the original files in the envelope (all
+   platforms). A .zip that is not an envelope or a product version that occurs twice stops it before
+   the first upload. It asks for the credentials (password without echo) and writes a log file into
+   the staging folder.
 
 ```bash
 python3 tools/opcua/build-envelopes.py [--sdk opcua|s7] --source <download folder> --output <new staging folder> [--all-patches]
