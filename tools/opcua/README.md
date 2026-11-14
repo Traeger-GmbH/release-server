@@ -18,13 +18,14 @@ this repository.
    uploads them as packages (`PUT /artifacts`), skips product versions that already exist, and verifies
    `/info` and the SHA-256 of every download against the original files in the envelope (all
    platforms). A .zip that is not an envelope or a product version that occurs twice stops it before
-   the first upload. It asks for the credentials (password without echo) and writes a log file into
-   the staging folder.
+   the first upload, as does a preview release (`isPreviewRelease` true) without `--allow-preview`,
+   because "latest" also delivers preview releases. It asks for the credentials (password without
+   echo) and writes a log file into the staging folder.
 
 ```bash
 python3 tools/opcua/build-envelopes.py [--sdk opcua|s7] --source <download folder> --output <new staging folder> [--all-patches]
 python3 tools/opcua/upload-envelopes.py --staging <staging folder> --dry-run
-python3 tools/opcua/upload-envelopes.py --staging <staging folder> [--server <url>]
+python3 tools/opcua/upload-envelopes.py --staging <staging folder> [--server <url>] [--allow-preview]
 ```
 
 Requires Python 3.9 or newer (standard library only). The release server must be version 1.1 or newer,
