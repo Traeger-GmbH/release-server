@@ -8,6 +8,8 @@ Uploads the envelopes of a staging folder to a release server and verifies every
   envelope.
 - Stops before the first upload if a .zip file is not a valid envelope or a product version occurs
   twice.
+- Preview releases (releaseNotes.isPreviewRelease true) are only uploaded with --allow-preview,
+  otherwise it stops before the first upload: "latest" also delivers preview releases.
 - Asks for user name and password at the start (the password without echo); nothing is stored.
 - Product versions that already exist on the server are skipped (never overwritten).
 - --dry-run only checks which envelopes would be uploaded (read-only requests).
@@ -99,6 +101,10 @@ def read_envelope(path):
         product, version, deployments = package.get('identifier'), package.get('version'), package.get('deployments')
         if not product or not version or not deployments:
             raise ValueError('package.json has no identifier, version or deployments')
+        notes = package.get('releaseNotes')
+        flag = notes.get('isPreviewRelease') if isinstance(notes, dict) else None
+        # Also treat the string "true" as true, in case the server's JSON reader converts it
+        preview = flag is True or (isinstance(flag, str) and flag.strip().lower() == 'true')
         # Paths in deployments are relative to the folder of package.json
         folder = names[0][:-len('package.json')]
         artifacts = []
@@ -106,11 +112,12 @@ def read_envelope(path):
             with envelope.open(folder + file_path) as stream:
                 sha256, size = sha256_of_stream(stream)
             artifacts.append({'platform': platform, 'file': file_path.rsplit('/', 1)[-1], 'size': size, 'sha256': sha256})
-    return {'product': product, 'version': version, 'path': path, 'artifacts': artifacts}
+    return {'product': product, 'version': version, 'path': path, 'artifacts': artifacts, 'preview': preview}
 
 
-def find_envelopes(staging):
-    """Returns all envelopes of the staging folder and the problems (invalid envelopes, duplicates)."""
+def find_envelopes(staging, allow_preview=False):
+    """Returns all envelopes of the staging folder and the problems (invalid envelopes, duplicates,
+    preview releases without allow_preview)."""
     envelopes, problems = [], []
     for root, folders, files in os.walk(staging):
         folders[:] = sorted(f for f in folders if not f.startswith('.'))
@@ -128,6 +135,10 @@ def find_envelopes(staging):
             problems.append(f'{envelope["product"]} {envelope["version"]} occurs twice: '
                             f'{os.path.relpath(seen[key], staging)}, {os.path.relpath(envelope["path"], staging)}')
         seen[key] = envelope['path']
+        if envelope['preview'] and not allow_preview:
+            problems.append(f'{envelope["product"]} {envelope["version"]} is a preview release (isPreviewRelease: true, '
+                            f'{os.path.relpath(envelope["path"], staging)}); it would also become "latest". '
+                            'Upload it only on purpose with --allow-preview')
     return envelopes, problems
 
 
@@ -167,11 +178,13 @@ def main():
     parser.add_argument('--staging', required=True, help='folder with the envelopes (searched recursively)')
     parser.add_argument('--server', default=DEFAULT_SERVER, help=f'release server (default {DEFAULT_SERVER})')
     parser.add_argument('--dry-run', action='store_true', help='only show what would be uploaded')
+    parser.add_argument('--allow-preview', action='store_true',
+                        help='also upload preview releases (isPreviewRelease true); they become "latest" as well')
     args = parser.parse_args()
 
     staging = os.path.expanduser(args.staging)
     server = args.server.rstrip('/')
-    envelopes, problems = find_envelopes(staging)
+    envelopes, problems = find_envelopes(staging, args.allow_preview)
 
     log = Log(os.path.join(staging, f'upload-log-{datetime.datetime.now():%Y-%m-%d_%H-%M-%S}.txt'))
     log.write(f'Server {server}, {len(envelopes)} envelopes, {"DRY RUN" if args.dry_run else "UPLOAD"}')
@@ -194,7 +207,7 @@ def main():
     counts = {'uploaded': 0, 'skipped': 0, 'planned': 0}
     for envelope in envelopes:
         files = ', '.join(f'{a["platform"]} {a["file"]}' for a in envelope['artifacts'])
-        name = f'{envelope["product"]} {envelope["version"]} ({files})'
+        name = f'{envelope["product"]} {envelope["version"]}{" PREVIEW" if envelope["preview"] else ""} ({files})'
         if find_release(server, envelope['product'], envelope['version']) is not None:
             log.write(f'SKIP     {name}: version exists already')
             counts['skipped'] += 1
