@@ -1,3 +1,9 @@
+## v1.1.2 (2026-11-21)
+
+Server:
+
+* [FEATURE] All responses carry the header "X-Robots-Tag: noindex", so search engines do not index downloads, API responses, the NuGet feed and the Swagger UI; downloads, CORS and all other headers are unchanged
+
 ## v1.1.1 (2026-10-25)
 
 Server:
