@@ -9,6 +9,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -92,6 +93,7 @@ namespace ReleaseServer.WebApi
                                   "All other endpoints maintain the server and **require authentication** (HTTP Basic).\n\n" +
                                   "All public GET endpoints also answer HEAD requests (same status and headers, no body), " +
                                   "e.g. for link checkers.\n\n" +
+                                  "All responses carry the header `X-Robots-Tag: noindex`, so search engines do not index downloads and API responses.\n\n" +
                                   "Errors are returned as problem details (RFC 7807) with the fields title, status and detail.",
                     Contact = new OpenApiContact
                     {
@@ -138,6 +140,17 @@ namespace ReleaseServer.WebApi
         /// <param name="env">Information about the web hosting environment of the application.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // No response of the server belongs into a search index (downloads, API, NuGet feed, Swagger UI).
+            // Set when the response starts, so it also reaches error responses that clear the headers before.
+            app.Use(async (context, next) =>
+            {
+                context.Response.OnStarting(() =>
+                {
+                    context.Response.Headers["X-Robots-Tag"] = "noindex";
+                    return Task.CompletedTask;
+                });
+                await next();
+            });
 
             if (env.IsDevelopment())
             {
